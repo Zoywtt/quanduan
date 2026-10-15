@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12-1 CSS 变量</title>
+    <style>
+        /* ============================================================
+           1. 在 :root 上定义全局 CSS 变量（自定义属性）
+           ============================================================ */
+        :root{
+            --zyf903_bg: #0b1120;
+            --zyf903_surface: #151d31;
+            --zyf903_text: #e2e8f0;
+            --zyf903_muted: #94a3b8;
+            --zyf903_accent: #6366f1;
+            --zyf903_accent-2: #a855f7;
+            --zyf903_border: rgba(255,255,255,0.10);
+
+            --zyf903_radius: 16px;
+            --zyf903_gap: 1rem;
+            --zyf903_shadow: 0 18px 40px rgba(0,0,0,0.45);
+
+            /* 局部变量：卡片内圆角由组件自己覆盖 */
+            --zyf903_card-pad: 1.4rem;
+        }
+
+        /* ============================================================
+           2. 主题切换：改变量值即可换肤，无需改任何选择器
+           ============================================================ */
+        html[data-theme="light"]{
+            --zyf903_bg: #f1f5f9;
+            --zyf903_surface: #ffffff;
+            --zyf903_text: #0f172a;
+            --zyf903_muted: #64748b;
+            --zyf903_accent: #2563eb;
+            --zyf903_accent-2: #db2777;
+            --zyf903_border: rgba(15,23,42,0.10);
+            --zyf903_shadow: 0 18px 40px rgba(15,23,42,0.12);
+        }
+
+        html[data-theme="sunset"]{
+            --zyf903_bg: #2b1055;
+            --zyf903_surface: #3d1a6e;
+            --zyf903_text: #fef3c7;
+            --zyf903_muted: #f9a8d4;
+            --zyf903_accent: #f97316;
+            --zyf903_accent-2: #ec4899;
+            --zyf903_border: rgba(254,243,199,0.18);
+            --zyf903_shadow: 0 18px 40px rgba(0,0,0,0.5);
+        }
+
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+        body{
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: var(--zyf903_bg);
+            color: var(--zyf903_text);
+            line-height: 1.8;
+            padding: 2rem;
+            min-height: 100vh;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* 用变量驱动的容器 */
+        .zyf903_wrap{
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .zyf903_header{
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .zyf903_header h1{
+            font-size: 2.1rem;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg,
+                        var(--zyf903_accent), var(--zyf903_accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .zyf903_header p{
+            margin-top: 0.5rem;
+            color: var(--zyf903_muted);
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+        }
+
+        /* 主题按钮组 */
+        .zyf903_themes{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .zyf903_btn{
+            padding: 0.5rem 1.1rem;
+            border-radius: 999px;
+            border: 1px solid var(--zyf903_border);
+            background: var(--zyf903_surface);
+            color: var(--zyf903_text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease,
+                        background 0.25s ease;
+        }
+        .zyf903_btn:hover{
+            transform: translateY(-2px);
+            border-color: var(--zyf903_accent);
+        }
+        .zyf903_btn.is-active{
+            background: var(--zyf903_accent);
+            border-color: var(--zyf903_accent);
+            color: #fff;
+        }
+
+        /* 布局：预览 + 变量面板 */
+        .zyf903_grid{
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.4rem;
+        }
+
+        /* 预览卡片：所有样式都来自变量 */
+        .zyf903_card{
+            background: var(--zyf903_surface);
+            border: 1px solid var(--zyf903_border);
+            border-radius: var(--zyf903_radius);
+            box-shadow: var(--zyf903_shadow);
+            padding: var(--zyf903_card-pad);
+            transition: box-shadow 0.4s ease, border-color 0.4s ease,
+                        background 0.4s ease;
+        }
+        .zyf903_card h2{
+            font-size: 1.2rem;
+            margin-bottom: 0.6rem;
+            color: var(--zyf903_accent);
+        }
+        .zyf903_card p{
+            color: var(--zyf903_muted);
+            font-size: 0.92rem;
+        }
+        .zyf903_author{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: #fff;
+            background: linear-gradient(135deg,
+                        var(--zyf903_accent), var(--zyf903_accent-2));
+        }
+        .zyf903_author::before{
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+
+        /* 局部变量覆盖：这个框里的圆角更小 */
+        .zyf903_card--local{
+            --zyf903_radius: 6px;
+            margin-top: 1rem;
+            padding: var(--zyf903_card-pad);
+            border: 1px dashed var(--zyf903_accent);
+            border-radius: var(--zyf903_radius);
+            background: var(--zyf903_bg);
+        }
+
+        /* 变量面板 */
+        .zyf903_panel h3{
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            color: var(--zyf903_accent-2);
+        }
+        .zyf903_var{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            padding: 0.5rem 0.2rem;
+            border-bottom: 1px solid var(--zyf903_border);
+            font-size: 0.82rem;
+        }
+        .zyf903_var code{
+            color: var(--zyf903_muted);
+            font-family: Consolas, "Courier New", monospace;
+        }
+        .zyf903_swatch{
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 1px solid var(--zyf903_border);
+            flex: none;
+        }
+
+        .zyf903_footer{
+            max-width: 980px;
+            margin: 2.4rem auto 0;
+            padding-top: 1.2rem;
+            border-top: 1px solid var(--zyf903_border);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--zyf903_muted);
+        }
+
+        @media (max-width: 760px){
+            body{ padding: 1rem; }
+            .zyf903_grid{ grid-template-columns: 1fr; }
+            .zyf903_header h1{ font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="zyf903_wrap">
+        <header class="zyf903_header">
+            <h1>CSS 变量 · Custom Properties</h1>
+            <p>用变量统一管理主题，切换按钮即可整页换肤</p>
+        </header>
+
+        <div class="zyf903_themes">
+            <button class="zyf903_btn is-active" data-theme="dark">暗夜</button>
+            <button class="zyf903_btn" data-theme="light">明亮</button>
+            <button class="zyf903_btn" data-theme="sunset">黄昏</button>
+        </div>
+
+        <div class="zyf903_grid">
+            <section class="zyf903_card" id="zyf903_preview">
+                <h2>变量驱动的卡片</h2>
+                <p>背景、文字、圆角、阴影和强调色全部来自 CSS 变量，
+                   切换主题时只需改变量值，布局与结构完全不动。</p>
+                <span class="zyf903_author">张耀夫</span>
+
+                <div class="zyf903_card--local">
+                    这里通过局部变量覆盖，把圆角改成了 6px。
+                </div>
+            </section>
+
+            <aside class="zyf903_card zyf903_panel">
+                <h3>当前变量值</h3>
+                <div class="zyf903_var">
+                    <code>--zyf903_bg</code>
+                    <span class="zyf903_swatch" id="zyf903_sw_bg"></span>
+                </div>
+                <div class="zyf903_var">
+                    <code>--zyf903_surface</code>
+                    <span class="zyf903_swatch" id="zyf903_sw_surface"></span>
+                </div>
+                <div class="zyf903_var">
+                    <code>--zyf903_text</code>
+                    <span class="zyf903_swatch" id="zyf903_sw_text"></span>
+                </div>
+                <div class="zyf903_var">
+                    <code>--zyf903_accent</code>
+                    <span class="zyf903_swatch" id="zyf903_sw_accent"></span>
+                </div>
+                <div class="zyf903_var">
+                    <code>--zyf903_accent-2</code>
+                    <span class="zyf903_swatch" id="zyf903_sw_accent2"></span>
+                </div>
+            </aside>
+        </div>
+
+        <footer class="zyf903_footer">
+            &copy; 2026 903张耀夫 · 《高级网页设计》课堂实践 · 12-1 CSS 变量
+        </footer>
+    </main>
+
+    <script>
+        // 所有 JS 变量都以 zyf903_ 开头
+        var zyf903_buttons = document.querySelectorAll(".zyf903_btn");
+        var zyf903_root = document.documentElement;
+
+        // 用变量名读取当前计算值（getComputedStyle）
+        var zyf903_varMap = {
+            "zyf903_sw_bg": "--zyf903_bg",
+            "zyf903_sw_surface": "--zyf903_surface",
+            "zyf903_sw_text": "--zyf903_text",
+            "zyf903_sw_accent": "--zyf903_accent",
+            "zyf903_sw_accent2": "--zyf903_accent-2"
+        };
+
+        function zyf903_paintSwatches(){
+            var zyf903_styles = getComputedStyle(zyf903_root);
+            for (var zyf903_id in zyf903_varMap){
+                var zyf903_el = document.getElementById(zyf903_id);
+                if (zyf903_el){
+                    zyf903_el.style.background =
+                        zyf903_styles.getPropertyValue(zyf903_varMap[zyf903_id]).trim();
+                }
+            }
+        }
+
+        function zyf903_setTheme(zyf903_name){
+            // 通过设置 data-theme 属性切换 :root 上的变量组
+            zyf903_root.setAttribute("data-theme", zyf903_name);
+            zyf903_buttons.forEach(function(zyf903_btn){
+                zyf903_btn.classList.toggle(
+                    "is-active", zyf903_btn.dataset.theme === zyf903_name);
+            });
+            zyf903_paintSwatches();
+        }
+
+        zyf903_buttons.forEach(function(zyf903_btn){
+            zyf903_btn.addEventListener("click", function(){
+                zyf903_setTheme(zyf903_btn.dataset.theme);
+            });
+        });
+
+        // 初始化色块
+        zyf903_paintSwatches();
+    </script>
+</body>
+</html>
