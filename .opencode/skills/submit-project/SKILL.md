@@ -1,66 +1,70 @@
 ---
 name: submit-project
-description: Use when the user asks to 提交项目 / 提交代码 / 上传项目 / commit 并 push the current project to Gitee. Commits all current changes and pushes the current project to the Gitee remote https://gitee.com/Zhang_yao_fu/advanced-web-design.
+description: Use when the user asks to 提交项目 / 提交代码 / 上传项目 / 上传文件到 Gitee / commit 并 push。上传前必须先向用户获取目标仓库网址和要上传的文件位置，然后提交并推送到该 Gitee 仓库。
 ---
 
-# 提交项目到 Gitee
+# 上传文件/项目到 Gitee
 
-把当前项目用 git 提交并推送到 Gitee 仓库：
-
-```
-https://gitee.com/Zhang_yao_fu/advanced-web-design
-```
+把本地指定位置的文件（或项目）用 git 提交并推送到**用户指定的** Gitee 仓库。
 
 ## 触发场景
 
-用户说「提交项目」「提交代码」「上传到 gitee」「commit 并 push」「帮我 push」等，
-且目标是上述 Gitee 仓库时使用本 skill。
+用户说「提交项目」「提交代码」「上传到 gitee」「上传文件」「帮我 push」等，
+需要把某些本地内容上传到 Gitee 仓库时使用本 skill。
 
-## 默认项目路径
+## 必须先获取的两个输入
 
-本 skill 默认针对下面这个本地项目目录操作（除非用户明确指定了别的目录）：
+执行前必须拿到以下两项信息。**若用户未提供，先向用户询问，得到答复后再继续，不要自行猜测或使用默认值。**
 
-```
-C:\Users\64020\OneDrive\Desktop\学工\qianduan
-```
+1. **目标仓库网址**：要上传到的 Gitee 仓库地址。
+   - 例：`https://gitee.com/Zhang_yao_fu/advanced-web-design.git`
+   - 用户可能只给网页地址（不带 `.git`），推送时补上 `.git` 即可。
+2. **文件位置**：要上传的本地文件或目录的绝对路径。
+   - 例：`C:\Users\64020\OneDrive\Desktop\学工\qianduan`
+   - 可以是单个文件，也可以是整个目录。
 
-该目录已初始化为 git 仓库，`origin` 已指向上面的 Gitee 仓库，默认分支为 `master`。
-执行时对 `git` 命令使用 `-C "C:\Users\64020\OneDrive\Desktop\学工\qianduan"` 指定该路径。
-若用户指定了其他目录，则以用户指定的为准。
+两项都拿到后，向用户复述一次「将把 `[文件位置]` 推送到 `[网址]`」，确认无误再执行。
 
 ## 执行步骤
 
-1. **确认是 git 仓库**
-   - 运行 `git rev-parse --is-inside-work-tree`（在默认项目路径下）。
-   - 若不是仓库，先 `git init`，并确保存在 `.gitignore`（至少忽略 `node_modules/`、`dist/`、`build/`、`.env` 等）。
+1. **确定工作目录**
+   - 若「文件位置」是**文件**，使用其所在目录；若是**目录**，直接使用该目录。
+   - 后续所有 `git` 命令都用 `-C "<该目录>"` 指定。
 
-2. **查看变更**
-   - 运行 `git status` 与 `git diff --stat`，确认要提交的内容。
+2. **确认/初始化 git 仓库**
+   - 运行 `git -C "<目录>" rev-parse --is-inside-work-tree`。
+   - 若返回 `true`，说明已在某个仓库中，直接用该仓库。
+   - 若不是仓库：先 `git -C "<目录>" init`，并确保存在 `.gitignore`（至少忽略 `node_modules/`、`dist/`、`build/`、`.env` 等）。
+
+3. **查看变更**
+   - 运行 `git -C "<目录>" status` 与 `git -C "<目录>" diff --stat`，确认要提交的内容。
    - 不要提交密钥、令牌、`.env` 等敏感文件。发现敏感文件时先中止并告知用户。
+   - 若用户只想上传「文件位置」指向的单个文件，就只 `git add "<该文件>"`，不要 `add -A` 整个目录。
 
-3. **暂存并提交**
-   - `git add -A`
-   - 提交信息用简洁的祈使句，例如：
-     - `git commit -m "update project"`
-     - 有明确改动时按其内容编写，如 `git commit -m "add login page"`。
-   - 若没有可提交的改动（nothing to commit），跳到第 5 步直接推送。
+4. **暂存并提交**
+   - 目录：`git -C "<目录>" add -A`
+   - 单文件：`git -C "<目录>" add "<文件绝对路径>"`
+   - 提交信息用简洁的祈使句，例如 `git commit -m "add submit-project skill"`。
+   - 若无改动（nothing to commit），跳到第 6 步直接推送。
 
-4. **确保远程指向目标仓库**
-   - 运行 `git remote -v`。
-   - 若没有 `origin`：`git remote add origin https://gitee.com/Zhang_yao_fu/advanced-web-design.git`
-   - 若 `origin` 不是该地址：`git remote set-url origin https://gitee.com/Zhang_yao_fu/advanced-web-design.git`
+5. **确保远程指向用户提供的仓库**
+   - 运行 `git -C "<目录>" remote -v`。
+   - 若无 `origin`：`git -C "<目录>" remote add origin "<网址>"`
+   - 若 `origin` 不是该地址：`git -C "<目录>" remote set-url origin "<网址>"`
+   - `<网址>` 用用户提供的那一项。
 
-5. **推送**
-   - 首次推送当前分支：`git push -u origin HEAD`
-   - 之后：`git push`
-   - 若远端有新提交导致被拒绝：先 `git pull --rebase origin <branch>` 再 push，遇到冲突时告知用户手动解决，不要强推。
+6. **推送**
+   - 首次推送当前分支：`git -C "<目录>" push -u origin HEAD`
+   - 之后：`git -C "<目录>" push`
+   - 若远端有新提交导致被拒绝：先 `git -C "<目录>" pull --rebase origin <branch>` 再 push；遇到冲突时告知用户手动解决，**不要强推**。
    - **不要**使用 `--force`，除非用户明确要求。
 
-6. **汇报结果**
-   - 用一句话说明：提交的 commit、推送的分支、仓库地址。
+7. **汇报结果**
+   - 用一句话说明：提交的 commit、推送的分支、以及用户提供的仓库网址。
 
 ## 注意
 
-- 只在用户明确要求「提交/推送」时才执行，不要主动提交。
+- 只在用户明确要求「提交/推送/上传」时才执行，不要主动提交。
+- 每次执行都以用户本次提供的「网址 + 文件位置」为准，不要沿用上一次的地址或路径。
 - 提交前不要修改用户的 git 全局配置。
 - 认证失败（需要 Gitee 账号密码/令牌）时，提示用户配置凭据后重试。
