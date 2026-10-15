@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>903张耀夫的《高级网页设计》课堂实践</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #0a0e1a;
+            min-height: 100vh;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 动态渐变光斑背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 浮动光球装饰 */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3), transparent);
+            top: -50px;
+            left: -50px;
+        }
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: 2s;
+        }
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.25), transparent);
+            top: 50%;
+            right: 10%;
+            animation-delay: 4s;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 100px 20px 60px;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 13px;
+            color: #a5b4fc;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 4px;
+            line-height: 1.3;
+        }
+
+        .header .subtitle {
+            margin-top: 16px;
+            font-size: 18px;
+            color: #94a3b8;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        .header .divider {
+            width: 80px;
+            height: 4px;
+            margin: 30px auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #3b82f6);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        .header .info-badge {
+            margin-top: 24px;
+            display: inline-flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .header .info-badge span {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 6px 18px;
+            font-size: 13px;
+            color: #cbd5e1;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ===== Container ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px 60px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title::before {
+            content: '';
+            width: 6px;
+            height: 28px;
+            border-radius: 3px;
+            background: linear-gradient(180deg, #6366f1, #a855f7);
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+        }
+
+        /* ===== Card Grid ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-decoration: none;
+            color: #e0e0e0;
+            display: block;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeUp 0.6s ease backwards;
+        }
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.2s; }
+        .card:nth-child(5) { animation-delay: 0.25s; }
+        .card:nth-child(6) { animation-delay: 0.3s; }
+        .card:nth-child(7) { animation-delay: 0.35s; }
+        .card:nth-child(8) { animation-delay: 0.4s; }
+        .card:nth-child(9) { animation-delay: 0.45s; }
+        .card:nth-child(10) { animation-delay: 0.5s; }
+        .card:nth-child(11) { animation-delay: 0.55s; }
+        .card:nth-child(12) { animation-delay: 0.6s; }
+
+        /* 渐变光效边框 */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent);
+            background-size: 200% 100%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* 内部渐变光晕 */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .card:hover {
+            border-color: rgba(129, 140, 248, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.4), 0 0 40px rgba(99, 102, 241, 0.1);
+            background: rgba(255,255,255,0.06);
+        }
+        .card:hover::before { opacity: 1; animation: shimmer 2s linear infinite; }
+        .card:hover::after { opacity: 1; }
+
+        .card .card-num {
+            font-size: 40px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .card .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+
+        .card .card-desc {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        .card .card-link {
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #818cf8;
+            transition: gap 0.3s ease;
+        }
+        .card:hover .card-link { gap: 12px; }
+
+        /* ===== Prompt Box ===== */
+        .prompt-box {
+            margin-top: 60px;
+            position: relative;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 32px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+        .prompt-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.05), transparent);
+            pointer-events: none;
+        }
+        .prompt-box h2 {
+            font-size: 20px;
+            color: #a5b4fc;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .prompt-box p {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 2;
+            word-break: break-all;
+            font-family: "Consolas", "Microsoft YaHei", monospace;
+            background: rgba(0,0,0,0.2);
+            padding: 16px 20px;
+            border-radius: 10px;
+            border-left: 3px solid #6366f1;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 20px;
+            color: #475569;
+            font-size: 13px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .footer .heart {
+            color: #818cf8;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 32px; letter-spacing: 2px; }
+            .header { padding: 60px 20px 40px; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="header">
+        <div class="badge">高级网页设计 · 课堂实践</div>
+        <h1>903张耀夫的<br>《高级网页设计》课堂实践</h1>
+        <div class="subtitle">HTML / CSS 学习实践项目集合</div>
+        <div class="divider"></div>
+        <div class="info-badge">
+            <span>学号：24001010903</span>
+            <span>班级：计算机24009</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title">课堂实践页面导航</div>
+        <div class="card-grid">
+            <a class="card" href="1-1.html">
+                <div class="card-num">01</div>
+                <div class="card-title">基础HTML页面</div>
+                <div class="card-desc">1-1.html — HTML入门，基本文字与页面结构</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="2-1.html">
+                <div class="card-num">02</div>
+                <div class="card-title">HTML元素</div>
+                <div class="card-desc">2-1.html — 开始标签、内容、结束标记，有序/无序列表</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="2-2.html">
+                <div class="card-num">03</div>
+                <div class="card-title">超链接与表格</div>
+                <div class="card-desc">2-2.html — 超链接、图片、大国重器表格</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="3-1form.html">
+                <div class="card-num">04</div>
+                <div class="card-title">表单Form</div>
+                <div class="card-desc">3-1form.html — input、radio、checkbox等表单元素</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="3-2css.html">
+                <div class="card-num">05</div>
+                <div class="card-title">CSS选择器</div>
+                <div class="card-desc">3-2css.html — 标签选择器、ID选择器、类选择器</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="4-1 css2.html">
+                <div class="card-num">06</div>
+                <div class="card-title">CSS进阶</div>
+                <div class="card-desc">4-1 css2.html — 群组选择器、后代选择器、盒子模型</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="重叠与继承.html">
+                <div class="card-num">07</div>
+                <div class="card-title">重叠与继承</div>
+                <div class="card-desc">重叠与继承.html — CSS优先级、!important、样式层叠</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="5-2盒模型.html">
+                <div class="card-num">08</div>
+                <div class="card-title">盒模型</div>
+                <div class="card-desc">5-2盒模型.html — border、padding、margin，框模型</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="6-1 flex.html">
+                <div class="card-num">09</div>
+                <div class="card-title">Flex弹性盒子</div>
+                <div class="card-desc">6-1 flex.html — flex布局、对齐方式、弹性子元素</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="6-2 一左一右.html">
+                <div class="card-num">10</div>
+                <div class="card-title">一左一右布局</div>
+                <div class="card-desc">6-2 一左一右.html — flex左右分栏布局实践</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="7-1上图下文.html">
+                <div class="card-num">11</div>
+                <div class="card-title">上图下文</div>
+                <div class="card-desc">7-1上图下文.html — 图文垂直排列布局</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="7-2左图右文.html">
+                <div class="card-num">12</div>
+                <div class="card-title">左图右文</div>
+                <div class="card-desc">7-2左图右文.html — 图文水平排列布局</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="9-1transition.html">
+                <div class="card-num">13</div>
+                <div class="card-title">Transition过渡</div>
+                <div class="card-desc">9-1transition.html — CSS过渡动画、图片放大效果</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="10-1animation.html">
+                <div class="card-num">14</div>
+                <div class="card-title">Animation动画</div>
+                <div class="card-desc">10-1animation.html — CSS animation背景变色、媒体查询</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="10-1-1.html">
+                <div class="card-num">15</div>
+                <div class="card-title">CSS幻灯片</div>
+                <div class="card-desc">10-1-1.html — CSS Animation自动切换幻灯片</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="10-1-2.html">
+                <div class="card-num">16</div>
+                <div class="card-title">rem响应式文字</div>
+                <div class="card-desc">10-1-2.html — rem单位、媒体查询文字缩放</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="10-1-3.html">
+                <div class="card-num">17</div>
+                <div class="card-title">响应式布局</div>
+                <div class="card-desc">10-1-3.html — 媒体查询8盒子响应式grid布局</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="903zyf_css_units.html">
+                <div class="card-num">18</div>
+                <div class="card-title">CSS长度单位</div>
+                <div class="card-desc">903zyf_css_units.html — px、em、rem、vw、vh、% 等长度单位演示</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="903zyf_css_3d.html">
+                <div class="card-num">19</div>
+                <div class="card-title">CSS3 3D动画</div>
+                <div class="card-desc">903zyf_css_3d.html — 3D立方体、翻转卡片、旋转木马动画演示</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="11-1.html">
+                <div class="card-num">20</div>
+                <div class="card-title">长度单位</div>
+                <div class="card-desc">11-1.html — px、em、rem、%、vw、vh、ch 及绝对单位演示</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="11-2.html">
+                <div class="card-num">21</div>
+                <div class="card-title">CSS3 3D动画</div>
+                <div class="card-desc">11-2.html — 3D立方体、翻转卡片、旋转木马、透视旋转演示</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+            <a class="card" href="11-4.html">
+                <div class="card-num">22</div>
+                <div class="card-title">瀑布流画廊</div>
+                <div class="card-desc">11-4.html — CSS多列瀑布流错落布局，悬停放大与文字遮罩</div>
+                <div class="card-link">查看页面 →</div>
+            </a>
+        </div>
+
+        <div class="prompt-box">
+            <h2>◆ 创建本页面的提示词</h2>
+            <p>"创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为903张耀夫的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。"</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 903张耀夫 <span class="heart">◆</span> 《高级网页设计》课堂实践
+    </div>
+</body>
+</html>

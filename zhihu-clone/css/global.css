@@ -1,0 +1,63 @@
+/* =========================================================
+   全局公共 CSS（所有页面共用）
+   高级网页设计I · 网页元素设计 - 知乎页面元素复刻
+   作者：zyf
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+    background-color: #f6f6f6;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+ul, li {
+    list-style: none;
+}
+
+img {
+    display: block;
+    border: none;
+}
+
+input {
+    border: none;
+    outline: none;
+    background: none;
+    font-family: inherit;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* 演示页通用容器：让每个元素在灰底上居中展示 */
+.zyf-demo-wrap {
+    width: 100%;
+    padding: 24px 32px 60px;
+}
+
+.zyf-demo-title {
+    font-size: 13px;
+    color: #8590a6;
+    text-align: center;
+    padding: 14px 0;
+    letter-spacing: 2px;
+}

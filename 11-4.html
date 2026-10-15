@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-4 瀑布流图片画廊</title>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+        body{
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: radial-gradient(circle at 20% 10%, #1e1b4b 0%, #0b1120 45%, #05070d 100%);
+            color: #e2e8f0;
+            line-height: 1.8;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* ===== 顶部标题 ===== */
+        .\39 03zyf_header{
+            max-width: 1000px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+        }
+        .\39 03zyf_header h1{
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .\39 03zyf_header .\39 03zyf_subtitle{
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+        .\39 03zyf_header .\39 03zyf_divider{
+            width: 5rem;
+            height: 4px;
+            margin: 1.2rem auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #38bdf8);
+        }
+
+        /* ============================================================
+           瀑布流：多列布局（column）实现错落排列
+           ============================================================ */
+        .\39 03zyf_gallery{
+            max-width: 1000px;
+            margin: 0 auto;
+            column-count: 2;
+            column-gap: 1.2rem;
+        }
+
+        .\39 03zyf_item{
+            position: relative;
+            break-inside: avoid;
+            margin-bottom: 1.2rem;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.5s ease,
+                        border-color 0.5s ease;
+            animation: zyf903FadeUp 0.8s ease backwards;
+        }
+        /* 入场错落感：给不同卡片加上不同的下移偏移 */
+        .\39 03zyf_item:nth-child(1){ animation-delay: 0.05s; }
+        .\39 03zyf_item:nth-child(2){ animation-delay: 0.18s; }
+        .\39 03zyf_item:nth-child(3){ animation-delay: 0.31s; }
+        .\39 03zyf_item:nth-child(4){ animation-delay: 0.44s; }
+
+        .\39 03zyf_item:hover{
+            transform: translateY(-8px) scale(1.015);
+            border-color: rgba(129,140,248,0.5);
+            box-shadow: 0 22px 50px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.18);
+        }
+
+        .\39 03zyf_item img{
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.5s ease;
+        }
+        .\39 03zyf_item:hover img{
+            transform: scale(1.08);
+        }
+
+        /* 图片说明遮罩 */
+        .\39 03zyf_caption{
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 2.4rem 1.1rem 1rem;
+            color: #fff;
+            background: linear-gradient(180deg, transparent, rgba(2,6,23,0.9));
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.5s ease;
+        }
+        .\39 03zyf_item:hover .\39 03zyf_caption{
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .\39 03zyf_caption h3{
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+        }
+        .\39 03zyf_caption span{
+            font-size: 0.78rem;
+            color: #93c5fd;
+            letter-spacing: 1px;
+        }
+
+        /* 序号角标 */
+        .\39 03zyf_num{
+            position: absolute;
+            top: 0.8rem;
+            left: 0.8rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(99,102,241,0.85);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        @keyframes zyf903FadeUp{
+            from{ opacity: 0; transform: translateY(40px); }
+            to  { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 页脚 ===== */
+        .\39 03zyf_footer{
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1.2rem;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px){
+            body{ padding: 1rem; }
+            .\39 03zyf_header h1{ font-size: 1.6rem; }
+            .\39 03zyf_gallery{ column-count: 2; column-gap: 0.8rem; }
+            .\39 03zyf_item{ margin-bottom: 0.8rem; }
+        }
+        @media (max-width: 480px){
+            .\39 03zyf_gallery{ column-count: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="903zyf_header">
+        <h1>瀑布流图片画廊</h1>
+        <div class="903zyf_subtitle">CSS 多列布局 (column) · 错落排列 · 悬停放大与文字遮罩</div>
+        <div class="903zyf_divider"></div>
+    </div>
+
+    <div class="903zyf_gallery">
+        <div class="903zyf_item">
+            <span class="903zyf_num">01</span>
+            <img src="./img/1.jpg" alt="画廊图片一">
+            <div class="903zyf_caption">
+                <h3>作品一</h3>
+                <span>张耀夫 · 903zyf_gallery</span>
+            </div>
+        </div>
+        <div class="903zyf_item">
+            <span class="903zyf_num">02</span>
+            <img src="./img/2.jpg" alt="画廊图片二">
+            <div class="903zyf_caption">
+                <h3>作品二</h3>
+                <span>张耀夫 · 903zyf_gallery</span>
+            </div>
+        </div>
+        <div class="903zyf_item">
+            <span class="903zyf_num">03</span>
+            <img src="./img/3.jpg" alt="画廊图片三">
+            <div class="903zyf_caption">
+                <h3>作品三</h3>
+                <span>张耀夫 · 903zyf_gallery</span>
+            </div>
+        </div>
+        <div class="903zyf_item">
+            <span class="903zyf_num">04</span>
+            <img src="./img/4.jpg" alt="画廊图片四">
+            <div class="903zyf_caption">
+                <h3>作品四</h3>
+                <span>张耀夫 · 903zyf_gallery</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="903zyf_footer">
+        &copy; 2026 903张耀夫 · 《高级网页设计》课堂实践 · 11-4 瀑布流图片画廊
+    </div>
+</body>
+</html>

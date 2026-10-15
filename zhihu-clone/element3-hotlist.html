@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页元素3 - 知乎热榜列表 - zyf</title>
+    <link rel="stylesheet" href="css/global.css">
+    <style>
+        /* ============ 网页元素3：知乎热榜列表（作者：zyf） ============ */
+        .zyf-hot {
+            width: 694px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
+        }
+
+        /* 热榜头部 */
+        .zyf-hot .zyf-hot-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f6f6f6;
+        }
+
+        .zyf-hot .zyf-hot-header svg {
+            margin-right: 8px;
+        }
+
+        .zyf-hot .zyf-hot-header h2 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .zyf-hot .zyf-hot-header .zyf-hot-more {
+            margin-left: auto;
+            font-size: 13px;
+            color: #8590a6;
+        }
+
+        /* 热榜条目 */
+        .zyf-hot .zyf-hot-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f6f6f6;
+        }
+
+        .zyf-hot .zyf-hot-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 排名序号 */
+        .zyf-hot .zyf-hot-rank {
+            flex: 0 0 24px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #8590a6;
+        }
+
+        /* 前三名特殊颜色 */
+        .zyf-hot .zyf-hot-rank.zyf-top {
+            color: #ff9607;
+        }
+
+        /* 中间标题与热度 */
+        .zyf-hot .zyf-hot-info {
+            flex: 1;
+            margin-right: 16px;
+            overflow: hidden;
+        }
+
+        .zyf-hot .zyf-hot-title {
+            font-size: 15px;
+            color: #1a1a1a;
+            line-height: 1.5;
+            /* 单行文字溢出省略号 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .zyf-hot .zyf-hot-tag {
+            display: inline-block;
+            vertical-align: 2px;
+            margin-left: 6px;
+            padding: 0 4px;
+            font-size: 11px;
+            line-height: 16px;
+            border-radius: 2px;
+        }
+
+        .zyf-hot .zyf-tag-hot {
+            color: #ff4d4f;
+            border: 1px solid #ff4d4f;
+        }
+
+        .zyf-hot .zyf-tag-new {
+            color: #0066ff;
+            border: 1px solid #0066ff;
+        }
+
+        .zyf-hot .zyf-hot-heat {
+            margin-top: 2px;
+            font-size: 13px;
+            color: #8590a6;
+        }
+
+        /* 右侧缩略图 */
+        .zyf-hot .zyf-hot-thumb {
+            flex: 0 0 60px;
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="zyf-demo-wrap">
+        <!-- 网页元素3：知乎热榜列表（列表，含图片） by zyf -->
+        <section class="zyf-hot">
+            <header class="zyf-hot-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff4d4f">
+                    <path d="M13.5 0.67s0.74 2.65 0.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l0.03-0.36c-1.43 1.47-2.23 3.44-2.23 5.56 0 4.42 3.58 8 8 8s8-3.58 8-8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+                <h2>知乎热榜</h2>
+                <a class="zyf-hot-more">查看全部 &gt;</a>
+            </header>
+
+            <ul>
+                <li class="zyf-hot-item">
+                    <span class="zyf-hot-rank zyf-top">1</span>
+                    <div class="zyf-hot-info">
+                        <p class="zyf-hot-title">
+                            神舟二十一号载人飞船发射取得圆满成功
+                            <span class="zyf-hot-tag zyf-tag-hot">热</span>
+                        </p>
+                        <p class="zyf-hot-heat">1287 万热度</p>
+                    </div>
+                    <img class="zyf-hot-thumb" alt="火箭发射"
+                         src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=long%20march%20rocket%20launch%20at%20night%2C%20bright%20orange%20flame%2C%20dramatic%20sky%2C%20news%20photography&image_size=square">
+                </li>
+
+                <li class="zyf-hot-item">
+                    <span class="zyf-hot-rank zyf-top">2</span>
+                    <div class="zyf-hot-info">
+                        <p class="zyf-hot-title">
+                            如何看待最新发布的国产 AI 芯片性能提升 300%？
+                            <span class="zyf-hot-tag zyf-tag-new">新</span>
+                        </p>
+                        <p class="zyf-hot-heat">986 万热度</p>
+                    </div>
+                    <img class="zyf-hot-thumb" alt="AI 芯片"
+                         src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=close-up%20of%20a%20futuristic%20computer%20chip%20on%20circuit%20board%2C%20blue%20neon%20lighting%2C%20macro%20photography&image_size=square">
+                </li>
+
+                <li class="zyf-hot-item">
+                    <span class="zyf-hot-rank zyf-top">3</span>
+                    <div class="zyf-hot-info">
+                        <p class="zyf-hot-title">国足世预赛最后一轮 2 : 1 逆转取胜，如何评价本场表现？</p>
+                        <p class="zyf-hot-heat">765 万热度</p>
+                    </div>
+                    <img class="zyf-hot-thumb" alt="足球赛场"
+                         src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=football%20stadium%20at%20night%20under%20floodlights%2C%20players%20running%2C%20dramatic&image_size=square">
+                </li>
+
+                <li class="zyf-hot-item">
+                    <span class="zyf-hot-rank">4</span>
+                    <div class="zyf-hot-info">
+                        <p class="zyf-hot-title">为什么今年「秋天的第一杯奶茶」突然没人喝了？</p>
+                        <p class="zyf-hot-heat">543 万热度</p>
+                    </div>
+                    <img class="zyf-hot-thumb" alt="奶茶"
+                         src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=bubble%20milk%20tea%20with%20tapioca%20pearls%20on%20wooden%20table%2C%20soft%20warm%20light%20photography&image_size=square">
+                </li>
+
+                <li class="zyf-hot-item">
+                    <span class="zyf-hot-rank">5</span>
+                    <div class="zyf-hot-info">
+                        <p class="zyf-hot-title">科学家发现新型超导材料，或将改变未来能源格局</p>
+                        <p class="zyf-hot-heat">421 万热度</p>
+                    </div>
+                    <img class="zyf-hot-thumb" alt="超导材料"
+                         src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=superconductor%20material%20glowing%20and%20levitating%20above%20magnets%20in%20laboratory%2C%20science%20fiction%20photography&image_size=square">
+                </li>
+            </ul>
+        </section>
+
+        <p class="zyf-demo-title">网页元素 3 · 知乎热榜列表 · zyf</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页元素2 - 知乎问答卡片（左文右图） - zyf</title>
+    <link rel="stylesheet" href="css/global.css">
+    <style>
+        /* ============ 网页元素2：知乎问答卡片（左文右图）（作者：zyf） ============ */
+        .zyf-card {
+            width: 694px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
+            padding: 16px 20px 0;
+        }
+
+        /* 卡片来源标签 */
+        .zyf-card .zyf-card-topic {
+            font-size: 13px;
+            color: #8590a6;
+            margin-bottom: 8px;
+        }
+
+        /* 问题标题 */
+        .zyf-card .zyf-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        /* 作者信息行 */
+        .zyf-card .zyf-card-author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .zyf-card .zyf-card-author img {
+            width: 24px;
+            height: 24px;
+            border-radius: 2px;
+            object-fit: cover;
+            margin-right: 8px;
+        }
+
+        .zyf-card .zyf-card-author .zyf-author-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #444;
+            margin-right: 6px;
+        }
+
+        .zyf-card .zyf-card-author .zyf-author-bio {
+            font-size: 13px;
+            color: #8590a6;
+        }
+
+        /* 内容区：左文右图 */
+        .zyf-card .zyf-card-body {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .zyf-card .zyf-card-text {
+            flex: 1;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.67;
+            /* 多行溢出省略号 */
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+            margin-right: 16px;
+        }
+
+        .zyf-card .zyf-card-cover {
+            flex: 0 0 190px;
+            height: 120px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        /* 底部操作栏 */
+        .zyf-card .zyf-card-actions {
+            display: flex;
+            align-items: center;
+            height: 44px;
+            border-top: 1px solid #f6f6f6;
+        }
+
+        .zyf-card .zyf-vote-btn {
+            height: 30px;
+            padding: 0 14px;
+            background-color: rgba(0, 102, 255, 0.08);
+            color: #0066ff;
+            font-size: 14px;
+            border-radius: 3px;
+            margin-right: 16px;
+        }
+
+        .zyf-card .zyf-action-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #8590a6;
+            margin-right: 20px;
+            background: none;
+        }
+
+        .zyf-card .zyf-action-item svg {
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="zyf-demo-wrap">
+        <!-- 网页元素2：知乎问答卡片（左文右图，含图片） by zyf -->
+        <article class="zyf-card">
+            <p class="zyf-card-topic">热门内容 · 来自话题：城市生活</p>
+            <h2 class="zyf-card-title">为什么重庆被称为「8D 魔幻城市」？</h2>
+
+            <div class="zyf-card-author">
+                <img alt="作者头像"
+                     src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=flat%20illustration%20avatar%20of%20a%20young%20chinese%20man%2C%20minimal%20style%2C%20solid%20color%20background&image_size=square">
+                <span class="zyf-author-name">山城观察者</span>
+                <span class="zyf-author-bio">城市规划师 · 轨道交通爱好者</span>
+            </div>
+
+            <div class="zyf-card-body">
+                <p class="zyf-card-text">
+                    在重庆，导航显示「您已到达目的地」，而目的地可能还在你头顶八层。轻轨从居民楼中呼啸穿过，立交桥层层叠叠多达五层二十个匝道；从一楼出去是马路，坐电梯到十一楼出去，竟然还是马路……
+                </p>
+                <img class="zyf-card-cover" alt="重庆夜景"
+                     src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chongqing%20city%20skyline%20at%20night%2C%20layered%20elevated%20highways%20and%20bridges%2C%20light%20rail%20passing%20through%20residential%20building%2C%20cyberpunk%20cityscape%2C%20cinematic%20photography&image_size=landscape_4_3">
+            </div>
+
+            <div class="zyf-card-actions">
+                <button class="zyf-vote-btn">▲ 赞同 2.3 万</button>
+                <button class="zyf-action-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    412 条评论
+                </button>
+                <button class="zyf-action-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    收藏
+                </button>
+                <button class="zyf-action-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    分享
+                </button>
+            </div>
+        </article>
+
+        <p class="zyf-demo-title">网页元素 2 · 知乎问答卡片（左文右图）· zyf</p>
+    </div>
+</body>
+</html>

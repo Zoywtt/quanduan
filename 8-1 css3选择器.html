@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>css3</title>
+    <style>
+        .main{
+            display: flex;/*子元素在一行*/
+            flex-wrap: wrap;/*换行*/
+            margin: 10px;/*子元素之间的间距*/
+        }
+        .box{
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            display: flex;/*子元素居中*/
+            justify-content: center;/*水平居中*/
+            align-items: center;/*垂直居中*/
+            font-size: 40px;
+            transition: all 0.5s;
+            box-sizing: border-box;/*width包含border和padding*/ 
+        }
+        .box:first-child:hover{
+            background-color: red;
+            color: white;
+            font-size: 140px;
+        }
+        .box:nth-child(2):hover{
+            border-radius: 50%;
+            border-width: 10px;
+
+        }
+        /* 既是3也是hover */
+        .box:nth-child(3):hover{
+            box-shadow: 10px 10px 10px #ccc;
+        }
+        /* 选择第4个元素 */
+        .box:nth-of-type(4):hover{
+            text-shadow: 100px 10px 10px #ccc;
+        }
+        .box:nth-of-type(5):hover{
+            /*线性渐变*/
+            background: linear-gradient(red,blue);
+        }
+        .box:nth-of-type(5)+.box{
+            /*径向渐变*/
+            background: radial-gradient(red,blue);
+        }
+        /*相邻兄弟选择器
+        +后面一个兄弟
+        ——后面所有兄弟*/
+        /*缩小向下为负*/
+        .box:nth-of-type(7):hover{
+            transform: scale(1.2);
+        }
+        .box:nth-of-type(8):hover{
+            transform: translate(-150px);
+        }
+        .box:nth-of-type(9):hover{
+            transform: rotateX(-150deg);
+        }
+        .box:nth-of-type(10):hover{
+            transform: skew(30deg)translateY(50px);
+        }
+        .box:nth-last-child(2):hover:before{
+            /*内部最前面的元素*/
+            content: '*';
+            color: red;
+        }
+        /*扩展：第12个盒子，hover显示名字张耀夫，深色背景白色文字，水平垂直居中*/
+        .box:last-child:hover{
+            background-color: #222;
+            font-size: 0;/*隐藏原来的"12"*/
+        }
+        .box:last-child:hover:after{
+            content: '张耀夫';
+            font-size: 24px;
+            color: white;
+        }
+        .box:nth-child(3n):hover{
+            border:3px solid red;
+        }
+        /*偶数even，奇数odd*/
+        /*扩展：鼠标在偶数个盒子上时，3D立体效果*/
+        .box:nth-child(even){
+            perspective: 600px;
+        }
+        .box:nth-child(even):hover{
+            transform: rotateY(45deg) rotateX(15deg);
+            box-shadow: -10px 10px 20px rgba(0,0,0,0.4);
+            background-color: #000;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="box">1</div>
+        <div class="box">2</div>
+        <div class="box">3</div>
+        <div class="box">4</div>
+        <div class="box">5</div>
+        <div class="box">6</div>
+        <div class="box">7</div>
+        <div class="box">8</div>
+        <div class="box">9</div>
+        <div class="box">10</div>
+        <div class="box">11</div>
+        <div class="box">12</div>
+    </div>
+</body>
+</html>

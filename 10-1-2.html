@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-1-2 rem响应式文字</title>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ====== 媒体查询改变html的font-size ====== */
+        html{
+            font-size: 20px;
+        }
+        @media (max-width: 1024px){ html{ font-size: 18px; } }
+        @media (max-width: 768px){ html{ font-size: 16px; } }
+        @media (max-width: 480px){ html{ font-size: 12px; } }
+
+        body{
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+        }
+
+        /* 浮动光球 */
+        .orb{
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+        .orb-1{
+            width: 300px; height: 300px;
+            background: #e94560;
+            top: -50px; left: -50px;
+            animation: orbFloat1 8s ease-in-out infinite;
+        }
+        .orb-2{
+            width: 250px; height: 250px;
+            background: #00d9f5;
+            bottom: -30px; right: -30px;
+            animation: orbFloat2 10s ease-in-out infinite;
+        }
+        @keyframes orbFloat1{ 50%{ transform: translate(50px, 80px); } }
+        @keyframes orbFloat2{ 50%{ transform: translate(-60px, -40px); } }
+
+        .card{
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 4rem 5rem;
+            border-radius: 2rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: cardIn 1s ease;
+        }
+        @keyframes cardIn{
+            from{ opacity: 0; transform: translateY(40px); }
+            to{ opacity: 1; transform: translateY(0); }
+        }
+
+        /* 渐变标题 */
+        h1{
+            font-size: 4rem;
+            background: linear-gradient(135deg, #e94560, #ff6b9d, #f9c80e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.3rem;
+            margin-bottom: 1.5rem;
+        }
+        .divider{
+            width: 4rem;
+            height: 0.2rem;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(90deg, transparent, #e94560, transparent);
+        }
+        p{
+            font-size: 1.4rem;
+            color: #cbd5e1;
+            line-height: 2;
+            margin-bottom: 1rem;
+        }
+        .info{
+            font-size: 1.2rem;
+            color: #00d9f5;
+            margin-top: 1.5rem;
+            padding: 0.8rem 2rem;
+            background: rgba(0,217,245,0.08);
+            border-radius: 2rem;
+            border: 1px solid rgba(0,217,245,0.2);
+            display: inline-block;
+        }
+        .hint{
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="card">
+        <h1>张耀夫</h1>
+        <div class="divider"></div>
+        <p>使用 rem 作为长度单位</p>
+        <p>视口变化时文字大小自动缩放</p>
+        <div class="info">学号 24001010903 | 计算机24009</div>
+        <div class="hint">缩小浏览器窗口，文字会随视口变小而缩小</div>
+    </div>
+</body>
+</html>

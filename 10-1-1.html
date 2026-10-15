@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-1 张耀夫的CSS幻灯片</title>
+    <style>
+        /* ========== 全局样式 ========== */
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+        body{
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #0f0f1e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ========== 幻灯片容器 ========== */
+        .slider{
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        /* ========== 幻灯片轨道：4张图横向排列 ========== */
+        .slides{
+            display: flex;
+            width: 400%; /* 4张 = 400% */
+            height: 100%;
+            /* CSS Animation 自动切换 */
+            animation: slideAuto 16s infinite;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 暂停时停止动画 */
+        .slider.paused .slides{
+            animation-play-state: paused;
+        }
+
+        /* 每一帧幻灯片 */
+        .slide{
+            width: 25%; /* 400% 中的 1/4 */
+            height: 100%;
+            display: flex;
+            flex-direction: column; /* 上图下文 */
+        }
+
+        /* 图片区域 */
+        .slide-img{
+            width: 100%;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .slide-img img{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 4s ease;
+        }
+
+        /* 名字浮在图片上 */
+        .slide-name{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.5); /* 透明黑底 */
+            color: white;               /* 白字 */
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* 文字说明区域 */
+        .slide-text{
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 24px 32px;
+            border-top: 2px solid #e94560;
+        }
+        .slide-text h3{
+            color: #e94560;
+            font-size: 22px;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .slide-text p{
+            color: #a0a0b0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* ========== CSS Animation 关键帧：4张图循环 ========== */
+        /* 每张展示4秒，共16秒，循环回到1.jpg */
+        @keyframes slideAuto{
+            0%   { transform: translateX(0); }      /* 第1张 */
+            20%  { transform: translateX(0); }
+            25%  { transform: translateX(-25%); }   /* 切到第2张 */
+            45%  { transform: translateX(-25%); }
+            50%  { transform: translateX(-50%); }   /* 切到第3张 */
+            70%  { transform: translateX(-50%); }
+            75%  { transform: translateX(-75%); }   /* 切到第4张 */
+            95%  { transform: translateX(-75%); }
+            100% { transform: translateX(0); }       /* 回到第1张 */
+        }
+
+        /* ========== 控制按钮 ========== */
+        .controls{
+            margin-top: 24px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        .controls button{
+            padding: 10px 28px;
+            border: 2px solid #e94560;
+            background: transparent;
+            color: #e94560;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .controls button:hover{
+            background: #e94560;
+            color: white;
+            box-shadow: 0 4px 20px rgba(233,69,96,0.4);
+        }
+
+        /* ========== 指示器圆点 ========== */
+        .indicators{
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            z-index: 10;
+        }
+        .dot{
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: background 0.3s ease;
+        }
+
+        /* ========== 标题 ========== */
+        h1{
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e94560;
+            font-size: 28px;
+            letter-spacing: 4px;
+            text-shadow: 0 2px 20px rgba(233,69,96,0.5);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px){
+            .slider{ width: 95%; height: 380px; }
+            .slide-text{ padding: 16px; }
+            .slide-text h3{ font-size: 18px; }
+            .slide-text p{ font-size: 12px; }
+            .controls button{ padding: 8px 18px; font-size: 14px; }
+            h1{ font-size: 20px; }
+        }
+        @media (max-width: 480px){
+            .slider{ height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>张耀夫的CSS幻灯片</h1>
+
+    <!-- ====== 幻灯片主体 ====== -->
+    <div class="slider" id="slider">
+        <div class="slides" id="slides">
+
+            <!-- 第1张：1.jpg -->
+            <div class="slide">
+                <div class="slide-img">
+                    <img src="./img/1.jpg" alt="幻灯片1">
+                    <div class="slide-name">张耀夫</div>
+                </div>
+                <div class="slide-text">
+                    <h3>第一帧</h3>
+                    <p>这是幻灯片的第一张图片，通过CSS Animation自动播放，展示img目录下的1.jpg。</p>
+                </div>
+            </div>
+
+            <!-- 第2张：2.jpg -->
+            <div class="slide">
+                <div class="slide-img">
+                    <img src="./img/2.jpg" alt="幻灯片2">
+                    <div class="slide-name">张耀夫</div>
+                </div>
+                <div class="slide-text">
+                    <h3>第二帧</h3>
+                    <p>第二张图片自动切入，平滑过渡，16秒一个完整循环周期。</p>
+                </div>
+            </div>
+
+            <!-- 第3张：3.jpg -->
+            <div class="slide">
+                <div class="slide-img">
+                    <img src="./img/3.jpg" alt="幻灯片3">
+                    <div class="slide-name">张耀夫</div>
+                </div>
+                <div class="slide-text">
+                    <h3>第三帧</h3>
+                    <p>第三张图片展示，图片区域自适应裁切，文字区域下方说明。</p>
+                </div>
+            </div>
+
+            <!-- 第4张：4.jpg -->
+            <div class="slide">
+                <div class="slide-img">
+                    <img src="./img/4.jpg" alt="幻灯片4">
+                    <div class="slide-name">张耀夫</div>
+                </div>
+                <div class="slide-text">
+                    <h3>第四帧</h3>
+                    <p>第四张图片播放完成后，动画自动循环回到第一张1.jpg，无限循环。</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 指示器圆点 -->
+        <div class="indicators">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <!-- ====== 控制按钮 ====== -->
+    <div class="controls">
+        <button id="btnPrev">后退</button>
+        <button id="btnPlay">暂停</button>
+        <button id="btnNext">前进</button>
+    </div>
+
+    <script>
+        /* 最小化JS：仅处理按钮交互，切换动画由CSS驱动 */
+        var slider   = document.getElementById('slider');
+        var slides   = document.getElementById('slides');
+        var btnPrev  = document.getElementById('btnPrev');
+        var btnNext  = document.getElementById('btnNext');
+        var btnPlay  = document.getElementById('btnPlay');
+        var dots     = document.querySelectorAll('.dot');
+
+        var total = 4;             /* 幻灯片总数 */
+        var current = 0;           /* 当前帧索引 */
+        var isPlaying = true;      /* 播放状态 */
+
+        /* 跳转到指定帧 */
+        function goTo(index){
+            current = (index + total) % total; /* 循环取模 */
+            slides.style.animation = 'none';    /* 先暂停CSS动画 */
+            slides.offsetHeight;               /* 触发重排，重置动画 */
+            slides.style.transform = 'translateX(-' + (current * 25) + '%)';
+            updateDots();
+        }
+
+        /* 更新指示器 */
+        function updateDots(){
+            dots.forEach(function(dot, i){
+                dot.style.background = (i === current) ? '#e94560' : 'rgba(255,255,255,0.3)';
+            });
+        }
+
+        /* 前进按钮 */
+        btnNext.addEventListener('click', function(){
+            goTo(current + 1);
+        });
+
+        /* 后退按钮 */
+        btnPrev.addEventListener('click', function(){
+            goTo(current - 1);
+        });
+
+        /* 暂停/播放按钮 */
+        btnPlay.addEventListener('click', function(){
+            isPlaying = !isPlaying;
+            if(isPlaying){
+                /* 恢复CSS自动动画 */
+                slides.style.animation = '';
+                slides.style.transform = '';
+                btnPlay.textContent = '暂停';
+                slider.classList.remove('paused');
+            } else {
+                /* 暂停 */
+                slider.classList.add('paused');
+                btnPlay.textContent = '播放';
+            }
+        });
+    </script>
+</body>
+</html>

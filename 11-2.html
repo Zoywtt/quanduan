@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-2 CSS3 3D动画</title>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+        html{ scroll-behavior: smooth; }
+
+        body{
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: radial-gradient(circle at 20% 10%, #1e1b4b 0%, #0b1120 45%, #05070d 100%);
+            color: #e2e8f0;
+            line-height: 1.8;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* ===== 顶部标题 ===== */
+        .\39 03zyf_header{
+            max-width: 1000px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+        }
+        .\39 03zyf_header h1{
+            font-size: 2.4rem;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .\39 03zyf_header .\39 03zyf_subtitle{
+            margin-top: 0.6rem;
+            font-size: 0.95rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+        .\39 03zyf_header .\39 03zyf_divider{
+            width: 5rem;
+            height: 4px;
+            margin: 1.2rem auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #38bdf8);
+        }
+
+        /* ===== 通用区块 ===== */
+        .\39 03zyf_wrap{ max-width: 1000px; margin: 0 auto; }
+
+        .\39 03zyf_section{
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1.2rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .\39 03zyf_section > h2{
+            font-size: 1.2rem;
+            color: #a5b4fc;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .\39 03zyf_section > h2::before{
+            content: '';
+            width: 6px;
+            height: 20px;
+            border-radius: 3px;
+            background: linear-gradient(180deg, #6366f1, #a855f7);
+        }
+        .\39 03zyf_section > p{
+            font-size: 0.88rem;
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+        .\39 03zyf_center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ============================================================
+           1. 旋转的 3D 立方体
+           ============================================================ */
+        .\39 03zyf_cube-scene{
+            width: 200px;
+            height: 200px;
+            perspective: 800px;
+        }
+        .\39 03zyf_cube{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: cubeSpin 10s linear infinite;
+        }
+        .\39 03zyf_cube .\39 03zyf_face{
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 0.6rem;
+            background: rgba(99,102,241,0.55);
+            backdrop-filter: blur(4px);
+            box-shadow: inset 0 0 40px rgba(168,85,247,0.5);
+        }
+        .\39 03zyf_cube .\39 03zyf_front { transform: translateZ(100px); }
+        .\39 03zyf_cube .\39 03zyf_back  { transform: rotateY(180deg) translateZ(100px); }
+        .\39 03zyf_cube .\39 03zyf_right { transform: rotateY(90deg) translateZ(100px); }
+        .\39 03zyf_cube .\39 03zyf_left  { transform: rotateY(-90deg) translateZ(100px); }
+        .\39 03zyf_cube .\39 03zyf_top   { transform: rotateX(90deg) translateZ(100px); }
+        .\39 03zyf_cube .\39 03zyf_bottom{ transform: rotateX(-90deg) translateZ(100px); }
+
+        @keyframes cubeSpin{
+            from{ transform: rotateX(-20deg) rotateY(0deg); }
+            to  { transform: rotateX(-20deg) rotateY(360deg); }
+        }
+
+        /* ============================================================
+           2. 悬停翻转卡片
+           ============================================================ */
+        .\39 03zyf_flip{
+            width: 260px;
+            height: 170px;
+            perspective: 1200px;
+        }
+        .\39 03zyf_flip-inner{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.9s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .\39 03zyf_flip:hover .\39 03zyf_flip-inner{
+            transform: rotateY(180deg);
+        }
+        .\39 03zyf_flip-front,
+        .\39 03zyf_flip-back{
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 600;
+        }
+        .\39 03zyf_flip-front{
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+        }
+        .\39 03zyf_flip-back{
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            color: #04202b;
+            transform: rotateY(180deg);
+        }
+        .\39 03zyf_flip-front small,
+        .\39 03zyf_flip-back small{
+            display: block;
+            font-weight: 400;
+            font-size: 0.75rem;
+            margin-top: 0.4rem;
+            opacity: 0.8;
+        }
+
+        /* ============================================================
+           3. 3D 旋转木马
+           ============================================================ */
+        .\39 03zyf_carousel-stage{
+            width: 100%;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1400px;
+            overflow: hidden;
+        }
+        .\39 03zyf_carousel{
+            position: relative;
+            width: 160px;
+            height: 210px;
+            transform-style: preserve-3d;
+            animation: carouselSpin 16s linear infinite;
+        }
+        .\39 03zyf_carousel .\39 03zyf_item{
+            position: absolute;
+            inset: 0;
+            border-radius: 0.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.35);
+            box-shadow: 0 0 30px rgba(56,189,248,0.35);
+            background: linear-gradient(160deg, rgba(56,189,248,0.9), rgba(129,140,248,0.9));
+        }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(1){ transform: rotateY(0deg)   translateZ(138px); }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(2){ transform: rotateY(60deg)  translateZ(138px); }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(3){ transform: rotateY(120deg) translateZ(138px); }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(4){ transform: rotateY(180deg) translateZ(138px); }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(5){ transform: rotateY(240deg) translateZ(138px); }
+        .\39 03zyf_carousel .\39 03zyf_item:nth-child(6){ transform: rotateY(300deg) translateZ(138px); }
+
+        @keyframes carouselSpin{
+            from{ transform: rotateY(0deg); }
+            to  { transform: rotateY(-360deg); }
+        }
+
+        /* ============================================================
+           4. 透视旋转演示（悬停）
+           ============================================================ */
+        .\39 03zyf_rotator{
+            width: 180px;
+            height: 180px;
+            perspective: 700px;
+        }
+        .\39 03zyf_rotator .\39 03zyf_plane{
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #f472b6, #a855f7);
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+        .\39 03zyf_rotator:hover .\39 03zyf_plane{
+            transform: rotateX(35deg) rotateY(45deg) rotateZ(15deg);
+        }
+
+        .\39 03zyf_hint{
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* ===== 页脚 ===== */
+        .\39 03zyf_footer{
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1.2rem;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px){
+            body{ padding: 1rem; }
+            .\39 03zyf_header h1{ font-size: 1.7rem; }
+            .\39 03zyf_section{ padding: 1.2rem; }
+            .\39 03zyf_carousel-stage{ height: 260px; transform: scale(0.85); }
+        }
+    </style>
+</head>
+<body>
+    <div class="903zyf_header">
+        <h1>CSS3 3D 动画</h1>
+        <div class="903zyf_subtitle">transform · perspective · rotateX / rotateY / rotateZ · transform-style: preserve-3d</div>
+        <div class="903zyf_divider"></div>
+    </div>
+
+    <div class="903zyf_wrap">
+
+        <!-- 1. 立方体 -->
+        <div class="903zyf_section">
+            <h2>旋转的 3D 立方体</h2>
+            <p>六个面用 rotateY / rotateX 加 translateZ 平移拼合，父级设置 transform-style: preserve-3d 并持续 rotateY，形成立体旋转。</p>
+            <div class="903zyf_center">
+                <div class="903zyf_cube-scene">
+                    <div class="903zyf_cube">
+                        <div class="903zyf_face 903zyf_front">前</div>
+                        <div class="903zyf_face 903zyf_back">后</div>
+                        <div class="903zyf_face 903zyf_right">右</div>
+                        <div class="903zyf_face 903zyf_left">左</div>
+                        <div class="903zyf_face 903zyf_top">上</div>
+                        <div class="903zyf_face 903zyf_bottom">下</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 翻转卡片 -->
+        <div class="903zyf_section">
+            <h2>悬停翻转卡片</h2>
+            <p>卡片正面与背面重叠，背面预先 rotateY(180deg)，配合 backface-visibility: hidden，悬停时整张卡片旋转 180°。</p>
+            <div class="903zyf_center">
+                <div class="903zyf_flip">
+                    <div class="903zyf_flip-inner">
+                        <div class="903zyf_flip-front">
+                            正面
+                            <small>鼠标移上来试试</small>
+                        </div>
+                        <div class="903zyf_flip-back">
+                            背面
+                            <small>3D 翻转完成</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="903zyf_hint">将鼠标移到卡片上查看翻转效果</div>
+        </div>
+
+        <!-- 3. 旋转木马 -->
+        <div class="903zyf_section">
+            <h2>3D 旋转木马</h2>
+            <p>六个面分别旋转 60° 并沿 Z 轴前移相同距离，围成六边形，整体绕 Y 轴匀速旋转，形成环形旋转效果。</p>
+            <div class="903zyf_carousel-stage">
+                <div class="903zyf_carousel">
+                    <div class="903zyf_item">1</div>
+                    <div class="903zyf_item">2</div>
+                    <div class="903zyf_item">3</div>
+                    <div class="903zyf_item">4</div>
+                    <div class="903zyf_item">5</div>
+                    <div class="903zyf_item">6</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 透视旋转 -->
+        <div class="903zyf_section">
+            <h2>透视与多轴旋转</h2>
+            <p>perspective 决定透视距离（值越小立体感越强）；鼠标悬停时同时应用 rotateX、rotateY、rotateZ，演示三轴复合变换。</p>
+            <div class="903zyf_center">
+                <div class="903zyf_rotator">
+                    <div class="903zyf_plane">HOVER ME</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="903zyf_footer">
+        &copy; 2026 903张耀夫 · 《高级网页设计》课堂实践 · 11-2 CSS3 3D动画
+    </div>
+</body>
+</html>

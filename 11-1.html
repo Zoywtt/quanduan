@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-1 CSS长度单位</title>
+    <style>
+        *{ margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* html 的 font-size 决定 1rem 的大小 */
+        html{ font-size: 16px; }
+        @media (max-width: 768px){ html{ font-size: 14px; } }
+        @media (max-width: 480px){ html{ font-size: 12px; } }
+
+        body{
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.8;
+            padding: 2rem;
+        }
+
+        /* ===== 顶部标题 ===== */
+        .header{
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+        .header h1{
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+        .header .subtitle{
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #94a3b8;
+        }
+        .header .divider{
+            width: 5rem;
+            height: 4px;
+            margin: 1.2rem auto 0;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #38bdf8);
+        }
+
+        /* ===== 内容容器 ===== */
+        .wrap{
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ===== 单位卡片 ===== */
+        .unit{
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .unit h2{
+            font-size: 1.15rem;
+            color: #a5b4fc;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .unit h2 code{
+            font-family: Consolas, monospace;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(129,140,248,0.3);
+            border-radius: 0.4rem;
+            padding: 0.1rem 0.6rem;
+            font-size: 1rem;
+            color: #c7d2fe;
+        }
+        .unit .desc{
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        /* 演示区 */
+        .demo{
+            background: rgba(0,0,0,0.25);
+            border-radius: 0.6rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+        .bar{
+            height: 1.6rem;
+            border-radius: 0.3rem;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            color: #fff;
+            font-size: 0.8rem;
+            line-height: 1.6rem;
+            padding-left: 0.6rem;
+            white-space: nowrap;
+        }
+        .label{
+            font-family: Consolas, monospace;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.4rem;
+        }
+
+        /* 具体单位演示元素 */
+        .px-box{ width: 200px; }
+        .pct-box{ width: 50%; }
+        .vw-box{ width: 30vw; }
+        .em-box{ font-size: 0.9rem; }
+        .em-box .bar{ width: 10em; }
+        .rem-box .bar{ width: 12rem; }
+        .ch-box .bar{ width: 20ch; }
+
+        /* 绝对长度单位色块 */
+        .abs-row{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+        .abs-row .item{ text-align: center; }
+        .abs-row .item .block{
+            background: linear-gradient(180deg, #38bdf8, #6366f1);
+            border-radius: 0.2rem 0.2rem 0 0;
+            width: 3rem;
+        }
+        .abs-row .item .name{
+            font-family: Consolas, monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.3rem;
+        }
+        .in-block{ height: 1in; }
+        .cm-block{ height: 1cm; }
+        .mm-block{ height: 10mm; }
+        .pt-block{ height: 72pt; }
+        .pc-block{ height: 6pc; }
+
+        /* 视口单位演示 */
+        .viewport-demo{
+            background: rgba(0,0,0,0.25);
+            border-radius: 0.6rem;
+            padding: 1rem;
+        }
+        .vh-bar{
+            height: 15vh;
+            min-height: 3rem;
+            background: linear-gradient(180deg, #f472b6, #a855f7);
+            border-radius: 0.3rem;
+            color: #fff;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+        }
+
+        /* font 关键字演示 */
+        .font-demo code{
+            font-family: Consolas, monospace;
+            color: #c7d2fe;
+        }
+
+        .footer{
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #475569;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Web 前端的长度单位</h1>
+        <div class="subtitle">px · em · rem · % · vw · vh · ch · 绝对单位</div>
+        <div class="divider"></div>
+    </div>
+
+    <div class="wrap">
+
+        <div class="unit">
+            <h2><code>px</code> 像素</h2>
+            <div class="desc">固定的绝对单位，1px 就是屏幕上的一个像素点，不随父元素字体或视口变化。</div>
+            <div class="demo">
+                <div class="bar px-box">width: 200px</div>
+                <div class="label">宽度固定为 200 像素</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2><code>%</code> 百分比</h2>
+            <div class="desc">相对于父元素的宽度计算，常用于流式（响应式）布局。</div>
+            <div class="demo">
+                <div class="bar pct-box">width: 50%</div>
+                <div class="label">始终占父容器的一半宽度</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2><code>em</code> 相对单位</h2>
+            <div class="desc">相对于<strong>当前元素的 font-size</strong>。若元素自身字体为 0.9rem，则 1em ≈ 14.4px，10em ≈ 144px。</div>
+            <div class="demo em-box">
+                <div class="bar">width: 10em</div>
+                <div class="label">随元素字体大小变化</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2><code>rem</code> 根相对单位</h2>
+            <div class="desc">相对于<strong>根元素 html 的 font-size</strong>。本页 html 字体默认 16px，则 1rem = 16px，12rem = 192px；缩小窗口时媒体查询会整体缩放。</div>
+            <div class="demo rem-box">
+                <div class="bar">width: 12rem</div>
+                <div class="label">只跟根元素字体有关，不受父级影响</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2><code>vw</code> / <code>vh</code> 视口单位</h2>
+            <div class="desc">1vw = 视口宽度的 1%，1vh = 视口高度的 1%。常用来做宽高自适应、全屏区块。</div>
+            <div class="demo">
+                <div class="bar vw-box">width: 30vw</div>
+                <div class="label">宽度始终为浏览器窗口宽度的 30%</div>
+            </div>
+            <div class="viewport-demo" style="margin-top:1rem;">
+                <div class="vh-bar">height: 15vh &nbsp;—&nbsp; 高度随窗口高度变化</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2><code>ch</code> 字符单位</h2>
+            <div class="desc">1ch 约等于当前字体中数字 “0” 的宽度，适合按字符数控制文本宽度。</div>
+            <div class="demo ch-box">
+                <div class="bar">width: 20ch</div>
+                <div class="label">大约容纳 20 个字符</div>
+            </div>
+        </div>
+
+        <div class="unit">
+            <h2>绝对长度单位</h2>
+            <div class="desc">in（英寸）、cm（厘米）、mm（毫米）、pt（磅，1pt = 1/72in）、pc（派卡，1pc = 12pt）。以下是相同缩放下的高度对比。</div>
+            <div class="demo">
+                <div class="abs-row">
+                    <div class="item"><div class="block in-block"></div><div class="name">1in</div></div>
+                    <div class="item"><div class="block cm-block"></div><div class="name">1cm</div></div>
+                    <div class="item"><div class="block mm-block"></div><div class="name">10mm</div></div>
+                    <div class="item"><div class="block pt-block"></div><div class="name">72pt</div></div>
+                    <div class="item"><div class="block pc-block"></div><div class="name">6pc</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="unit font-demo">
+            <h2>关键字与特殊值</h2>
+            <div class="desc">
+                <code>font-size</code> 还可使用关键字：<code>small</code>、<code>medium</code>、<code>large</code>、<code>x-large</code>；
+                长度还可用 <code>0</code>（无需单位）、<code>auto</code>、<code>calc()</code> 混合计算，例如
+                <code>calc(100% - 2rem)</code>。
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        &copy; 2026 903张耀夫 · 《高级网页设计》课堂实践 · 11-1 CSS长度单位
+    </div>
+</body>
+</html>
