@@ -1,0 +1,265 @@
+<!-- 姓名：张耀夫 日期：2026-10-22 功能名称：JavaScript六种基础数据类型的定义与演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>14-2 JavaScript 六种基础数据类型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f0f4f8;
+            color: #2d3748;
+            min-height: 100vh;
+        }
+        .zyf_header {
+            background: linear-gradient(135deg, #4f6df5, #7b9cff);
+            color: #fff;
+            text-align: center;
+            padding: 36px 20px;
+        }
+        .zyf_header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .zyf_header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .zyf_container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+        .zyf_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .zyf_card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .zyf_card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+        }
+        .zyf_card_title {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .zyf_card_title h2 {
+            font-size: 20px;
+            color: #4f6df5;
+        }
+        .zyf_card_title span {
+            font-size: 13px;
+            color: #718096;
+        }
+        .zyf_card_desc {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+        .zyf_code {
+            background: #1e2430;
+            color: #a5d6a7;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .zyf_btn {
+            align-self: flex-start;
+            border: none;
+            background: #4f6df5;
+            color: #fff;
+            font-size: 13px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .zyf_btn:hover {
+            background: #3b57d9;
+        }
+        .zyf_result {
+            margin-top: 12px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            background: #edf2fb;
+            border-left: 4px solid #4f6df5;
+            border-radius: 6px;
+            padding: 10px 12px;
+            min-height: 40px;
+            color: #2b3a67;
+            display: none;
+        }
+        .zyf_note {
+            margin-top: 24px;
+            background: #fff8e1;
+            border-left: 4px solid #f6c344;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #6b5b1e;
+        }
+        .zyf_run_all {
+            display: block;
+            margin: 26px auto 0;
+            border: none;
+            background: #2b3a67;
+            color: #fff;
+            font-size: 15px;
+            padding: 12px 40px;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .zyf_run_all:hover {
+            background: #1d2a4d;
+        }
+    </style>
+</head>
+<body>
+    <header class="zyf_header">
+        <h1>JavaScript 六种基础数据类型</h1>
+        <p>张耀夫 · Number / String / Boolean / Undefined / Null / Object 的定义与演示</p>
+    </header>
+
+    <main class="zyf_container">
+        <div class="zyf_grid" id="zyf_grid"></div>
+
+        <div class="zyf_note">
+            注意：<code>typeof null</code> 返回 <code>"object"</code>，这是 JavaScript 沿袭已久的历史遗留问题，
+            实际上 Null 是独立的基础数据类型，表示“空值”。
+        </div>
+
+        <button class="zyf_run_all" id="zyf_run_all">全部运行</button>
+    </main>
+
+    <script>
+        // 六种基础数据类型的演示数据
+        var zyf_types = [
+            {
+                name: "Number",
+                cn: "数值型",
+                desc: "表示整数和浮点数，不区分 int 与 float，还包括 Infinity、-Infinity 和 NaN（非数值）。",
+                code: 'var zyf_num = 42;\nvar zyf_price = 9.9;',
+                run: function () {
+                    var zyf_num = 42;
+                    var zyf_price = 9.9;
+                    return "zyf_num = " + zyf_num + "  →  typeof zyf_num = " + typeof zyf_num +
+                           "\nzyf_price = " + zyf_price + "  →  typeof zyf_price = " + typeof zyf_price;
+                }
+            },
+            {
+                name: "String",
+                cn: "字符串型",
+                desc: "表示文本数据，用单引号、双引号或反引号包裹，字符串一旦创建不可修改。",
+                code: 'var zyf_str = "张耀夫";',
+                run: function () {
+                    var zyf_str = "张耀夫";
+                    return 'zyf_str = "' + zyf_str + '"  →  typeof zyf_str = ' + typeof zyf_str;
+                }
+            },
+            {
+                name: "Boolean",
+                cn: "布尔型",
+                desc: "只有两个取值：true（真）和 false（假），常用于条件判断。",
+                code: "var zyf_flag = true;",
+                run: function () {
+                    var zyf_flag = true;
+                    return "zyf_flag = " + zyf_flag + "  →  typeof zyf_flag = " + typeof zyf_flag;
+                }
+            },
+            {
+                name: "Undefined",
+                cn: "未定义型",
+                desc: "变量已声明但未赋值时，其值默认为 undefined，表示“尚未定义”。",
+                code: "var zyf_undef;",
+                run: function () {
+                    var zyf_undef;
+                    return "zyf_undef = " + zyf_undef + "  →  typeof zyf_undef = " + typeof zyf_undef;
+                }
+            },
+            {
+                name: "Null",
+                cn: "空值型",
+                desc: "表示刻意设置的空值，只有一个取值 null，常用来主动清空对象引用。",
+                code: "var zyf_empty = null;",
+                run: function () {
+                    var zyf_empty = null;
+                    return "zyf_empty = " + zyf_empty + "  →  typeof zyf_empty = " + typeof zyf_empty +
+                           "（历史遗留 bug）";
+                }
+            },
+            {
+                name: "Object",
+                cn: "对象型",
+                desc: "由键值对组成的复合数据类型，数组、函数、日期等都属于对象。",
+                code: 'var zyf_obj = { name: "张耀夫", age: 20 };',
+                run: function () {
+                    var zyf_obj = { name: "张耀夫", age: 20 };
+                    return 'zyf_obj = { name: "' + zyf_obj.name + '", age: ' + zyf_obj.age +
+                           ' }  →  typeof zyf_obj = ' + typeof zyf_obj;
+                }
+            }
+        ];
+
+        // 动态生成六张演示卡片
+        var zyf_grid = document.getElementById("zyf_grid");
+        for (var zyf_i = 0; zyf_i < zyf_types.length; zyf_i++) {
+            var zyf_item = zyf_types[zyf_i];
+            var zyf_card = document.createElement("section");
+            zyf_card.className = "zyf_card";
+            zyf_card.innerHTML =
+                '<div class="zyf_card_title"><h2>' + zyf_item.name + "</h2><span>" + zyf_item.cn + "</span></div>" +
+                '<p class="zyf_card_desc">' + zyf_item.desc + "</p>" +
+                '<div class="zyf_code">' + zyf_item.code + "</div>" +
+                '<button class="zyf_btn" data-zyf_index="' + zyf_i + '">运行演示</button>' +
+                '<div class="zyf_result" id="zyf_result_' + zyf_i + '"></div>';
+            zyf_grid.appendChild(zyf_card);
+        }
+
+        // 单个卡片演示
+        function zyf_runDemo(zyf_index) {
+            var zyf_box = document.getElementById("zyf_result_" + zyf_index);
+            zyf_box.textContent = zyf_types[zyf_index].run();
+            zyf_box.style.display = "block";
+            console.log(zyf_types[zyf_index].name + " 演示：\n" + zyf_box.textContent);
+        }
+
+        // 绑定按钮事件
+        var zyf_buttons = document.querySelectorAll(".zyf_btn");
+        for (var zyf_j = 0; zyf_j < zyf_buttons.length; zyf_j++) {
+            zyf_buttons[zyf_j].addEventListener("click", function () {
+                zyf_runDemo(this.getAttribute("data-zyf_index"));
+            });
+        }
+
+        document.getElementById("zyf_run_all").addEventListener("click", function () {
+            for (var zyf_k = 0; zyf_k < zyf_types.length; zyf_k++) {
+                zyf_runDemo(zyf_k);
+            }
+        });
+    </script>
+</body>
+</html>
