@@ -1,0 +1,284 @@
+<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：inline SVG 方案的自适应宽度下导航 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>15-2 SVG 内联 · 自适应宽度下导航</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f5f6f8;
+            color: #2d3748;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .zyf_header {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #fff;
+            text-align: center;
+            padding: 32px 20px;
+        }
+        .zyf_header h1 { font-size: 24px; margin-bottom: 6px; }
+        .zyf_header p  { font-size: 13px; opacity: 0.9; }
+
+        .zyf_main {
+            flex: 1;
+            padding: 24px 20px 100px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        @media (min-width: 720px) {
+            .zyf_main { grid-template-columns: 320px 1fr; align-items: start; }
+        }
+
+        /* ===== 手机预览 ===== */
+        .zyf_phone {
+            background: #fff;
+            border-radius: 28px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+            overflow: hidden;
+            border: 8px solid #1a1a1a;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+        .zyf_phone_statusbar {
+            height: 24px;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 18px;
+        }
+        .zyf_phone_content {
+            height: 360px;
+            background: linear-gradient(180deg, #fff7e6 0%, #f5f6f8 100%);
+            padding: 24px 20px;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.9;
+        }
+        .zyf_phone_content h2 { color: #f59e0b; font-size: 18px; margin-bottom: 12px; }
+
+        /* ===== 下导航（SVG 方案，与 15-1 技术有区别） ===== */
+        .zyf_nav {
+            display: flex;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid #eef0f5;
+            padding: 8px 0 10px;
+            /* 自适应关键：flex 容器 + 每个 tab flex: 1 等分 */
+        }
+        .zyf_nav_tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px 0;
+            color: #a0aec0;
+            text-decoration: none;
+            font-size: 11px;
+            transition: color 0.25s ease, transform 0.25s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .zyf_nav_tab:hover { transform: scale(1.04); }
+
+        /* SVG 用 fill="currentColor"，父元素 color 改变时 SVG 自动变色 */
+        .zyf_nav_tab svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: transform 0.25s ease;
+        }
+
+        /* active 态：颜色变化 + 图标轻微弹跳 */
+        .zyf_nav_tab.active { color: #f59e0b; }
+        .zyf_nav_tab.active svg { transform: scale(1.12); }
+
+        /* ===== 样式修改面板 ===== */
+        .zyf_panel {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        .zyf_panel h2 { font-size: 16px; color: #2d3748; margin-bottom: 14px; }
+        .zyf_panel h3 { font-size: 13px; color: #f59e0b; margin: 14px 0 8px; }
+        .zyf_panel label {
+            display: block;
+            font-size: 12px;
+            color: #718096;
+            margin: 6px 0 4px;
+        }
+        .zyf_panel input[type="range"] { width: 100%; }
+        .zyf_panel input[type="color"] {
+            width: 100%; height: 36px;
+            border: 1px solid #e2e8f0; border-radius: 6px;
+            background: #fff; cursor: pointer;
+        }
+        .zyf_row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .zyf_tip {
+            font-size: 12px;
+            color: #a0aec0;
+            background: #fefce8;
+            border-left: 3px solid #f59e0b;
+            padding: 10px 12px;
+            margin-top: 14px;
+            line-height: 1.8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header class="zyf_header">
+        <h1>15-2 · inline SVG 方案</h1>
+        <p>自适应宽度下导航 · fill="currentColor" 实现 CSS 修饰</p>
+    </header>
+
+    <main class="zyf_main">
+        <!-- 手机预览 -->
+        <div class="zyf_phone" id="zyf_phone">
+            <div class="zyf_phone_statusbar"><span>9:41</span><span>●●●●● 5G</span></div>
+            <div class="zyf_phone_content">
+                <h2>首页</h2>
+                <p>本页演示 <b>inline SVG</b> 方案的下导航。<br>
+                   图标直接写在 HTML 里，用 <code>stroke="currentColor"</code><br>
+                   让 SVG 颜色自动跟随父元素 color 变化。</p>
+                <p>与 15-1 的字体图标方案互为补充，<br>
+                   两种技术路线对比：字体图标靠伪元素渲染，<br>
+                   SVG 方案靠 XML + currentColor，加载与缩放各有优势。</p>
+            </div>
+
+            <!-- 下导航：inline SVG -->
+            <nav class="zyf_nav" id="zyf_nav">
+                <a class="zyf_nav_tab active" data-zyf_tab="home">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-6h-6v6H5a2 2 0 01-2-2z"/></svg>
+                    <span>首页</span>
+                </a>
+                <a class="zyf_nav_tab" data-zyf_tab="search">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                    <span>搜索</span>
+                </a>
+                <a class="zyf_nav_tab" data-zyf_tab="message">
+                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    <span>消息</span>
+                </a>
+                <a class="zyf_nav_tab" data-zyf_tab="cart">
+                    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1.5"/><circle cx="18" cy="21" r="1.5"/><path d="M3 3h3l2.4 11.2a2 2 0 002 1.6h7.6a2 2 0 002-1.6L22 7H6"/></svg>
+                    <span>购物车</span>
+                </a>
+                <a class="zyf_nav_tab" data-zyf_tab="user">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 样式修改面板 -->
+        <div class="zyf_panel">
+            <h2>🎨 CSS 实时修饰面板</h2>
+            <h3>图标大小</h3>
+            <label>当前大小：<span id="zyf_size_val">22</span>px</label>
+            <input type="range" id="zyf_size" min="12" max="40" value="22">
+
+            <h3>颜色</h3>
+            <div class="zyf_row">
+                <div>
+                    <label>默认颜色</label>
+                    <input type="color" id="zyf_color_normal" value="#a0aec0">
+                </div>
+                <div>
+                    <label>激活颜色</label>
+                    <input type="color" id="zyf_color_active" value="#f59e0b">
+                </div>
+            </div>
+
+            <h3>激活图标弹跳幅度</h3>
+            <label>当前：<span id="zyf_anim_val">1.12</span> 倍</label>
+            <input type="range" id="zyf_anim" min="1" max="1.4" step="0.02" value="1.12">
+
+            <div class="zyf_tip">
+                💡 SVG 内联方案无需任何字体文件，刷新即可运行。<br>
+                图标颜色通过父元素的 <code>color</code> 控制，<br>
+                这就是 <code>stroke="currentColor"</code> 的优势。
+            </div>
+        </div>
+    </main>
+
+    <script>
+        var zyf_nav = document.getElementById("zyf_nav");
+        var zyf_tabs = zyf_nav.querySelectorAll(".zyf_nav_tab");
+        var zyf_sizeInput = document.getElementById("zyf_size");
+        var zyf_sizeVal = document.getElementById("zyf_size_val");
+        var zyf_colorNormal = document.getElementById("zyf_color_normal");
+        var zyf_colorActive = document.getElementById("zyf_color_active");
+        var zyf_animInput = document.getElementById("zyf_anim");
+        var zyf_animVal = document.getElementById("zyf_anim_val");
+
+        // === tab 切换 ===
+        for (var zyf_i = 0; zyf_i < zyf_tabs.length; zyf_i++) {
+            zyf_tabs[zyf_i].addEventListener("click", function () {
+                for (var zyf_j = 0; zyf_j < zyf_tabs.length; zyf_j++) {
+                    zyf_tabs[zyf_j].classList.remove("active");
+                }
+                this.classList.add("active");
+                zyf_applyColors();
+            });
+        }
+
+        // === 图标大小 ===
+        zyf_sizeInput.addEventListener("input", function () {
+            var zyf_val = this.value;
+            zyf_sizeVal.textContent = zyf_val;
+            document.querySelectorAll(".zyf_nav_tab svg").forEach(function (el) {
+                el.style.width = zyf_val + "px";
+                el.style.height = zyf_val + "px";
+            });
+        });
+
+        // === 颜色 ===
+        function zyf_applyColors() {
+            for (var zyf_k = 0; zyf_k < zyf_tabs.length; zyf_k++) {
+                if (zyf_tabs[zyf_k].classList.contains("active")) {
+                    zyf_tabs[zyf_k].style.color = zyf_colorActive.value;
+                } else {
+                    zyf_tabs[zyf_k].style.color = zyf_colorNormal.value;
+                }
+            }
+        }
+        zyf_colorNormal.addEventListener("input", zyf_applyColors);
+        zyf_colorActive.addEventListener("input", zyf_applyColors);
+
+        // === 激活弹跳幅度 ===
+        zyf_animInput.addEventListener("input", function () {
+            var zyf_val = parseFloat(this.value).toFixed(2);
+            zyf_animVal.textContent = zyf_val;
+            document.querySelectorAll(".zyf_nav_tab.active svg").forEach(function (el) {
+                el.style.transform = "scale(" + zyf_val + ")";
+            });
+        });
+
+        zyf_applyColors();
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+/*
+ * zyf_icon - iconfont 字体图标样式
+ * 姓名：张耀夫 日期：2026-10-26
+ * 说明：
+ *   1. 字体文件请从 iconfont.com 下载后放入 font/ 目录（iconfont.woff2、iconfont.ttf 等）
+ *   2. 下列字符码为占位示例，实际使用时请把 zyf_icon_xxx:before 的 content
+ *      替换为你下载的 iconfont.css 中对应图标的字符码
+ */
+
+@font-face {
+    font-family: "iconfont";
+    /* 字体文件放入 font/ 目录后，以下 URL 即可生效 */
+    src: url("iconfont.woff2") format("woff2"),
+         url("iconfont.woff")  format("woff"),
+         url("iconfont.ttf")   format("truetype"),
+         url("iconfont.eot")   format("embedded-opentype"),
+         url("iconfont.svg")   format("svg");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.zyf_icon {
+    font-family: "iconfont" !important;
+    font-size: inherit;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ===== 图标字符码（占位，按你下载的 iconfont.css 替换） ===== */
+.zyf_icon_home::before   { content: "\e600"; }   /* 首页 */
+.zyf_icon_search::before { content: "\e601"; }   /* 搜索 */
+.zyf_icon_message::before{ content: "\e602"; }   /* 消息 */
+.zyf_icon_user::before  { content: "\e603"; }   /* 我的 */
+.zyf_icon_cart::before  { content: "\e604"; }   /* 购物车 */
+.zyf_icon_star::before  { content: "\e605"; }   /* 收藏 */
+.zyf_icon_setting::before{ content: "\e606"; }   /* 设置 */
+.zyf_icon_plus::before  { content: "\e607"; }   /* 加号 */
