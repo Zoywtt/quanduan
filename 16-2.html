@@ -1,0 +1,436 @@
+<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：JavaScript 程序结构演示（条件 + 循环） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-2 JS 条件与循环</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "Consolas", monospace;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .zyf_header h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #6366f1, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .zyf_header p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .zyf_section {
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+        .zyf_section_title {
+            font-size: 22px;
+            color: #22d3ee;
+            margin-bottom: 20px;
+            padding-left: 14px;
+            border-left: 4px solid #22d3ee;
+        }
+
+        /* ========== 卡片 ========== */
+        .zyf_card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .zyf_card h3 {
+            font-size: 16px;
+            color: #a5b4fc;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .zyf_card h3::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #f472b6;
+        }
+
+        /* ========== 代码块 ========== */
+        .zyf_code {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 16px 18px;
+            font-family: "Consolas", "Microsoft YaHei", monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #cbd5e1;
+            overflow-x: auto;
+            margin-bottom: 16px;
+            white-space: pre;
+        }
+        .zyf_code .kw { color: #c084fc; font-weight: 600; }   /* 关键字 */
+        .zyf_code .fn { color: #22d3ee; }                      /* 函数 */
+        .zyf_code .str { color: #86efac; }                     /* 字符串 */
+        .zyf_code .num { color: #fbbf24; }                     /* 数字 */
+        .zyf_code .cmt { color: #64748b; font-style: italic; } /* 注释 */
+
+        /* ========== 运行区域 ========== */
+        .zyf_run {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .zyf_btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #6366f1, #22d3ee);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .zyf_btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+        }
+        .zyf_btn:active { transform: translateY(0); }
+        .zyf_btn.zyf_input_btn {
+            background: linear-gradient(135deg, #f472b6, #fbbf24);
+        }
+
+        .zyf_input_group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .zyf_input_group label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .zyf_input {
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 13px;
+            width: 100px;
+            outline: none;
+        }
+        .zyf_input:focus { border-color: #6366f1; }
+
+        .zyf_output {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(0,0,0,0.3);
+            border: 1px dashed #334155;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #a5b4fc;
+            font-family: "Consolas", "Microsoft YaHei", monospace;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .zyf_output:empty::before {
+            content: '// 点击按钮运行，结果会显示在这里';
+            color: #475569;
+        }
+
+        /* ========== 分隔 ========== */
+        .zyf_divider {
+            text-align: center;
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="zyf_header">
+        <h1>JavaScript 程序结构</h1>
+        <p>条件判断 · 循环控制 —— 点击按钮查看运行效果</p>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                 第一部分：条件判断                            -->
+    <!-- ========================================================= -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">① 条件判断（Conditional）</div>
+
+        <!-- if / else if / else -->
+        <div class="zyf_card">
+            <h3>if — else if — else 多分支</h3>
+            <div class="zyf_code"><span class="cmt">// 根据分数判定等级</span>
+<span class="kw">function</span> <span class="fn">zyf_getGrade</span>(score) {
+    <span class="kw">if</span> (score >= <span class="num">90</span>)  <span class="kw">return</span> <span class="str">"A"</span>;
+    <span class="kw">else if</span> (score >= <span class="num">80</span>) <span class="kw">return</span> <span class="str">"B"</span>;
+    <span class="kw">else if</span> (score >= <span class="num">70</span>) <span class="kw">return</span> <span class="str">"C"</span>;
+    <span class="kw">else if</span> (score >= <span class="num">60</span>) <span class="kw">return</span> <span class="str">"D"</span>;
+    <span class="kw">else</span> <span class="kw">return</span> <span class="str">"不及格"</span>;
+}</div>
+            <div class="zyf_run">
+                <div class="zyf_input_group">
+                    <label>输入分数：</label>
+                    <input type="number" class="zyf_input" id="zyf_if_score" value="85" min="0" max="100">
+                </div>
+                <button class="zyf_btn zyf_input_btn" onclick="zyf_runIf()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_if_out"></div>
+            </div>
+        </div>
+
+        <!-- switch -->
+        <div class="zyf_card">
+            <h3>switch 多分支</h3>
+            <div class="zyf_code"><span class="cmt">// 根据数字输出中文星期</span>
+<span class="kw">function</span> <span class="fn">zyf_weekDay</span>(n) {
+    <span class="kw">switch</span> (n) {
+        <span class="kw">case</span> <span class="num">1</span>: <span class="kw">return</span> <span class="str">"星期一"</span>;
+        <span class="kw">case</span> <span class="num">2</span>: <span class="kw">return</span> <span class="str">"星期二"</span>;
+        <span class="kw">case</span> <span class="num">3</span>: <span class="kw">return</span> <span class="str">"星期三"</span>;
+        <span class="kw">case</span> <span class="num">4</span>: <span class="kw">return</span> <span class="str">"星期四"</span>;
+        <span class="kw">case</span> <span class="num">5</span>: <span class="kw">return</span> <span class="str">"星期五"</span>;
+        <span class="kw">case</span> <span class="num">6</span>: <span class="kw">return</span> <span class="str">"星期六"</span>;
+        <span class="kw">case</span> <span class="num">7</span>: <span class="kw">return</span> <span class="str">"星期日"</span>;
+        <span class="kw">default</span>:   <span class="kw">return</span> <span class="str">"❓ 非法输入"</span>;
+    }
+}</div>
+            <div class="zyf_run">
+                <div class="zyf_input_group">
+                    <label>输入 1-7：</label>
+                    <input type="number" class="zyf_input" id="zyf_switch_n" value="3" min="1" max="7">
+                </div>
+                <button class="zyf_btn zyf_input_btn" onclick="zyf_runSwitch()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_switch_out"></div>
+            </div>
+        </div>
+
+        <!-- 三元运算符 -->
+        <div class="zyf_card">
+            <h3>三元运算符 condition ? a : b</h3>
+            <div class="zyf_code"><span class="cmt">// 奇偶判断 —— 三元替代 if/else</span>
+<span class="kw">function</span> <span class="fn">zyf_parity</span>(n) {
+    <span class="kw">return</span> n % <span class="num">2</span> === <span class="num">0</span>
+         ? <span class="str">"偶数 ✅"</span>
+         : <span class="str">"奇数 🔺"</span>;
+}</div>
+            <div class="zyf_run">
+                <div class="zyf_input_group">
+                    <label>输入整数：</label>
+                    <input type="number" class="zyf_input" id="zyf_ternary_n" value="42">
+                </div>
+                <button class="zyf_btn zyf_input_btn" onclick="zyf_runTernary()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_ternary_out"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                 第二部分：循环                              -->
+    <!-- ========================================================= -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">② 循环（Loop）</div>
+
+        <!-- for 循环 -->
+        <div class="zyf_card">
+            <h3>for 循环 —— 固定次数</h3>
+            <div class="zyf_code"><span class="cmt">// 1 到 n 的累加和</span>
+<span class="kw">function</span> <span class="fn">zyf_sumFor</span>(n) {
+    <span class="kw">let</span> sum = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= n; i++) {
+        sum += i;
+    }
+    <span class="kw">return</span> sum;
+}</div>
+            <div class="zyf_run">
+                <div class="zyf_input_group">
+                    <label>输入 n：</label>
+                    <input type="number" class="zyf_input" id="zyf_for_n" value="10" min="1" max="100">
+                </div>
+                <button class="zyf_btn zyf_input_btn" onclick="zyf_runFor()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_for_out"></div>
+            </div>
+        </div>
+
+        <!-- while -->
+        <div class="zyf_card">
+            <h3>while 循环 —— 条件驱动</h3>
+            <div class="zyf_code"><span class="cmt">// 计算 2 的几次方刚好 ≥ 输入值</span>
+<span class="kw">function</span> <span class="fn">zyf_powerOfTwo</span>(target) {
+    <span class="kw">let</span> result = <span class="num">1</span>, count = <span class="num">0</span>;
+    <span class="kw">while</span> (result < target) {
+        result *= <span class="num">2</span>;
+        count++;
+    }
+    <span class="kw">return</span> <span class="str">"2^"</span> + count + <span class="str">" = "</span> + result;
+}</div>
+            <div class="zyf_run">
+                <div class="zyf_input_group">
+                    <label>输入目标值：</label>
+                    <input type="number" class="zyf_input" id="zyf_while_n" value="100" min="1">
+                </div>
+                <button class="zyf_btn zyf_input_btn" onclick="zyf_runWhile()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_while_out"></div>
+            </div>
+        </div>
+
+        <!-- break & continue -->
+        <div class="zyf_card">
+            <h3>break 与 continue</h3>
+            <div class="zyf_code"><span class="cmt">// 输出 1-20 中，跳过 7 的倍数，遇到 15 停止</span>
+<span class="kw">function</span> <span class="fn">zyf_breakContinue</span>() {
+    <span class="kw">let</span> arr = [];
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">1</span>; i <= <span class="num">20</span>; i++) {
+        <span class="kw">if</span> (i === <span class="num">15</span>) <span class="kw">break</span>;       <span class="cmt">// 遇到 15 就停止</span>
+        <span class="kw">if</span> (i % <span class="num">7</span> === <span class="num">0</span>) <span class="kw">continue</span>; <span class="cmt">// 跳过 7 的倍数</span>
+        arr.push(i);
+    }
+    <span class="kw">return</span> arr;
+}</div>
+            <div class="zyf_run">
+                <button class="zyf_btn" onclick="zyf_runBreakContinue()">▶ 运行</button>
+                <div class="zyf_output" id="zyf_bc_out"></div>
+            </div>
+        </div>
+
+        <!-- for...of -->
+        <div class="zyf_card">
+            <h3>for...of —— 遍历数组</h3>
+            <div class="zyf_code"><span class="cmt">// 统计数组中每个字符串的长度</span>
+<span class="kw">function</span> <span class="fn">zyf_forOf</span>(arr) {
+    <span class="kw">let</span> result = [];
+    <span class="kw">for</span> (<span class="kw">let</span> item <span class="kw">of</span> arr) {
+        result.push(item + <span class="str">"("</span> + item.length + <span class="str">")"</span>);
+    }
+    <span class="kw">return</span> result;
+}</div>
+            <div class="zyf_run">
+                <button class="zyf_btn" onclick="zyf_runForOf()">▶ 运行（默认数组）</button>
+                <div class="zyf_output" id="zyf_forof_out"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zyf_divider">· · · 张耀夫 · JavaScript 程序结构 · · ·</div>
+
+    <script>
+        // ========== 条件 ==========
+        function zyf_getGrade(score) {
+            if (score >= 90)  return "A";
+            else if (score >= 80) return "B";
+            else if (score >= 70) return "C";
+            else if (score >= 60) return "D";
+            else return "不及格";
+        }
+        function zyf_runIf() {
+            var s = parseInt(document.getElementById("zyf_if_score").value) || 0;
+            var g = zyf_getGrade(s);
+            document.getElementById("zyf_if_out").textContent =
+                "分数 " + s + " → 等级 " + g;
+        }
+
+        function zyf_weekDay(n) {
+            switch (n) {
+                case 1: return "星期一";
+                case 2: return "星期二";
+                case 3: return "星期三";
+                case 4: return "星期四";
+                case 5: return "星期五";
+                case 6: return "星期六";
+                case 7: return "星期日";
+                default: return "❓ 非法输入";
+            }
+        }
+        function zyf_runSwitch() {
+            var n = parseInt(document.getElementById("zyf_switch_n").value) || 0;
+            document.getElementById("zyf_switch_out").textContent =
+                "数字 " + n + " → " + zyf_weekDay(n);
+        }
+
+        function zyf_parity(n) {
+            return n % 2 === 0 ? "偶数 ✅" : "奇数 🔺";
+        }
+        function zyf_runTernary() {
+            var n = parseInt(document.getElementById("zyf_ternary_n").value) || 0;
+            document.getElementById("zyf_ternary_out").textContent =
+                n + " → " + zyf_parity(n);
+        }
+
+        // ========== 循环 ==========
+        function zyf_sumFor(n) {
+            var sum = 0;
+            for (var i = 1; i <= n; i++) sum += i;
+            return sum;
+        }
+        function zyf_runFor() {
+            var n = parseInt(document.getElementById("zyf_for_n").value) || 1;
+            document.getElementById("zyf_for_out").textContent =
+                "1 + 2 + ... + " + n + " = " + zyf_sumFor(n);
+        }
+
+        function zyf_powerOfTwo(target) {
+            var result = 1, count = 0;
+            while (result < target) { result *= 2; count++; }
+            return "2^" + count + " = " + result;
+        }
+        function zyf_runWhile() {
+            var n = parseInt(document.getElementById("zyf_while_n").value) || 1;
+            document.getElementById("zyf_while_out").textContent =
+                "≥ " + n + " 的最小 2 的幂: " + zyf_powerOfTwo(n);
+        }
+
+        function zyf_runBreakContinue() {
+            var arr = [];
+            for (var i = 1; i <= 20; i++) {
+                if (i === 15) break;
+                if (i % 7 === 0) continue;
+                arr.push(i);
+            }
+            document.getElementById("zyf_bc_out").textContent =
+                "结果: " + arr.join(", ") + "\n共 " + arr.length + " 个";
+        }
+
+        function zyf_runForOf() {
+            var fruits = ["Apple", "Banana", "Cherry", "Date", "Elderberry"];
+            var result = [];
+            for (var idx = 0; idx < fruits.length; idx++) {
+                var item = fruits[idx];
+                result.push(item + "(" + item.length + "字)");
+            }
+            document.getElementById("zyf_forof_out").textContent =
+                "输入: [" + fruits.join(", ") + "]\n" +
+                "结果: " + result.join(", ");
+        }
+
+        // 页面加载时自动运行一次默认演示
+        window.onload = function() {
+            zyf_runIf();
+            zyf_runSwitch();
+            zyf_runTernary();
+            zyf_runFor();
+            zyf_runWhile();
+            zyf_runBreakContinue();
+            zyf_runForOf();
+        };
+    </script>
+</body>
+</html>
