@@ -1,14 +1,13 @@
-<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：iconfont 字体图标方案的自适应宽度下导航 -->
+<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：CSS mask-image 伪元素图标方案的自适应宽度下导航 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>15-1 iconfont 字体图标 · 自适应宽度下导航</title>
-    <!-- 字体图标样式（用户放入 font/iconfont.woff2 等文件后即可生效） -->
+    <title>15-1 mask-image 伪元素图标 · 自适应宽度下导航</title>
+    <!-- mask-image 伪元素图标样式（用 font/ 目录下的 首页.svg、搜索.svg、消息.svg、我的.svg） -->
     <link rel="stylesheet" href="font/iconfont.css">
     <style>
-        /* ===== 页面基础 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: "Microsoft YaHei", Arial, sans-serif;
@@ -19,7 +18,6 @@
             flex-direction: column;
         }
 
-        /* ===== 顶部标题 ===== */
         .zyf_header {
             background: linear-gradient(135deg, #4f6df5, #7b9cff);
             color: #fff;
@@ -29,7 +27,6 @@
         .zyf_header h1 { font-size: 24px; margin-bottom: 6px; }
         .zyf_header p  { font-size: 13px; opacity: 0.9; }
 
-        /* ===== 中间演示区（手机预览 + 样式面板） ===== */
         .zyf_main {
             flex: 1;
             padding: 24px 20px 100px;
@@ -75,17 +72,15 @@
         .zyf_phone_content h2 { color: #4f6df5; font-size: 18px; margin-bottom: 12px; }
 
         /* ===== 下导航（自适应宽度：flex 等分） ===== */
-        /* 注意：下导航必须放在手机边框内最底部，紧贴底部 */
         .zyf_nav {
             display: flex;
             width: 100%;
             background: #ffffff;
             border-top: 1px solid #eef0f5;
             padding: 8px 0 10px;
-            /* 自适应关键：flex 容器 + 每个 tab flex: 1 等分 */
         }
         .zyf_nav_tab {
-            flex: 1;                  /* 关键：等分宽度 */
+            flex: 1;                  /* 关键：flex 1 等分宽度 —— 自适应 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -101,36 +96,18 @@
         }
         .zyf_nav_tab:hover { transform: scale(1.04); }
 
-        /* 图标大小、颜色全部由 CSS 修饰 */
-        .zyf_nav_tab .zyf_icon,
-        .zyf_nav_tab .zyf_svg_fallback {
-            font-size: 22px;          /* 关键：CSS 修饰字体图标大小 */
-            width: 22px; height: 22px;
-            color: inherit;           /* 关键：继承父元素颜色 */
-            fill: currentColor;       /* SVG 方案也能用 currentColor */
+        /* mask-image 方案下，图标大小由 width/height 控制，颜色由 currentColor 继承 */
+        .zyf_nav_tab .zyf_icon {
+            width: 22px;
+            height: 22px;
         }
-        .zyf_nav_tab .zyf_svg_fallback {
-            /* 字体未加载时的 fallback：用 inline SVG 显示 */
-            display: block;
-        }
-        /* 等字体加载后，隐藏 SVG fallback（通过 @font-face 加载成功判断） */
-        @font-face {
-            font-family: "iconfont-check";
-            src: local("iconfont");
-        }
-        .zyf_font_loaded .zyf_svg_fallback { display: none; }
-        .zyf_font_loaded .zyf_icon { display: inline-block; }
-        /* 默认情况下：如果 iconfont.woff2 不存在，.zyf_icon 的 font-family 不生效，
-           会显示为空框，此时用 JS 在 font 加载成功前显示 SVG fallback。
-           见底部 <script> 里的 zyf_checkIconfont() */
-        .zyf_nav_tab .zyf_icon { display: none; }
 
         .zyf_nav_tab.active {
             color: #4f6df5;
         }
-        .zyf_nav_tab.active .zyf_icon,
-        .zyf_nav_tab.active .zyf_svg_fallback {
-            /* active 态颜色：已通过父元素 color: 继承，此处可加强调 */
+        .zyf_nav_tab.active .zyf_icon {
+            transform: scale(1.06);
+            transition: transform 0.25s ease;
         }
 
         /* ===== 样式修改面板 ===== */
@@ -169,12 +146,22 @@
             line-height: 1.8;
             border-radius: 4px;
         }
+        .zyf_code {
+            background: #1e2430;
+            color: #a5d6a7;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 8px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
     <header class="zyf_header">
-        <h1>15-1 · iconfont 字体图标</h1>
-        <p>自适应宽度下导航 · CSS 修饰大小与颜色</p>
+        <h1>15-1 · CSS mask-image 方案</h1>
+        <p>自适应宽度下导航 · mask-image + currentColor 修饰</p>
     </header>
 
     <main class="zyf_main">
@@ -183,34 +170,31 @@
             <div class="zyf_phone_statusbar"><span>9:41</span><span>●●●●● 5G</span></div>
             <div class="zyf_phone_content">
                 <h2>首页</h2>
-                <p>当前页面演示 iconfont 字体图标方案的下导航。<br>
-                   每个 tab 使用 font-family: iconfont 的伪元素渲染图标，<br>
-                   整体用 flex 1 等分实现自适应宽度。</p>
-                <p>尝试拖动右侧「样式修改面板」的滑块，<br>
-                   图标大小、颜色会实时变化 —— 这就是 CSS 修饰的效果。</p>
+                <p>当前页面演示 CSS <b>mask-image</b> 伪元素图标方案。<br>
+                   图标使用 iconfont.com 下载的 <code>首页.svg</code> 等文件，<br>
+                   通过 <code>-webkit-mask-image: url("首页.svg")</code> 加载，<br>
+                   再用 <code>background: currentColor</code> 上色。</p>
+                <p>这是"字体图标"的 CSS 实现思路，<br>
+                   图标大小、颜色全部由 CSS 控制。<br>
+                   右侧面板可实时修改体验。</p>
             </div>
 
-            <!-- 下导航：4 个 tab，自适应 flex 1 等分 -->
+            <!-- 下导航：mask-image 伪元素图标，自适应 flex 1 等分 -->
             <nav class="zyf_nav" id="zyf_nav">
                 <a class="zyf_nav_tab active" data-zyf_tab="home">
                     <i class="zyf_icon zyf_icon_home"></i>
-                    <!-- SVG fallback：字体未加载时显示 -->
-                    <svg class="zyf_svg_fallback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4v-6h-6v6H5a2 2 0 01-2-2z"/></svg>
                     <span>首页</span>
                 </a>
                 <a class="zyf_nav_tab" data-zyf_tab="search">
                     <i class="zyf_icon zyf_icon_search"></i>
-                    <svg class="zyf_svg_fallback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
                     <span>搜索</span>
                 </a>
                 <a class="zyf_nav_tab" data-zyf_tab="message">
                     <i class="zyf_icon zyf_icon_message"></i>
-                    <svg class="zyf_svg_fallback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                     <span>消息</span>
                 </a>
                 <a class="zyf_nav_tab" data-zyf_tab="user">
                     <i class="zyf_icon zyf_icon_user"></i>
-                    <svg class="zyf_svg_fallback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
                     <span>我的</span>
                 </a>
             </nav>
@@ -223,7 +207,7 @@
             <label>当前大小：<span id="zyf_size_val">22</span>px</label>
             <input type="range" id="zyf_size" min="12" max="40" value="22">
 
-            <h3>颜色</h3>
+            <h3>颜色（父元素 color → currentColor → mask 背景）</h3>
             <div class="zyf_row">
                 <div>
                     <label>默认颜色</label>
@@ -236,16 +220,23 @@
             </div>
 
             <div class="zyf_tip">
-                💡 字体图标生效条件：把你从 iconfont.com 下载的字体文件
-                （iconfont.woff2 / iconfont.ttf 等）放到项目根目录的
-                <b>font/</b> 文件夹，页面刷新后 .zyf_icon_home:before
-                等伪元素会自动渲染字体图标，SVG fallback 会自动隐藏。
+                💡 本页与 15-2 的 <b>inline SVG</b> 方案互为补充，两种技术路线对比：<br>
+                <code>mask-image</code>（本页）：用 CSS 把 SVG 当遮罩上色，无额外 HTML 元素，<br>
+                适合批量图标统一改色；<br>
+                <code>inline SVG</code>（15-2）：SVG 直接写在 HTML 里，用 <code>stroke="currentColor"</code><br>
+                让颜色跟随父元素，灵活可交互。
             </div>
+
+            <h3>核心 CSS</h3>
+            <pre class="zyf_code">.zyf_icon {
+  mask-image: url("首页.svg");
+  background:  currentColor;   /* 继承父元素 color */
+  width: 22px; height: 22px;   /* 控制大小 */
+}</pre>
         </div>
     </main>
 
     <script>
-        // 命名规范：所有变量以 zyf_ 开头
         var zyf_nav = document.getElementById("zyf_nav");
         var zyf_tabs = zyf_nav.querySelectorAll(".zyf_nav_tab");
         var zyf_sizeInput = document.getElementById("zyf_size");
@@ -260,6 +251,7 @@
                     zyf_tabs[zyf_j].classList.remove("active");
                 }
                 this.classList.add("active");
+                zyf_applyColors();
             });
         }
 
@@ -267,12 +259,10 @@
         zyf_sizeInput.addEventListener("input", function () {
             var zyf_val = this.value;
             zyf_sizeVal.textContent = zyf_val;
-            document.querySelectorAll(".zyf_nav_tab .zyf_icon, .zyf_nav_tab .zyf_svg_fallback")
-                .forEach(function (el) {
-                    el.style.fontSize = zyf_val + "px";
-                    el.style.width = zyf_val + "px";
-                    el.style.height = zyf_val + "px";
-                });
+            document.querySelectorAll(".zyf_nav_tab .zyf_icon").forEach(function (el) {
+                el.style.width = zyf_val + "px";
+                el.style.height = zyf_val + "px";
+            });
         });
 
         // === 实时 CSS 修饰：颜色 ===
@@ -288,18 +278,6 @@
         zyf_colorNormal.addEventListener("input", zyf_applyColors);
         zyf_colorActive.addEventListener("input", zyf_applyColors);
         zyf_applyColors();
-
-        // === 检测 iconfont 字体是否已加载 ===
-        function zyf_checkIconfont() {
-            if (document.fonts && document.fonts.load) {
-                document.fonts.load("22px iconfont").then(function () {
-                    if (document.fonts.check("22px iconfont")) {
-                        document.body.classList.add("zyf_font_loaded");
-                    }
-                });
-            }
-        }
-        zyf_checkIconfont();
     </script>
 </body>
 </html>
