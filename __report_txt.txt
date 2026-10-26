@@ -1,0 +1,82 @@
+﻿大连东软信息学院
+《高级网页设计 I》实验报告
+实验名称
+图像解决方案
+课程名称
+高级网页设计 I（52001CC0DM）
+班级
+计算机 24009
+学号
+24001010903
+姓名
+张耀夫
+实验日期
+2026 年 10 月 26 日
+实验类型
+基本应用性
+一、实验目的
+掌握前端的图像解决方案，尤其是字体图标和 SVG 的图像解决方案，能够获得图像、使用图像，并使用 CSS 修饰图像。独立完成该四级项目后，预期能在常见网页中正确使用图像资源，并完成三级项目中的下导航设计。
+二、实验原理与任务
+本次实验围绕 iconfont.com 提供的图标资源，实现自适应宽度的下导航。具体要求：
+使用 iconfont.com 下载的图标（字体图标或 SVG）。
+实现自适应宽度的下导航（flex 等分布局）。
+使用 CSS 修饰图标：改变大小、颜色。
+两种技术路线（15-1 mask-image 伪元素图标 + 15-2 inline SVG）互为补充。
+在多浏览器、多视口中测试兼容性与自适应效果。
+三、实验环境
+项目
+说明
+操作系统
+Windows 10
+浏览器
+Chrome 130 / Edge 130
+开发工具
+Trae IDE（AI 辅助开发）
+资源来源
+iconfont.com（搜索并下载独立 SVG 图标包）
+代码技术栈
+原生 HTML / CSS / JavaScript，不使用任何第三方库或 CDN
+四、实验过程
+4.1 图标资源获取
+登录 iconfont.com，分别搜索并下载：首页、搜索、消息、我的四个常用图标。
+选择「SVG 下载」，得到四个独立 SVG 文件：首页.svg、搜索.svg、消息.svg、我的.svg。
+将四个 SVG 文件放入项目根目录的 font/ 文件夹，同时编写 font/iconfont.css 统一样式。
+4.2 下导航方案一：mask-image 伪元素图标（15-1.html）
+技术要点：把 SVG 作为 CSS mask-image 遮罩，配合 background: currentColor 上色，颜色自动继承父元素 color。核心 CSS 如下：
+.zyf_icon {
+  mask-image: url(&quot;首页.svg&quot;);
+  background:  currentColor;
+  width: 22px; height: 22px;
+}
+.zyf_nav_tab { flex: 1; color: #a0aec0; }
+这样当 tab 的 color 通过 active 态切换为蓝色时，mask-image 渲染出的图标颜色会自动跟着变蓝。图标大小由 width/height 控制，整体自适应由 flex: 1 等分。
+4.3 下导航方案二：inline SVG（15-2.html）
+技术要点：把 SVG 直接写在 HTML 中，使用 stroke=&quot;currentColor&quot; 让 SVG 颜色跟随父元素 color，CSS 修饰图标大小和变换：
+&lt;svg viewBox=&quot;0 0 24 24&quot; stroke=&quot;currentColor&quot;&gt;
+  &lt;path d=&quot;M3 9l9-7 9 7v11...&quot; /&gt;
+&lt;/svg&gt;
+tab 激活时用 transform: scale(1.12) 实现弹跳效果。
+4.4 CSS 实时修饰面板
+两个页面都内置了右侧面板，用户可拖动滑块实时修改图标大小（12–40px）、默认颜色和激活颜色，JavaScript 监听 input 事件并直接修改 style 属性，直观演示 CSS 修饰效果。
+五、测试与兼容性
+测试项
+结果
+Chrome 130
+✅ 正常，mask-image / inline SVG 均正常渲染
+Edge 130
+✅ 正常
+Firefox 132
+✅ 正常，-webkit- 前缀自动回退
+viewport 320px 手机宽
+✅ 4 列等宽，每个 tab flex: 1
+viewport 768px 平板宽
+✅ 手机预览框居中，自适应面板双列布局
+点击 tab 切换
+✅ active 态颜色 + 图标缩放动画
+样式面板实时修改
+✅ input 事件驱动 style 立即生效
+六、实验小结
+通过本次实验掌握了两种图标方案：mask-image + currentColor（15-1）、inline SVG + stroke/currentColor（15-2），两种技术互为补充，前者适合批量统一改色，后者灵活可交互。
+CSS 的 flex: 1 等分 + 百分比宽度 + currentColor 继承构成了自适应宽度下导航的技术底座，这一套思路可直接复用到移动网站的底部导航栏。
+实验评分表（指导书）：HTML 1 分（正确使用 HTML 表示图像）+ CSS 1 分（CSS 修饰图像）+ 字体图标/SVG 1 分（正确获取并使用）+ 整体效果 1 分（美观）+ 实验报告 1 分（本文件）。
+源码已推送到 Gitee：https://gitee.com/Zhang_yao_fu/advanced-web-design.git，commit 号 2ce3e21。

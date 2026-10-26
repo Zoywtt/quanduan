@@ -1,0 +1,166 @@
+<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：数7游戏100格（7的倍数或末位是7输出空盒子，其余显示数字） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16-1 数7游戏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #eaf0ff 0%, #f5f6f8 100%);
+            color: #2d3748;
+            min-height: 100vh;
+            padding: 36px 20px 60px;
+        }
+
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .zyf_header h1 {
+            font-size: 26px;
+            color: #4f6df5;
+            margin-bottom: 8px;
+        }
+        .zyf_header p {
+            font-size: 13px;
+            color: #718096;
+            line-height: 1.8;
+        }
+
+        /* 10 列 × 10 行 = 100 格 */
+        .zyf_grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .zyf_cell {
+            aspect-ratio: 1 / 1;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            cursor: default;
+            user-select: none;
+        }
+        .zyf_cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 109, 245, 0.15);
+            border-color: #4f6df5;
+        }
+
+        /* 满足数 7 规则 → 空盒子（边框虚线、隐藏数字） */
+        .zyf_cell.zyf_empty {
+            border-style: dashed;
+            border-color: #a0aec0;
+            background: #f7fafc;
+            color: transparent;
+            cursor: not-allowed;
+        }
+        .zyf_cell.zyf_empty:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #cbd5e0;
+        }
+
+        .zyf_counter {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #718096;
+        }
+        .zyf_counter span {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 6px 14px;
+            margin: 0 6px;
+        }
+        .zyf_legend {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 14px;
+            font-size: 12px;
+            color: #718096;
+        }
+        .zyf_legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .zyf_legend .zyf_dot {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border-radius: 3px;
+            border: 2px solid #e2e8f0;
+            background: #fff;
+        }
+        .zyf_legend .zyf_dot.zyf_dot_empty { border-style: dashed; border-color: #a0aec0; background: #f7fafc; }
+    </style>
+</head>
+<body>
+    <div class="zyf_header">
+        <h1>数 7 游戏 · 100 格</h1>
+        <p>1–100 按顺序排列；<br>
+           满足「<b>7 的倍数</b>」或「<b>末位是 7</b>」的格子 → 空盒子；<br>
+           其余格子 → 内填数字。</p>
+    </div>
+
+    <div class="zyf_grid" id="zyf_grid"></div>
+
+    <div class="zyf_counter">
+        <span>共 100 格</span>
+        <span id="zyf_empty_count">空格：0</span>
+        <span id="zyf_number_count">数字格：0</span>
+    </div>
+
+    <div class="zyf_legend">
+        <span><i class="zyf_dot"></i>数字格</span>
+        <span><i class="zyf_dot zyf_dot_empty"></i>满足数 7 规则 → 空盒</span>
+    </div>
+
+    <script>
+        // 数 7 规则判定函数
+        // 返回值：
+        //   true  —— 满足规则（7 的倍数 或 末位是 7），输出空盒
+        //   false —— 不满足规则，盒子内填数字
+        function zyf_is7(n) {
+            var zyf_mul = (n % 7 === 0);       // 7 的倍数
+            var zyf_end7 = (n % 10 === 7);     // 末位是 7
+            return zyf_mul || zyf_end7;
+        }
+
+        var zyf_grid = document.getElementById("zyf_grid");
+        var zyf_emptyCount = 0;
+        var zyf_numberCount = 0;
+
+        // 生成 1–100 共 100 格
+        for (var zyf_i = 1; zyf_i <= 100; zyf_i++) {
+            var zyf_cell = document.createElement("div");
+            zyf_cell.className = "zyf_cell";
+            zyf_cell.textContent = zyf_i;
+
+            if (zyf_is7(zyf_i)) {
+                zyf_cell.classList.add("zyf_empty");   // 满足规则 → 空盒子
+                zyf_emptyCount++;
+            } else {
+                zyf_numberCount++;                      // 不满足 → 保留数字
+            }
+
+            zyf_grid.appendChild(zyf_cell);
+        }
+
+        document.getElementById("zyf_empty_count").textContent   = "空格：" + zyf_emptyCount;
+        document.getElementById("zyf_number_count").textContent = "数字格：" + zyf_numberCount;
+    </script>
+</body>
+</html>
