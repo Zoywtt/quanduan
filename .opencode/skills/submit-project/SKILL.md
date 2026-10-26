@@ -41,25 +41,36 @@ description: Use when the user asks to 提交项目 / 提交代码 / 上传项�
    - 不要提交密钥、令牌、`.env` 等敏感文件。发现敏感文件时先中止并告知用户。
    - 若用户只想上传「文件位置」指向的单个文件，就只 `git add "<该文件>"`，不要 `add -A` 整个目录。
 
-4. **暂存并提交**
+4. **同步更新 index.html（目录提交且存在 index.html 时）**
+   - 若目录下存在 `index.html`，且其中包含卡片式页面导航（`<div class="card-grid">`），先扫描目录下所有 `.html` 文件。
+   - 对比 index.html 中已有的 `href`，找出未被收录的页面（`index.html` 自身除外）。
+   - 按现有卡片的相同结构，为每个新页面在 `.card-grid` 末尾追加一个 `<a class="card" href="文件名">` 卡片：
+     - `.card-num`：两位数字序号，顺延现有最大编号（如 23、24）；
+     - `.card-title`：页面功能名称；
+     - `.card-desc`：`文件名 — 简要功能说明`；
+     - 其余结构与样式类名保持与现有卡片一致。
+   - 将更新后的 index.html 一并纳入本次提交。
+   - 单文件提交，或目录中没有 index.html / 没有新页面时，跳过本步。
+
+5. **暂存并提交**
    - 目录：`git -C "<目录>" add -A`
    - 单文件：`git -C "<目录>" add "<文件绝对路径>"`
    - 提交信息用简洁的祈使句，例如 `git commit -m "add submit-project skill"`。
-   - 若无改动（nothing to commit），跳到第 6 步直接推送。
+   - 若无改动（nothing to commit），跳到第 7 步直接推送。
 
-5. **确保远程指向用户提供的仓库**
+6. **确保远程指向用户提供的仓库**
    - 运行 `git -C "<目录>" remote -v`。
    - 若无 `origin`：`git -C "<目录>" remote add origin "<网址>"`
    - 若 `origin` 不是该地址：`git -C "<目录>" remote set-url origin "<网址>"`
    - `<网址>` 用用户提供的那一项。
 
-6. **推送**
+7. **推送**
    - 首次推送当前分支：`git -C "<目录>" push -u origin HEAD`
    - 之后：`git -C "<目录>" push`
    - 若远端有新提交导致被拒绝：先 `git -C "<目录>" pull --rebase origin <branch>` 再 push；遇到冲突时告知用户手动解决，**不要强推**。
    - **不要**使用 `--force`，除非用户明确要求。
 
-7. **汇报结果**
+8. **汇报结果**
    - 用一句话说明：提交的 commit、推送的分支、以及用户提供的仓库网址。
 
 ## 注意
