@@ -1,0 +1,505 @@
+<!-- 姓名：张耀夫 日期：2026-10-26 功能名称：图像解决方案实验 —— SVG 与 iconfont 自适应下导航演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>15-1 图像解决方案 —— 自适应下导航</title>
+    <!-- ========== iconfont 字体图标（预留） ==========
+         请把 iconfont 下载文件放入 font/ 目录后，取消下方两行的注释。
+         需要的文件：iconfont.css + iconfont.ttf/.woff2 等字体文件。
+         例如：
+         <link rel="stylesheet" href="font/iconfont.css">
+         .zyf_icon { font-family: "iconfont" !important; font-size: 22px; }
+         .zyf_icon-home:before { content: "\e600"; }
+         .zyf_icon-category:before { content: "\e601"; }
+         ...
+         下方 <nav class="zyf_tabbar-font"> 中的图标元素已写好，注释里标出了 class 占位。
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #f4f6fa;
+            color: #2d3748;
+            min-height: 100vh;
+            padding-bottom: 260px; /* 底部留出两个导航的空间 */
+        }
+
+        /* ========= 页面头部 ========= */
+        .zyf_header {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: #fff;
+            padding: 32px 20px 26px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .zyf_header p {
+            font-size: 13px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        /* ========= 演示区域容器 ========= */
+        .zyf_section {
+            max-width: 900px;
+            margin: 28px auto;
+            padding: 0 16px;
+        }
+        .zyf_section h2 {
+            font-size: 16px;
+            color: #4f6df5;
+            margin-bottom: 14px;
+            padding-left: 10px;
+            border-left: 4px solid #6366f1;
+        }
+        .zyf_section p.zyf_tip {
+            font-size: 13px;
+            color: #718096;
+            margin-bottom: 14px;
+            line-height: 1.7;
+        }
+
+        /* ========= 手机模拟框 ========= */
+        .zyf_phone {
+            position: relative;
+            width: 100%;
+            max-width: 390px;
+            height: 560px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 36px;
+            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+            overflow: hidden;
+        }
+        .zyf_phone::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 22px;
+            background: #1a202c;
+            border-radius: 14px;
+            z-index: 20;
+        }
+        .zyf_phone-body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 42px 16px 0;
+            overflow-y: auto;
+        }
+        .zyf_phone-body .zyf_demo-card {
+            background: #edf2fb;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+
+        /* ========= SVG 下导航（固定贴底 + 自适应宽度） ========= */
+        .zyf_tabbar-svg {
+            position: absolute; /* 相对手机框 */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 64px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+            z-index: 10;
+        }
+        .zyf_tabbar-svg .zyf_tab-item {
+            flex: 1 1 0;                    /* 等分自适应宽度 */
+            min-width: 0;                   /* 防止内容撑开 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #a0aec0;
+            font-size: 12px;
+            transition: color 0.2s ease, transform 0.2s ease;
+            padding: 6px 0;
+            user-select: none;
+        }
+        /* SVG 图标用 CSS 修饰大小和颜色 */
+        .zyf_tabbar-svg .zyf_tab-item svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;             /* 关键：让 SVG 继承父元素 color */
+            transition: transform 0.25s ease;
+        }
+        .zyf_tabbar-svg .zyf_tab-item:hover {
+            color: #6366f1;
+        }
+        .zyf_tabbar-svg .zyf_tab-item:hover svg {
+            transform: scale(1.08);
+        }
+        .zyf_tabbar-svg .zyf_tab-item.zyf_active {
+            color: #6366f1;
+        }
+        .zyf_tabbar-svg .zyf_tab-item.zyf_active svg {
+            transform: translateY(-2px) scale(1.12);
+            filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.35));
+        }
+
+        /* ========= iconfont 下导航（占位，待字体文件） ========= */
+        .zyf_tabbar-font {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 64px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+            z-index: 10;
+        }
+        .zyf_tabbar-font .zyf_tab-item {
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #a0aec0;
+            font-size: 12px;
+            transition: color 0.2s ease, transform 0.2s ease;
+            padding: 6px 0;
+            user-select: none;
+        }
+        /* 这里的 .zyf_icon 占位样式，等 iconfont.css 生效后会覆盖字体 */
+        .zyf_tabbar-font .zyf_icon {
+            font-family: "Segoe UI Emoji", "Segoe UI Symbol", sans-serif; /* 临时回退 */
+            font-size: 22px;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            transition: transform 0.25s ease;
+        }
+        .zyf_tabbar-font .zyf_tab-item:hover { color: #6366f1; }
+        .zyf_tabbar-font .zyf_tab-item:hover .zyf_icon { transform: scale(1.08); }
+        .zyf_tabbar-font .zyf_tab-item.zyf_active { color: #6366f1; }
+        .zyf_tabbar-font .zyf_tab-item.zyf_active .zyf_icon {
+            transform: translateY(-2px) scale(1.12);
+        }
+
+        /* ========= 图标大小演示（CSS 修饰） ========= */
+        .zyf_size-demo {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .zyf_size-demo h3 {
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+        .zyf_size-demo .zyf_row {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 12px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .zyf_size-demo .zyf_row:last-child { border-bottom: none; }
+        .zyf_size-demo .zyf_item {
+            text-align: center;
+        }
+        .zyf_size-demo .zyf_item svg,
+        .zyf_size-demo .zyf_item .zyf_icon {
+            color: #6366f1;
+        }
+        .zyf_size-demo .zyf_item.zyf_s12 svg { width: 12px; height: 12px; }
+        .zyf_size-demo .zyf_item.zyf_s16 svg { width: 16px; height: 16px; }
+        .zyf_size-demo .zyf_item.zyf_s24 svg { width: 24px; height: 24px; }
+        .zyf_size-demo .zyf_item.zyf_s32 svg { width: 32px; height: 32px; }
+        .zyf_size-demo .zyf_item.zyf_s48 svg { width: 48px; height: 48px; }
+        .zyf_size-demo .zyf_item span {
+            display: block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #718096;
+        }
+
+        .zyf_color-demo {
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .zyf_color-demo h3 {
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+        .zyf_color-demo .zyf_row {
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .zyf_color-demo .zyf_row:last-child { border-bottom: none; }
+        .zyf_color-demo .zyf_item {
+            text-align: center;
+        }
+        .zyf_color-demo .zyf_item svg {
+            width: 26px;
+            height: 26px;
+        }
+        .zyf_color-demo .zyf_item.zyf_c1 svg { fill: #2d3748; }
+        .zyf_color-demo .zyf_item.zyf_c2 svg { fill: #6366f1; }
+        .zyf_color-demo .zyf_item.zyf_c3 svg { fill: #10b981; }
+        .zyf_color-demo .zyf_item.zyf_c4 svg { fill: #f59e0b; }
+        .zyf_color-demo .zyf_item.zyf_c5 svg { fill: #ef4444; }
+        .zyf_color-demo .zyf_item.zyf_c6 svg { fill: #8b5cf6; }
+        .zyf_color-demo .zyf_item span {
+            display: block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #718096;
+        }
+
+        /* ========= 响应式（多视口自适应） ========= */
+        @media (max-width: 420px) {
+            .zyf_phone {
+                max-width: 100%;
+                height: 480px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .zyf_phone::before { display: none; }
+            .zyf_phone-body { padding-top: 16px; }
+            body { padding-bottom: 420px; }
+        }
+        @media (min-width: 768px) {
+            body {
+                background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="zyf_header">
+        <h1>图像解决方案 · 自适应下导航</h1>
+        <p>张耀夫 · 用 SVG 和 iconfont 字体图标实现移动端底部导航<br>CSS 修饰图标大小与颜色 · 自适应宽度</p>
+    </header>
+
+    <!-- ========== 演示 1：SVG 下导航（完整实现） ========== -->
+    <section class="zyf_section">
+        <h2>方案 A · SVG 自适应下导航（固定贴底）</h2>
+        <p class="zyf_tip">
+            使用 <code>flex: 1</code> 等分宽度实现自适应；图标为 SVG，通过 <code>fill: currentColor</code> 继承父元素
+            <code>color</code>，用 CSS 一行代码同时改变图标和文字的颜色；激活项有缩放和阴影动效。
+        </p>
+        <div class="zyf_phone">
+            <div class="zyf_phone-body">
+                <div class="zyf_demo-card">
+                    👋 欢迎来到「张耀夫 App」首页。<br>
+                    下方是 SVG 自适应下导航，点击试试高亮效果！
+                </div>
+                <div class="zyf_demo-card">
+                    核心知识点：<br>
+                    · <code>fill: currentColor</code> 让 SVG 跟随文字变色<br>
+                    · <code>flex: 1 1 0</code> 等分自适应宽度<br>
+                    · <code>position: absolute</code> 实现固定贴底
+                </div>
+            </div>
+            <nav class="zyf_tabbar-svg" id="zyf_tab_svg">
+                <a class="zyf_tab-item zyf_active" data-zyf_key="home">
+                    <!-- SVG home -->
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>首页</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="category">
+                    <!-- SVG category -->
+                    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+                    <span>分类</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="search">
+                    <!-- SVG search -->
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <span>发现</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="cart">
+                    <!-- SVG cart -->
+                    <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.44c-.16.28-.25.61-.25.97 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.47c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    <span>购物车</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="me">
+                    <!-- SVG me -->
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <span>我的</span>
+                </a>
+            </nav>
+        </div>
+    </section>
+
+    <!-- ========== 演示 2：iconfont 字体图标下导航（占位） ========== -->
+    <section class="zyf_section">
+        <h2>方案 B · iconfont 字体图标下导航（待字体文件）</h2>
+        <p class="zyf_tip">
+            请在 <code>font/</code> 目录下放入 iconfont 下载的字体文件和 <code>iconfont.css</code>，
+            然后在本页 <code>&lt;head&gt;</code> 中取消 link 的注释即可生效。结构和自适应布局与 SVG 方案一致，
+            只是图标换成 <code>&lt;i class="zyf_icon zyf_icon-home"&gt;&lt;/i&gt;</code>。
+        </p>
+        <div class="zyf_phone">
+            <div class="zyf_phone-body">
+                <div class="zyf_demo-card">
+                    📦 iconfont 方案占位。<br>
+                    当前图标临时使用 Emoji 回退，放入真实字体文件后自动切换。
+                </div>
+            </div>
+            <nav class="zyf_tabbar-font">
+                <a class="zyf_tab-item zyf_active" data-zyf_key="home">
+                    <!-- 占位：等 iconfont.css 生效后，替换为 .zyf_icon-home:before  -->
+                    <i class="zyf_icon">🏠</i>
+                    <!-- 真实写法：<i class="zyf_icon zyf_icon-home"></i> -->
+                    <span>首页</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="category">
+                    <i class="zyf_icon">📂</i>
+                    <!-- <i class="zyf_icon zyf_icon-category"></i> -->
+                    <span>分类</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="search">
+                    <i class="zyf_icon">🔍</i>
+                    <!-- <i class="zyf_icon zyf_icon-search"></i> -->
+                    <span>发现</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="cart">
+                    <i class="zyf_icon">🛒</i>
+                    <!-- <i class="zyf_icon zyf_icon-cart"></i> -->
+                    <span>购物车</span>
+                </a>
+                <a class="zyf_tab-item" data-zyf_key="me">
+                    <i class="zyf_icon">👤</i>
+                    <!-- <i class="zyf_icon zyf_icon-me"></i> -->
+                    <span>我的</span>
+                </a>
+            </nav>
+        </div>
+    </section>
+
+    <!-- ========== 演示 3：CSS 修饰图标（大小 & 颜色） ========== -->
+    <section class="zyf_section">
+        <h2>CSS 修饰图标 · 大小与颜色</h2>
+
+        <div class="zyf_size-demo">
+            <h3>① 改变图标大小</h3>
+            <div class="zyf_row">
+                <div class="zyf_item zyf_s12">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>12px</span>
+                </div>
+                <div class="zyf_item zyf_s16">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>16px</span>
+                </div>
+                <div class="zyf_item zyf_s24">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>24px</span>
+                </div>
+                <div class="zyf_item zyf_s32">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>32px</span>
+                </div>
+                <div class="zyf_item zyf_s48">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>48px</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="zyf_color-demo">
+            <h3>② 改变图标颜色（SVG fill / 字体图标 color）</h3>
+            <div class="zyf_row">
+                <div class="zyf_item zyf_c1">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#2d3748</span>
+                </div>
+                <div class="zyf_item zyf_c2">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#6366f1</span>
+                </div>
+                <div class="zyf_item zyf_c3">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#10b981</span>
+                </div>
+                <div class="zyf_item zyf_c4">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#f59e0b</span>
+                </div>
+                <div class="zyf_item zyf_c5">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#ef4444</span>
+                </div>
+                <div class="zyf_item zyf_c6">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>#8b5cf6</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 下导航点击切换激活状态（同时驱动 SVG 和 iconfont 两套）
+        var zyf_svg_nav = document.getElementById("zyf_tab_svg");
+        if (zyf_svg_nav) {
+            zyf_svg_nav.addEventListener("click", function (e) {
+                var zyf_target = e.target.closest(".zyf_tab-item");
+                if (!zyf_target) return;
+                var zyf_items = zyf_svg_nav.querySelectorAll(".zyf_tab-item");
+                for (var zyf_i = 0; zyf_i < zyf_items.length; zyf_i++) {
+                    zyf_items[zyf_i].classList.remove("zyf_active");
+                }
+                zyf_target.classList.add("zyf_active");
+            });
+        }
+
+        var zyf_font_nav = document.querySelector(".zyf_tabbar-font");
+        if (zyf_font_nav) {
+            zyf_font_nav.addEventListener("click", function (e) {
+                var zyf_target = e.target.closest(".zyf_tab-item");
+                if (!zyf_target) return;
+                var zyf_items = zyf_font_nav.querySelectorAll(".zyf_tab-item");
+                for (var zyf_j = 0; zyf_j < zyf_items.length; zyf_j++) {
+                    zyf_items[zyf_j].classList.remove("zyf_active");
+                }
+                zyf_target.classList.add("zyf_active");
+            });
+        }
+
+        // 打印当前视口尺寸到控制台，方便多视口测试
+        window.addEventListener("resize", function () {
+            console.log("[zyf] viewport: " + window.innerWidth + " × " + window.innerHeight);
+        });
+        console.log("[zyf] viewport: " + window.innerWidth + " × " + window.innerHeight);
+    </script>
+</body>
+</html>
