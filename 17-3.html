@@ -1,0 +1,364 @@
+<!-- 姓名：张耀夫 日期：2026-10-29 功能名称：京东风格电商品类导航（按图片还原） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 电商品类导航</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #fff;
+            color: #333;
+            font-size: 13px;
+        }
+
+        /* ============ 分类导航主体 ============ */
+        .zyf_cate {
+            max-width: 1190px;
+            margin: 14px auto;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* 每一行 */
+        .zyf_row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            min-height: 36px;
+        }
+        .zyf_row:last-child { border-bottom: none; }
+
+        /* 左侧主分类 */
+        .zyf_main {
+            width: 90px;
+            flex-shrink: 0;
+            text-align: right;
+            padding-right: 10px;
+            line-height: 36px;
+        }
+        .zyf_main a {
+            color: #e1251b;  /* 京东红 */
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .zyf_main a:hover { color: #333; }
+        .zyf_main .zyf_arrow {
+            color: #c0c0c0;
+            font-weight: 400;
+            margin-left: 2px;
+        }
+
+        /* 右侧子分类 */
+        .zyf_sub {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            gap: 0;
+            line-height: 36px;
+        }
+        .zyf_sub a {
+            color: #333;
+            font-size: 12px;
+            text-decoration: none;
+            padding: 0 10px;
+            border-left: 1px solid #e0e0e0;
+            transition: color 0.2s;
+            white-space: nowrap;
+        }
+        .zyf_sub a:first-child { border-left: none; padding-left: 0; }
+        .zyf_sub a:hover { color: #e1251b; }
+
+        /* ============ 页面外框（仿京东首页容器） ============ */
+        .zyf_wrap {
+            max-width: 1190px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+        }
+
+        .zyf_header {
+            max-width: 1190px;
+            margin: 18px auto 0;
+            padding: 0 10px;
+            text-align: left;
+        }
+        .zyf_header h1 {
+            font-size: 22px;
+            color: #e1251b;
+            font-weight: 700;
+        }
+        .zyf_header p {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>京东 · 全部商品分类</h1>
+        <p>按图片还原 · 京东风格品类导航栏</p>
+    </div>
+
+    <div class="zyf_wrap">
+        <div class="zyf_cate" id="zyf_cate">
+
+            <!-- 1 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">热卖频道<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">潮电数码频道</a>
+                </div>
+            </div>
+
+            <!-- 2 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">天猫榜单<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">云台热销榜</a>
+                    <a href="#">风冷散热器热销榜</a>
+                    <a href="#">路由器热销榜</a>
+                    <a href="#">声卡热销榜</a>
+                    <a href="#">全景声回音壁音响热销榜</a>
+                    <a href="#">AI语音鼠标热销榜</a>
+                </div>
+            </div>
+
+            <!-- 3 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#"></a></div>
+                <div class="zyf_sub">
+                    <a href="#">充电宝好价格</a>
+                    <a href="#">家用游戏机热销榜</a>
+                    <a href="#">便携显示器热销榜</a>
+                    <a href="#">无人机热销榜</a>
+                </div>
+            </div>
+
+            <!-- 4 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">电脑整机<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">笔记本电脑</a>
+                    <a href="#">游戏本</a>
+                    <a href="#">平板电</a>
+                    <a href="#">DIY电脑</a>
+                    <a href="#">服务器/工作站</a>
+                    <a href="#">一体机</a>
+                    <a href="#">mini机</a>
+                </div>
+            </div>
+
+            <!-- 5 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">电脑配件<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">显示器</a>
+                    <a href="#">CPU</a>
+                    <a href="#">主板</a>
+                    <a href="#">显卡</a>
+                    <a href="#">硬盘</a>
+                    <a href="#">内存</a>
+                    <a href="#">机箱</a>
+                    <a href="#">电源</a>
+                    <a href="#">散热器</a>
+                    <a href="#">显示器支架</a>
+                    <a href="#">光驱</a>
+                    <a href="#">声卡</a>
+                    <a href="#">装机配件</a>
+                    <a href="#">SSD固态硬盘</a>
+                </div>
+            </div>
+
+            <!-- 6 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#"></a></div>
+                <div class="zyf_sub">
+                    <a href="#">组装电脑</a>
+                    <a href="#">USB分线器</a>
+                    <a href="#">主板CPU</a>
+                </div>
+            </div>
+
+            <!-- 7 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">外设产品<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">鼠标</a>
+                    <a href="#">键盘</a>
+                    <a href="#">网络仪表仪器</a>
+                    <a href="#">U盘</a>
+                    <a href="#">移动硬盘</a>
+                    <a href="#">摄像头</a>
+                    <a href="#">手写板</a>
+                    <a href="#">UPS电源</a>
+                    <a href="#">平板电脑配件</a>
+                    <a href="#">笔记本配件</a>
+                    <a href="#">投影器</a>
+                </div>
+            </div>
+
+            <!-- 8 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#"></a></div>
+                <div class="zyf_sub">
+                    <a href="#">扩展坞</a>
+                </div>
+            </div>
+
+            <!-- 9 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">游戏设备<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">游戏机</a>
+                    <a href="#">游戏耳机</a>
+                    <a href="#">手柄/方向盘</a>
+                    <a href="#">游戏软件</a>
+                    <a href="#">游戏周边</a>
+                    <a href="#">游戏手办</a>
+                </div>
+            </div>
+
+            <!-- 10 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">网络产品<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">路由器</a>
+                    <a href="#">网络机顶盒</a>
+                    <a href="#">交换机</a>
+                    <a href="#">网络存储</a>
+                    <a href="#">网卡</a>
+                    <a href="#">5G/4G上网</a>
+                    <a href="#">网线</a>
+                    <a href="#">网络配件</a>
+                </div>
+            </div>
+
+            <!-- 11 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">办公设备<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">投影机</a>
+                    <a href="#">打印机</a>
+                    <a href="#">传真设备</a>
+                    <a href="#">碎纸机</a>
+                    <a href="#">考勤门禁</a>
+                    <a href="#">收银机</a>
+                    <a href="#">保险柜</a>
+                    <a href="#">安防监控</a>
+                </div>
+            </div>
+
+            <!-- 12 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">办公耗材<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">墨粉</a>
+                    <a href="#">墨盒</a>
+                    <a href="#">色带</a>
+                    <a href="#">纸类</a>
+                    <a href="#">刻录光盘</a>
+                    <a href="#">电脑打印纸</a>
+                    <a href="#">条码标签纸</a>
+                    <a href="#">收银纸</a>
+                    <a href="#">卡纸</a>
+                </div>
+            </div>
+
+            <!-- 13 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">财务办公<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">订书机</a>
+                    <a href="#">票夹</a>
+                    <a href="#">大头针</a>
+                    <a href="#">美工刀</a>
+                    <a href="#">胶带</a>
+                    <a href="#">复写纸</a>
+                    <a href="#">号码机</a>
+                    <a href="#">印泥</a>
+                    <a href="#">账本</a>
+                    <a href="#">计算器</a>
+                </div>
+            </div>
+
+            <!-- 14 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">书写工具<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">钢笔</a>
+                    <a href="#">记号笔</a>
+                    <a href="#">荧光笔</a>
+                    <a href="#">油漆笔</a>
+                    <a href="#">秀丽笔</a>
+                    <a href="#">圆珠笔</a>
+                    <a href="#">中性笔</a>
+                    <a href="#">笔芯</a>
+                    <a href="#">铅笔</a>
+                </div>
+            </div>
+
+            <!-- 15 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">本册纸类<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">记事本</a>
+                    <a href="#">日记本</a>
+                    <a href="#">作业本</a>
+                    <a href="#">教学用本</a>
+                    <a href="#">手帐</a>
+                    <a href="#">纪念册</a>
+                    <a href="#">索引纸</a>
+                    <a href="#">文稿纸</a>
+                    <a href="#">相册</a>
+                    <a href="#">明信片</a>
+                </div>
+            </div>
+
+            <!-- 16 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">学习用品<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">卷笔刀</a>
+                    <a href="#">练字帖</a>
+                    <a href="#">拼音口计算器</a>
+                    <a href="#">橡皮擦</a>
+                    <a href="#">修正带</a>
+                    <a href="#">阅读架</a>
+                    <a href="#">文具盒</a>
+                    <a href="#">地球仪</a>
+                </div>
+            </div>
+
+            <!-- 17 -->
+            <div class="zyf_row">
+                <div class="zyf_main"><a href="#">绘画书法<span class="zyf_arrow">›</span></a></div>
+                <div class="zyf_sub">
+                    <a href="#">画纸</a>
+                    <a href="#">颜料画笔</a>
+                    <a href="#">勾线笔</a>
+                    <a href="#">蜡笔</a>
+                    <a href="#">水彩笔</a>
+                    <a href="#">画架</a>
+                    <a href="#">文房套装</a>
+                    <a href="#">砚台</a>
+                    <a href="#">毛笔字帖</a>
+                    <a href="#">宣纸</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
