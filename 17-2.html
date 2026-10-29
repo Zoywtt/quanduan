@@ -1,0 +1,539 @@
+<!-- 姓名：张耀夫 日期：2026-10-29 功能名称：JavaScript 对象与字符串方法形象演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-2 JS 对象与字符串</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "Consolas", monospace;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 36px 20px 80px;
+        }
+
+        .zyf_header { text-align: center; margin-bottom: 36px; }
+        .zyf_header h1 {
+            font-size: 30px;
+            background: linear-gradient(135deg, #a855f7, #ec4899, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        .zyf_header p { font-size: 13px; color: #94a3b8; }
+
+        .zyf_section { max-width: 960px; margin: 0 auto 36px; }
+        .zyf_section_title {
+            font-size: 20px; margin-bottom: 18px; padding-left: 12px;
+            border-left: 4px solid #a855f7; color: #a855f7;
+        }
+        .zyf_section_title.zyf_str { border-left-color: #ec4899; color: #ec4899; }
+
+        /* ============ 可视化 ============ */
+        .zyf_visual {
+            padding: 18px 20px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            min-height: 60px;
+        }
+        .zyf_obj_box {
+            display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+        }
+        .zyf_kv {
+            padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            background: linear-gradient(135deg, #334155, #475569);
+            border: 1px solid #64748b;
+            transition: all 0.3s;
+        }
+        .zyf_kv .k { color: #fbbf24; }
+        .zyf_kv .v { color: #86efac; }
+        .zyf_kv.zyf_new { animation: zyf_pop 0.5s; }
+        .zyf_kv.zyf_del { animation: zyf_shrink 0.4s forwards; }
+        @keyframes zyf_pop { 0%{transform:scale(0);opacity:0;} 60%{transform:scale(1.15);} 100%{transform:scale(1);opacity:1;} }
+        @keyframes zyf_shrink { to{transform:scale(0);opacity:0;} }
+
+        /* 字符串字符可视化 */
+        .zyf_str_row {
+            display: flex; flex-wrap: wrap; gap: 2px;
+            padding: 14px; background: rgba(0,0,0,0.3);
+            border: 1px solid #334155; border-radius: 10px; margin-bottom: 14px;
+        }
+        .zyf_chr {
+            width: 34px; height: 40px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #1e293b, #334155);
+            border: 1px solid #475569;
+            color: #f1f5f9;
+        }
+        .zyf_chr .idx { font-size: 9px; color: #64748b; font-weight: 400; line-height: 1; }
+        .zyf_chr.zyf_hl { background: linear-gradient(180deg, #f59e0b, #fbbf24); color: #1e293b; border-color: #f59e0b; }
+        .zyf_chr.zyf_hl2 { background: linear-gradient(180deg, #ec4899, #f472b6); color: #fff; border-color: #ec4899; }
+        .zyf_chr.zyf_new { animation: zyf_pop 0.45s; }
+
+        /* ============ 卡片 ============ */
+        .zyf_card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 18px;
+            backdrop-filter: blur(10px);
+        }
+        .zyf_card h3 {
+            font-size: 15px; color: #fbbf24; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .zyf_method {
+            font-family: "Consolas", monospace;
+            background: rgba(0,0,0,0.4); padding: 2px 10px; border-radius: 4px;
+            color: #c084fc; font-weight: 600; border-left: 3px solid #c084fc;
+        }
+        .zyf_code {
+            background: #020617; border: 1px solid #1e293b; border-radius: 8px;
+            padding: 14px 16px; font-family: "Consolas", monospace;
+            font-size: 12.5px; line-height: 1.8; color: #cbd5e1;
+            overflow-x: auto; margin-bottom: 12px; white-space: pre;
+        }
+        .zyf_code .kw { color: #c084fc; font-weight: 600; }
+        .zyf_code .fn { color: #22d3ee; }
+        .zyf_code .str { color: #86efac; }
+        .zyf_code .num { color: #fbbf24; }
+        .zyf_code .cmt { color: #64748b; font-style: italic; }
+        .zyf_code .prop { color: #f472b6; }
+
+        .zyf_controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .zyf_btn {
+            padding: 7px 18px; border: none; border-radius: 6px; color: #fff;
+            font-size: 12.5px; font-weight: 600; cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #22d3ee);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .zyf_btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(99,102,241,0.4); }
+        .zyf_btn:active { transform: translateY(0); }
+        .zyf_btn.zyf_reset { background: linear-gradient(135deg, #64748b, #475569); }
+        .zyf_btn.zyf_purple { background: linear-gradient(135deg, #a855f7, #ec4899); }
+        .zyf_btn.zyf_pink { background: linear-gradient(135deg, #ec4899, #fbbf24); }
+
+        .zyf_input {
+            padding: 6px 10px; background: rgba(0,0,0,0.3);
+            border: 1px solid #334155; border-radius: 6px;
+            color: #e2e8f0; font-size: 12.5px; width: 90px; outline: none;
+            font-family: "Consolas", monospace;
+        }
+        .zyf_input:focus { border-color: #6366f1; }
+        .zyf_inline_label { font-size: 12.5px; color: #94a3b8; }
+
+        .zyf_result {
+            background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.25);
+            border-radius: 6px; padding: 8px 14px; font-family: "Consolas", monospace;
+            font-size: 12.5px; color: #a5b4fc; line-height: 1.8;
+        }
+        .zyf_result b { color: #22d3ee; }
+
+        .zyf_divider {
+            text-align: center; color: #475569; font-size: 12px;
+            letter-spacing: 4px; margin: 30px 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="zyf_header">
+        <h1>JS 对象 & 字符串</h1>
+        <p>可视化 + 交互式演示 · 键值对彩色标签 · 字符位置高亮</p>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                 第一部分：对象                                -->
+    <!-- ========================================================= -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">① 对象（Object）</div>
+
+        <!-- 可视化 -->
+        <div class="zyf_visual">
+            <div style="color:#64748b;font-size:12px;margin-bottom:10px;">当前对象 person =</div>
+            <div id="zyf_obj_visual" class="zyf_obj_box"></div>
+        </div>
+
+        <!-- 创建与访问 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">{}</span> 对象创建与访问</h3>
+            <div class="zyf_code"><span class="cmt">// 对象字面量</span>
+<span class="kw">let</span> person = { <span class="prop">name</span>: <span class="str">"张耀夫"</span>, <span class="prop">age</span>: <span class="num">19</span>, <span class="prop">grade</span>: <span class="str">"计算机24009"</span> };
+
+<span class="cmt">// 两种访问方式</span>
+person.<span class="prop">name</span>;           <span class="cmt">// "." 常用</span>
+person[<span class="str">"age"</span>];         <span class="cmt">// "[]" 支持变量/特殊字符</span>
+
+<span class="cmt">// 修改 / 新增属性</span>
+person.<span class="prop">age</span> = <span class="num">20</span>;          <span class="cmt">// 修改</span>
+person.<span class="prop">email</span> = <span class="str">"1827735290@qq.com"</span>; <span class="cmt">// 新增</span>
+
+<span class="cmt">// 删除属性</span>
+<span class="kw">delete</span> person.<span class="prop">grade</span>;</div>
+            <div class="zyf_controls">
+                <span class="zyf_inline_label">属性名：</span>
+                <input type="text" class="zyf_input" id="zyf_o_key" value="phone" style="width:110px;">
+                <span class="zyf_inline_label">值：</span>
+                <input type="text" class="zyf_input" id="zyf_o_val" value="13800138000" style="width:140px;">
+                <button class="zyf_btn zyf_purple" onclick="zyf_objSet()">▶ person[key]=val</button>
+                <button class="zyf_btn zyf_purple" onclick="zyf_objGet()">▶ person.name</button>
+            </div>
+            <div class="zyf_result" id="zyf_obj_rw_out"></div>
+            <div class="zyf_controls" style="margin-top:8px;">
+                <button class="zyf_btn zyf_reset" onclick="zyf_objDel()">▶ delete person.email</button>
+                <button class="zyf_btn zyf_reset" onclick="zyf_objReset()">🔄 重置对象</button>
+            </div>
+        </div>
+
+        <!-- for...in / keys / values -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">for...in</span> / <span class="zyf_method">Object.keys</span> / <span class="zyf_method">Object.values</span></h3>
+            <div class="zyf_code"><span class="cmt">// 遍历键名</span>
+<span class="kw">for</span> (<span class="kw">let</span> key <span class="kw">in</span> person) { <span class="fn">console</span>.<span class="fn">log</span>(key, person[key]); }
+
+<span class="cmt">// 静态方法（返回数组）</span>
+Object.<span class="fn">keys</span>(person);    <span class="cmt">// → [所有键名]</span>
+Object.<span class="fn">values</span>(person);  <span class="cmt">// → [所有值]</span>
+Object.<span class="fn">entries</span>(person); <span class="cmt">// → [[key,val], ...]</span></div>
+            <div class="zyf_controls">
+                <button class="zyf_btn zyf_purple" onclick="zyf_doKeys()">▶ Object.keys()</button>
+                <button class="zyf_btn zyf_purple" onclick="zyf_doValues()">▶ Object.values()</button>
+                <button class="zyf_btn zyf_purple" onclick="zyf_doEntries()">▶ Object.entries()</button>
+                <button class="zyf_btn zyf_purple" onclick="zyf_doForIn()">▶ for...in 遍历</button>
+            </div>
+            <div class="zyf_result" id="zyf_obj_iter_out"></div>
+        </div>
+
+        <!-- JSON -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">JSON.stringify</span> / <span class="zyf_method">JSON.parse</span> — 序列化</h3>
+            <div class="zyf_code"><span class="cmt">// 对象 ↔ JSON 字符串</span>
+<span class="kw">let</span> str = JSON.<span class="fn">stringify</span>(person);
+<span class="kw">let</span> obj = JSON.<span class="fn">parse</span>(str);
+<span class="cmt">// str 可传给服务器，obj 是全新的对象副本</span></div>
+            <div class="zyf_controls">
+                <button class="zyf_btn zyf_purple" onclick="zyf_doJson()">▶ 双向转换</button>
+            </div>
+            <div class="zyf_result" id="zyf_json_out"></div>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!--                 第二部分：字符串                              -->
+    <!-- ========================================================= -->
+    <div class="zyf_section">
+        <div class="zyf_section_title zyf_str">② 字符串（String）</div>
+
+        <!-- 可视化 -->
+        <div class="zyf_str_row" id="zyf_str_vis"></div>
+        <div class="zyf_controls">
+            <span class="zyf_inline_label">替换文本：</span>
+            <input type="text" class="zyf_input" id="zyf_str_edit" value="Hello JavaScript 你好世界" style="width:240px;">
+            <button class="zyf_btn zyf_pink" onclick="zyf_setStr()">✏️ 设置</button>
+            <button class="zyf_btn zyf_reset" onclick="zyf_setStrDefault()">🔄 默认</button>
+            <span class="zyf_inline_label" id="zyf_str_info" style="margin-left:auto;"></span>
+        </div>
+
+        <!-- 基础属性/访问 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">.length</span> / <span class="zyf_method">[index]</span> / <span class="zyf_method">charAt()</span></h3>
+            <div class="zyf_code"><span class="kw">let</span> s = <span class="str">"Hello"</span>;
+s.<span class="prop">length</span>;          <span class="cmt">// 5</span>
+s[<span class="num">0</span>];             <span class="cmt">// "H"</span>
+s.<span class="fn">charAt</span>(<span class="num">4</span>);      <span class="cmt">// "o"</span>
+s.<span class="fn">charCodeAt</span>(<span class="num">0</span>);   <span class="cmt">// 72 (ASCII)</span></div>
+            <div class="zyf_controls">
+                <span class="zyf_inline_label">索引：</span>
+                <input type="number" class="zyf_input" id="zyf_chr_i" value="0" min="0" style="width:60px;">
+                <button class="zyf_btn zyf_pink" onclick="zyf_doCharAt()">▶ 查字符</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doLength()">▶ .length</button>
+            </div>
+            <div class="zyf_result" id="zyf_str_basic_out"></div>
+        </div>
+
+        <!-- 查找 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">indexOf</span> / <span class="zyf_method">includes</span> / <span class="zyf_method">startsWith</span> / <span class="zyf_method">endsWith</span></h3>
+            <div class="zyf_code"><span class="kw">let</span> s = <span class="str">"Hello JavaScript"</span>;
+s.<span class="fn">indexOf</span>(<span class="str">"Java"</span>);        <span class="cmt">// 6（找不到返回 -1）</span>
+s.<span class="fn">includes</span>(<span class="str">"JS"</span>);          <span class="cmt">// false</span>
+s.<span class="fn">startsWith</span>(<span class="str">"Hel"</span>);       <span class="cmt">// true</span>
+s.<span class="fn">endsWith</span>(<span class="str">"Script"</span>);      <span class="cmt">// true</span></div>
+            <div class="zyf_controls">
+                <span class="zyf_inline_label">查找：</span>
+                <input type="text" class="zyf_input" id="zyf_find_sub" value="Java" style="width:110px;">
+                <button class="zyf_btn zyf_pink" onclick="zyf_doIndexOf()">▶ indexOf + 高亮</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doIncludes()">▶ 四个检测</button>
+            </div>
+            <div class="zyf_result" id="zyf_find_out"></div>
+        </div>
+
+        <!-- 截取 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">slice</span> / <span class="zyf_method">substring</span> / <span class="zyf_method">substr</span></h3>
+            <div class="zyf_code"><span class="kw">let</span> s = <span class="str">"Hello JavaScript"</span>;
+s.<span class="fn">slice</span>(<span class="num">6</span>, <span class="num">10</span>);      <span class="cmt">// "Java"  负索引支持</span>
+s.<span class="fn">slice</span>(-<span class="num">10</span>);         <span class="cmt">// "JavaScript" 后10个</span>
+s.<span class="fn">substring</span>(<span class="num">0</span>, <span class="num">5</span>);   <span class="cmt">// "Hello"</span></div>
+            <div class="zyf_controls">
+                <span class="zyf_inline_label">start：</span>
+                <input type="number" class="zyf_input" id="zyf_sl_s" value="6" style="width:60px;">
+                <span class="zyf_inline_label">end：</span>
+                <input type="number" class="zyf_input" id="zyf_sl_e" value="10" style="width:60px;">
+                <button class="zyf_btn zyf_pink" onclick="zyf_doSlice()">▶ slice(start,end)</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doSliceNeg()">▶ slice(-10)</button>
+            </div>
+            <div class="zyf_result" id="zyf_slice_out"></div>
+        </div>
+
+        <!-- 替换/分割/拼接 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">replace</span> / <span class="zyf_method">split</span> / <span class="zyf_method">join</span></h3>
+            <div class="zyf_code"><span class="kw">let</span> s = <span class="str">"Hello World"</span>;
+s.<span class="fn">replace</span>(<span class="str">"World"</span>, <span class="str">"JS"</span>);  <span class="cmt">// "Hello JS"  (返回新字符串!)</span>
+s.<span class="fn">split</span>(<span class="str">" "</span>);           <span class="cmt">// ["Hello","World"]</span>
+s.<span class="fn">split</span>(<span class="str">""</span>);            <span class="cmt">// ["H","e","l","l","o",...]</span></div>
+            <div class="zyf_controls">
+                <button class="zyf_btn zyf_pink" onclick="zyf_doReplace()">▶ replace(" ","⭐")</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doSplit()">▶ split("")</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doSplitJoin()">▶ 反转字符串</button>
+            </div>
+            <div class="zyf_result" id="zyf_rep_out"></div>
+        </div>
+
+        <!-- 大小写/去空格/重复 -->
+        <div class="zyf_card">
+            <h3><span class="zyf_method">toUpperCase</span> / <span class="zyf_method">trim</span> / <span class="zyf_method">repeat</span></h3>
+            <div class="zyf_controls">
+                <button class="zyf_btn zyf_pink" onclick="zyf_doUpper()">▶ toUpperCase()</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doLower()">▶ toLowerCase()</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doTrim()">▶ trim()</button>
+                <button class="zyf_btn zyf_pink" onclick="zyf_doRepeat()">▶ repeat(3)</button>
+            </div>
+            <div class="zyf_result" id="zyf_misc_out"></div>
+        </div>
+    </div>
+
+    <div class="zyf_divider">· · · 张耀夫 · JS 对象与字符串 · · ·</div>
+
+    <script>
+        // ============ 对象状态 ============
+        var zyf_person = { name: "张耀夫", age: 19, grade: "计算机24009" };
+
+        function zyf_objRender() {
+            var host = document.getElementById("zyf_obj_visual");
+            host.innerHTML = "";
+            var keys = Object.keys(zyf_person);
+            for (var i = 0; i < keys.length; i++) {
+                var span = document.createElement("div");
+                span.className = "zyf_kv";
+                span.innerHTML = '<span class="k">' + keys[i] + '</span>: <span class="v">' + zyf_person[keys[i]] + '</span>';
+                host.appendChild(span);
+            }
+        }
+        function zyf_objReset() {
+            zyf_person = { name: "张耀夫", age: 19, grade: "计算机24009" };
+            zyf_objRender();
+            document.getElementById("zyf_obj_rw_out").textContent = "// 对象已重置";
+            document.getElementById("zyf_obj_iter_out").textContent = "";
+            document.getElementById("zyf_json_out").textContent = "";
+        }
+        zyf_objRender();
+
+        function zyf_objSet() {
+            var k = document.getElementById("zyf_o_key").value.trim();
+            var vRaw = document.getElementById("zyf_o_val").value.trim();
+            var v = isNaN(Number(vRaw)) || vRaw === "" ? vRaw : Number(vRaw);
+            var existed = Object.prototype.hasOwnProperty.call(zyf_person, k);
+            zyf_person[k] = v;
+            zyf_objRender();
+            document.getElementById("zyf_obj_rw_out").innerHTML =
+                (existed ? "修改" : "新增") + ': <b>' + k + ' = ' + v + '</b><br>' +
+                "现在 person = " + JSON.stringify(zyf_person);
+        }
+        function zyf_objGet() {
+            var n = zyf_person.name;
+            document.getElementById("zyf_obj_rw_out").innerHTML =
+                "person.<b>name</b> = <b>" + n + "</b><br>" +
+                "person.<b>age</b>  = <b>" + zyf_person.age + "</b><br>" +
+                "person['grade']   = <b>" + zyf_person["grade"] + "</b>";
+        }
+        function zyf_objDel() {
+            if (!zyf_person.email) {
+                document.getElementById("zyf_obj_rw_out").textContent = "// person 上没有 email 属性";
+                return;
+            }
+            delete zyf_person.email;
+            zyf_objRender();
+            document.getElementById("zyf_obj_rw_out").textContent = "已 delete person.email";
+        }
+
+        function zyf_doKeys() {
+            var r = Object.keys(zyf_person);
+            document.getElementById("zyf_obj_iter_out").innerHTML =
+                "Object.keys → <b>[" + r.join(", ") + "]</b>  共 " + r.length + " 键";
+        }
+        function zyf_doValues() {
+            var r = Object.values(zyf_person);
+            document.getElementById("zyf_obj_iter_out").innerHTML =
+                "Object.values → <b>[" + r.join(", ") + "]</b>";
+        }
+        function zyf_doEntries() {
+            var r = Object.entries(zyf_person);
+            document.getElementById("zyf_obj_iter_out").innerHTML =
+                "Object.entries → <b>" + JSON.stringify(r) + "</b>";
+        }
+        function zyf_doForIn() {
+            var lines = [];
+            for (var k in zyf_person) lines.push(k + " → " + zyf_person[k]);
+            document.getElementById("zyf_obj_iter_out").innerHTML = lines.join("<br>");
+        }
+        function zyf_doJson() {
+            var str = JSON.stringify(zyf_person);
+            var obj = JSON.parse(str);
+            document.getElementById("zyf_json_out").innerHTML =
+                "JSON.stringify → <b>" + str + "</b><br>" +
+                "JSON.parse → <b>" + JSON.stringify(obj) + "</b><br>" +
+                "<span style='color:#64748b'>=== 深拷贝：obj !== person 且 obj.email='新值' 不影响 person</span>";
+            obj.email = "test@test.com";
+        }
+
+        // ============ 字符串状态 ============
+        var zyf_str = "Hello JavaScript 你好世界";
+
+        function zyf_strRender(highlightRanges) {
+            // highlightRanges: [{start,end,cls}] 可选
+            var host = document.getElementById("zyf_str_vis");
+            host.innerHTML = "";
+            for (var i = 0; i < zyf_str.length; i++) {
+                var c = document.createElement("div");
+                c.className = "zyf_chr";
+                var chr = zyf_str[i] === " " ? "·" : zyf_str[i];
+                c.innerHTML = '<span class="idx">' + i + '</span>' + chr;
+                if (highlightRanges) {
+                    for (var h = 0; h < highlightRanges.length; h++) {
+                        var r = highlightRanges[h];
+                        if (i >= r.start && i < r.end) c.classList.add(r.cls || "zyf_hl");
+                    }
+                }
+                host.appendChild(c);
+            }
+            document.getElementById("zyf_str_info").textContent =
+                '"' + zyf_str + '"  length=' + zyf_str.length;
+        }
+        function zyf_setStr() {
+            zyf_str = document.getElementById("zyf_str_edit").value;
+            zyf_strRender();
+        }
+        function zyf_setStrDefault() {
+            zyf_str = "Hello JavaScript 你好世界";
+            document.getElementById("zyf_str_edit").value = zyf_str;
+            zyf_strRender();
+        }
+        zyf_strRender();
+
+        function zyf_doCharAt() {
+            var i = parseInt(document.getElementById("zyf_chr_i").value) || 0;
+            if (i < 0 || i >= zyf_str.length) {
+                document.getElementById("zyf_str_basic_out").textContent = "⚠️ 索引越界"; return;
+            }
+            var ch = zyf_str[i];
+            var code = zyf_str.charCodeAt(i);
+            zyf_strRender([{start: i, end: i + 1, cls: "zyf_hl"}]);
+            document.getElementById("zyf_str_basic_out").innerHTML =
+                '"' + zyf_str + '"[' + i + '] = <b>"' + ch + '"</b><br>' +
+                '.charCodeAt(' + i + ') = <b>' + code + '</b>';
+        }
+        function zyf_doLength() {
+            document.getElementById("zyf_str_basic_out").innerHTML =
+                '"' + zyf_str + '".length = <b>' + zyf_str.length + '</b>';
+        }
+
+        function zyf_doIndexOf() {
+            var sub = document.getElementById("zyf_find_sub").value;
+            var idx = zyf_str.indexOf(sub);
+            if (idx >= 0) {
+                zyf_strRender([{start: idx, end: idx + sub.length, cls: "zyf_hl2"}]);
+            } else {
+                zyf_strRender();
+            }
+            document.getElementById("zyf_find_out").innerHTML =
+                "indexOf('" + sub + "') = <b>" + idx + "</b>" +
+                (idx < 0 ? "  （没找到）" : "  （已用粉色高亮）");
+        }
+        function zyf_doIncludes() {
+            var s = zyf_str;
+            document.getElementById("zyf_find_out").innerHTML =
+                "includes('Java') → <b>" + s.includes("Java") + "</b><br>" +
+                "startsWith('Hel') → <b>" + s.startsWith("Hel") + "</b><br>" +
+                "endsWith('世界') → <b>" + s.endsWith("世界") + "</b><br>" +
+                "includes('abc')  → <b>" + s.includes("abc") + "</b>";
+        }
+
+        function zyf_doSlice() {
+            var a = parseInt(document.getElementById("zyf_sl_s").value);
+            var b = parseInt(document.getElementById("zyf_sl_e").value);
+            var r = zyf_str.slice(a, b);
+            var rs = a < 0 ? zyf_str.length + a : a;
+            var re = b < 0 ? zyf_str.length + b : b;
+            zyf_strRender([{start: Math.max(0, rs), end: Math.min(zyf_str.length, re), cls: "zyf_hl"}]);
+            document.getElementById("zyf_slice_out").innerHTML =
+                '"' + zyf_str + '".slice(' + a + ',' + b + ') = <b>"' + r + '"</b>';
+        }
+        function zyf_doSliceNeg() {
+            var r = zyf_str.slice(-10);
+            zyf_strRender([{start: zyf_str.length - 10, end: zyf_str.length, cls: "zyf_hl"}]);
+            document.getElementById("zyf_slice_out").innerHTML =
+                'slice(-10) → 后 10 个字符: <b>"' + r + '"</b>';
+        }
+
+        function zyf_doReplace() {
+            var r = zyf_str.replace(" ", "⭐");
+            document.getElementById("zyf_rep_out").innerHTML =
+                '原字符串: <b>"' + zyf_str + '"</b><br>' +
+                'replace(" ","⭐") → <b>"' + r + '"</b><br>' +
+                "<span style='color:#64748b'>⚠️ 字符串不可变！replace 返回的是新字符串，原串未变</span>";
+        }
+        function zyf_doSplit() {
+            var arr = zyf_str.split("");
+            document.getElementById("zyf_rep_out").innerHTML =
+                'split("") → 拆成 <b>' + arr.length + '</b> 个字符：<b>[' + arr.join(", ") + ']</b>';
+        }
+        function zyf_doSplitJoin() {
+            var rev = zyf_str.split("").reverse().join("");
+            document.getElementById("zyf_rep_out").innerHTML =
+                'split("").reverse().join("")<br>' +
+                '"' + zyf_str + '"<br>→ <b>"' + rev + '"</b>';
+        }
+
+        function zyf_doUpper() {
+            document.getElementById("zyf_misc_out").innerHTML =
+                'toUpperCase() → <b>"' + zyf_str.toUpperCase() + '"</b>';
+        }
+        function zyf_doLower() {
+            document.getElementById("zyf_misc_out").innerHTML =
+                'toLowerCase() → <b>"' + zyf_str.toLowerCase() + '"</b>';
+        }
+        function zyf_doTrim() {
+            var padded = "   " + zyf_str + "   ";
+            document.getElementById("zyf_misc_out").innerHTML =
+                '("   ' + zyf_str + '   ").trim() → <b>"' + padded.trim() + '"</b><br>' +
+                'trim().length = <b>' + padded.trim().length + '</b>  (原长 ' + padded.length + ')';
+        }
+        function zyf_doRepeat() {
+            document.getElementById("zyf_misc_out").innerHTML =
+                '"★".repeat(5) → <b>"' + "★".repeat(5) + '"</b><br>' +
+                '原串.repeat(2)  → <b>"' + zyf_str.repeat(2) + '"</b>';
+        }
+    </script>
+</body>
+</html>
