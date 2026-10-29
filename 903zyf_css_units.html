@@ -1,0 +1,246 @@
+<!-- 姓名：张耀夫 日期：2026-10-29 功能名称：CSS 长度单位可视化演示（px/em/rem/vw/vh/% 等） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>903zyf CSS 长度单位</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }   <span style="color:#64748b">/* 基准：1rem = 16px */</span>
+        body {
+            font-family: "Microsoft YaHei", "Consolas", monospace;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0; min-height: 100vh; padding: 36px 20px 80px;
+        }
+        .zyf_header { text-align: center; margin-bottom: 36px; }
+        .zyf_header h1 {
+            font-size: 30px;
+            background: linear-gradient(135deg, #38bdf8, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px; margin-bottom: 8px;
+        }
+        .zyf_header p { font-size: 13px; color: #94a3b8; }
+        .zyf_section { max-width: 960px; margin: 0 auto 32px; }
+        .zyf_section_title {
+            font-size: 20px; margin-bottom: 18px; padding-left: 12px;
+            border-left: 4px solid #38bdf8; color: #38bdf8;
+        }
+        .zyf_card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 22px; margin-bottom: 18px;
+        }
+        .zyf_card h3 { font-size: 14px; color: #fbbf24; margin-bottom: 4px; font-family: "Consolas", monospace; }
+        .zyf_card h3 small { color: #64748b; font-weight: 400; margin-left: 6px; }
+        .zyf_card p { font-size: 12.5px; color: #94a3b8; margin-bottom: 14px; line-height: 1.8; }
+
+        /* ===== 可视化条形 ===== */
+        .zyf_bar_row {
+            display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
+        }
+        .zyf_bar_label {
+            width: 100px; font-size: 12.5px; color: #a5b4fc; font-family: "Consolas", monospace;
+            flex-shrink: 0; text-align: right;
+        }
+        .zyf_bar_wrap {
+            flex: 1; height: 28px;
+            background: rgba(0,0,0,0.3); border: 1px dashed #334155; border-radius: 4px;
+            position: relative; overflow: hidden;
+        }
+        .zyf_bar {
+            height: 100%; border-radius: 3px; transition: width 0.4s ease;
+            display: flex; align-items: center; padding-left: 10px;
+            font-size: 11px; font-weight: 700; color: #fff;
+            background: linear-gradient(90deg, #38bdf8, #a855f7);
+        }
+        .zyf_bar.zyf_purple { background: linear-gradient(90deg, #a855f7, #ec4899); }
+        .zyf_bar.zyf_pink   { background: linear-gradient(90deg, #ec4899, #fbbf24); }
+        .zyf_bar.zyf_green  { background: linear-gradient(90deg, #22c55e, #86efac); }
+
+        /* ===== 单位演示方块 ===== */
+        .zyf_demo_row {
+            display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+            padding: 20px; background: rgba(0,0,0,0.3); border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .zyf_demo_cell { text-align: center; }
+        .zyf_demo_box {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: #fff; font-weight: 700; margin-bottom: 6px;
+            transition: transform 0.3s;
+        }
+        .zyf_demo_box:hover { transform: scale(1.05); }
+        .zyf_demo_label { font-size: 11px; color: #64748b; font-family: "Consolas", monospace; }
+
+        /* ===== em 嵌套演示 ===== */
+        .zyf_em_tree { padding: 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #334155; }
+        .zyf_em_tree .zyf_l1 {
+            padding: 16px; border: 2px solid #38bdf8; border-radius: 8px;
+            font-size: 24px; color: #38bdf8; margin-bottom: 10px;
+        }
+        .zyf_em_tree .zyf_l2 {
+            padding: 1em; border: 2px solid #a855f7; border-radius: 6px;
+            font-size: 1em; color: #a855f7;
+        }
+        .zyf_em_tree .zyf_l3 {
+            padding: 1em; border: 2px solid #f472b6; border-radius: 4px;
+            font-size: 1em; color: #f472b6;
+        }
+
+        /* ===== rem vs px 响应式 ===== */
+        .zyf_rem_demo {
+            padding: 20px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #334155;
+            text-align: center;
+        }
+        .zyf_rem_demo .zyf_rem_box {
+            width: 12rem; height: 6rem; margin: 0 auto 10px;
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; font-weight: 700; color: #fff;
+        }
+        .zyf_rem_demo .zyf_px_box {
+            width: 192px; height: 96px; margin: 0 auto 10px;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: #fff;
+        }
+        .zyf_controls { margin-top: 10px; }
+        .zyf_controls button {
+            padding: 6px 16px; margin: 0 4px; border: none; border-radius: 6px; cursor: pointer;
+            font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff;
+        }
+        .zyf_controls button:hover { transform: translateY(-2px); }
+
+        .zyf_divider { text-align: center; color: #475569; font-size: 12px; letter-spacing: 4px; margin: 30px 0 10px; }
+    </style>
+</head>
+<body>
+    <div class="zyf_header">
+        <h1>CSS 长度单位</h1>
+        <p>px · em · rem · vw · vh · % · ch —— 形象对比演示</p>
+    </div>
+
+    <!-- ============ px 绝对单位 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">① 绝对单位 px</div>
+        <div class="zyf_card">
+            <h3>px (pixel) <small>固定像素，不受任何字体设置影响</small></h3>
+            <p>显示器上一个像素点。写多少就是多少，不会随着浏览器缩放或根字体变化。</p>
+            <div class="zyf_demo_row">
+                <div class="zyf_demo_cell"><div class="zyf_demo_box" style="width:32px;height:32px;">32</div><div class="zyf_demo_label">32px</div></div>
+                <div class="zyf_demo_cell"><div class="zyf_demo_box" style="width:64px;height:64px;">64</div><div class="zyf_demo_label">64px</div></div>
+                <div class="zyf_demo_cell"><div class="zyf_demo_box" style="width:96px;height:96px;">96</div><div class="zyf_demo_label">96px</div></div>
+                <div class="zyf_demo_cell"><div class="zyf_demo_box" style="width:128px;height:128px;">128</div><div class="zyf_demo_label">128px</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ em / rem ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">② em（相对父元素）vs rem（相对根元素）</div>
+
+        <div class="zyf_card">
+            <h3>em —— 相对于<strong>父元素</strong>的 font-size</h3>
+            <p>⚠️ em 在嵌套时会产生「放大效应」：父 24px → 子 1em=24px → 孙子 1em=子的 1em 还是 24px，但 padding:1em 会层层传递放大。</p>
+            <div class="zyf_em_tree">
+                <div class="zyf_l1">L1: font-size: 24px
+                    <div class="zyf_l2">L2: font-size: 1em (=24px)
+                        <div class="zyf_l3">L3: font-size: 1em (=24px)<br>但 padding:1em 每一层都放大！</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="zyf_card">
+            <h3>rem —— 相对于 html 的 font-size（root em）⭐推荐</h3>
+            <p>整个页面只有一个基准点：<code style="color:#c084fc">html { font-size: 16px; }</code>。1rem = 16px，**不随嵌套放大**。</p>
+            <div class="zyf_rem_demo">
+                <p style="color:#64748b;font-size:12px;margin-bottom:10px;">👇 点击按钮改变 html font-size，看 rem vs px 谁会跟着变：</p>
+                <div style="display:flex;justify-content:center;gap:40px;flex-wrap:wrap;">
+                    <div>
+                        <div class="zyf_rem_box">width: 12rem</div>
+                        <div style="font-size:11px;color:#22c55e;font-weight:700;">✅ rem：跟着变</div>
+                    </div>
+                    <div>
+                        <div class="zyf_px_box">width: 192px</div>
+                        <div style="font-size:11px;color:#ef4444;font-weight:700;">❌ px：不变</div>
+                    </div>
+                </div>
+                <div class="zyf_controls">
+                    <button onclick="document.documentElement.style.fontSize='16px';document.getElementById('zyf_rem_info').textContent='html font-size: 16px → 1rem = 16px';">🔹 16px (默认)</button>
+                    <button onclick="document.documentElement.style.fontSize='20px';document.getElementById('zyf_rem_info').textContent='html font-size: 20px → 1rem = 20px';">🔸 20px</button>
+                    <button onclick="document.documentElement.style.fontSize='24px';document.getElementById('zyf_rem_info').textContent='html font-size: 24px → 1rem = 24px';">🔶 24px</button>
+                    <button onclick="document.documentElement.style.fontSize='12px';document.getElementById('zyf_rem_info').textContent='html font-size: 12px → 1rem = 12px';">🔷 12px</button>
+                </div>
+                <div id="zyf_rem_info" style="font-size:11px;color:#a5b4fc;margin-top:8px;">html font-size: 16px → 1rem = 16px</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ vw / vh ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">③ vw / vh —— 视口百分比</div>
+        <div class="zyf_card">
+            <h3>vw (viewport width) · vh (viewport height)</h3>
+            <p>1vw = 视口宽度的 1%，1vh = 视口高度的 1%。拖动浏览器窗口大小看看效果！</p>
+            <p style="font-size:11px;color:#64748b;">💡 当前视口: <span id="zyf_viewport_info">--</span></p>
+
+            <div class="zyf_bar_row"><span class="zyf_bar_label">25vw</span><div class="zyf_bar_wrap"><div class="zyf_bar" style="width:25vw;">25vw</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">50vw</span><div class="zyf_bar_wrap"><div class="zyf_bar zyf_purple" style="width:50vw;">50vw</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">75vw</span><div class="zyf_bar_wrap"><div class="zyf_bar zyf_pink" style="width:75vw;">75vw</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">100vw</span><div class="zyf_bar_wrap"><div class="zyf_bar zyf_green" style="width:100%;">100vw = 满宽</div></div></div>
+        </div>
+    </div>
+
+    <!-- ============ % ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">④ % —— 父容器百分比</div>
+        <div class="zyf_card">
+            <h3>%</h3>
+            <p>相对于<strong>父容器</strong>的尺寸。父容器变它就变，父容器多大它就相对多大。</p>
+            <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:16px;border:1px solid #334155;">
+                <div style="background:linear-gradient(135deg,#334155,#475569);border-radius:6px;padding:14px;margin-bottom:10px;color:#94a3b8;font-size:12px;">
+                    父容器 width: 100%
+                    <div style="background:linear-gradient(135deg,#38bdf8,#a855f7);border-radius:4px;padding:8px;width:50%;color:#fff;font-size:11px;margin-top:8px;">子 50% → 父的一半</div>
+                    <div style="background:linear-gradient(135deg,#ec4899,#fbbf24);border-radius:4px;padding:8px;width:25%;color:#fff;font-size:11px;margin-top:6px;">孙子 50% → 父的 50% = 爷的 25%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 汇总 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">⑤ 一图看懂：6 种单位对比</div>
+        <div class="zyf_card">
+            <h3>同样的「128」值，不同单位实际长度</h3>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">128px</span>   <div class="zyf_bar_wrap"><div class="zyf_bar" style="width:128px;">128px</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">8rem</span>    <div class="zyf_bar_wrap"><div class="zyf_bar zyf_purple" style="width:8rem;">8rem (=128px @16px)</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">8em</span>     <div class="zyf_bar_wrap"><div class="zyf_bar zyf_purple" style="width:8em;">8em (看父元素)</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">15vw</span>    <div class="zyf_bar_wrap"><div class="zyf_bar zyf_pink" style="width:15vw;">15vw (≈ 视口15%)</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">30%</span>     <div class="zyf_bar_wrap"><div class="zyf_bar zyf_green" style="width:30%;">30% (父容器的)</div></div></div>
+            <div class="zyf_bar_row"><span class="zyf_bar_label">16ch</span>    <div class="zyf_bar_wrap"><div class="zyf_bar" style="width:16ch;">16ch ≈ 16个"0"的宽</div></div></div>
+        </div>
+        <div class="zyf_card" style="background:rgba(56,189,248,0.06);border-color:rgba(56,189,248,0.3);">
+            <h3 style="color:#22d3ee;">💡 选型建议</h3>
+            <p>• <b>px</b>：边框、阴影、固定小图标尺寸</p>
+            <p>• <b>rem</b>：<b>推荐作为主力单位</b>，padding/margin/字体/容器宽度全用它，改根字号全站响应</p>
+            <p>• <b>em</b>：仅在想让某个子元素跟随父元素 font-size 变化时用（如按钮内部 padding）</p>
+            <p>• <b>vw/vh</b>：全屏 Banner、视口高度布局（100vh）、文字 clamp()</p>
+            <p>• <b>%</b>：父容器内部的流式分栏</p>
+        </div>
+    </div>
+
+    <div class="zyf_divider">· · · 张耀夫 · CSS 长度单位 · · ·</div>
+
+    <script>
+        function zyf_updateViewport() {
+            document.getElementById("zyf_viewport_info").textContent =
+                window.innerWidth + "px × " + window.innerHeight + "px";
+        }
+        zyf_updateViewport();
+        window.addEventListener("resize", zyf_updateViewport);
+    </script>
+</body>
+</html>

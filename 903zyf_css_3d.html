@@ -1,0 +1,250 @@
+<!-- 姓名：张耀夫 日期：2026-10-29 功能名称：CSS3 3D 动画演示（立方体、翻转卡片、旋转木马） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>903zyf CSS3 3D 动画</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "Consolas", monospace;
+            background: radial-gradient(circle at 20% 10%, #1e1b4b 0%, #0b1120 45%, #05070d 100%);
+            color: #e2e8f0; min-height: 100vh; padding: 36px 20px 80px; overflow-x: hidden;
+        }
+        .zyf_header { text-align: center; margin-bottom: 36px; }
+        .zyf_header h1 {
+            font-size: 30px;
+            background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 2px; margin-bottom: 8px;
+        }
+        .zyf_header p { font-size: 13px; color: #94a3b8; }
+        .zyf_section { max-width: 960px; margin: 0 auto 40px; }
+        .zyf_section_title {
+            font-size: 20px; margin-bottom: 20px; padding-left: 12px;
+            border-left: 4px solid #c084fc; color: #c084fc;
+        }
+
+        /* ============ 3D 舞台 ============ */
+        .zyf_stage { perspective: 1200px; display: flex; justify-content: center; align-items: center; }
+
+        /* ============ 立方体 ============ */
+        .zyf_cube_scene { width: 220px; height: 220px; perspective: 800px; margin: 20px auto; }
+        .zyf_cube {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d;
+            animation: zyf_cube_spin 12s infinite linear;
+        }
+        @keyframes zyf_cube_spin {
+            0%   { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+        .zyf_face {
+            position: absolute; width: 220px; height: 220px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 700; color: #fff; letter-spacing: 3px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: inset 0 0 40px rgba(255,255,255,0.1);
+            backface-visibility: visible;
+        }
+        .zyf_face.zyf_front  { background: rgba(239,68,68,0.85);  transform: translateZ(110px); }
+        .zyf_face.zyf_back   { background: rgba(59,130,246,0.85);  transform: rotateY(180deg) translateZ(110px); }
+        .zyf_face.zyf_right  { background: rgba(34,197,94,0.85);   transform: rotateY(90deg) translateZ(110px); }
+        .zyf_face.zyf_left   { background: rgba(249,115,22,0.85);  transform: rotateY(-90deg) translateZ(110px); }
+        .zyf_face.zyf_top    { background: rgba(168,85,247,0.85);  transform: rotateX(90deg) translateZ(110px); }
+        .zyf_face.zyf_bottom { background: rgba(236,72,153,0.85);  transform: rotateX(-90deg) translateZ(110px); }
+
+        .zyf_controls { display:flex; gap:10px; justify-content:center; margin-top:14px; }
+        .zyf_btn { padding:6px 16px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; transition:transform .15s; }
+        .zyf_btn:hover { transform: translateY(-2px); }
+
+        /* ============ 翻转卡片 ============ */
+        .zyf_flip_card_wrap { display:flex; gap:30px; justify-content:center; flex-wrap:wrap; perspective:1000px; }
+        .zyf_flip_card {
+            width: 180px; height: 240px; position: relative;
+            transform-style: preserve-3d; transition: transform 0.8s;
+            cursor: pointer;
+        }
+        .zyf_flip_card:hover { transform: rotateY(180deg); }
+        .zyf_flip_card.zyf_flipped { transform: rotateY(180deg); }
+        .zyf_side {
+            position: absolute; width: 100%; height: 100%;
+            border-radius: 14px; backface-visibility: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
+        }
+        .zyf_side.zyf_front {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+        }
+        .zyf_side.zyf_back {
+            background: linear-gradient(135deg, #ec4899, #fbbf24);
+            transform: rotateY(180deg);
+            box-shadow: 0 10px 30px rgba(236,72,153,0.4);
+        }
+        .zyf_side .zyf_emoji { font-size: 48px; margin-bottom: 10px; }
+        .zyf_side h4 { color:#fff; font-size:18px; margin-bottom:6px; }
+        .zyf_side p { color:rgba(255,255,255,0.8); font-size:12px; line-height:1.6; }
+
+        /* ============ 旋转木马 ============ */
+        .zyf_carousel_scene { width: 260px; height: 260px; perspective: 1000px; margin: 20px auto; }
+        .zyf_carousel {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d;
+            animation: zyf_carousel_spin 16s infinite linear;
+        }
+        @keyframes zyf_carousel_spin {
+            from { transform: rotateY(0deg); }
+            to   { transform: rotateY(360deg); }
+        }
+        .zyf_carousel:hover { animation-play-state: paused; }
+        .zyf_carousel .zyf_c_item {
+            position: absolute; width: 180px; height: 180px; left: 40px; top: 40px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 42px;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        /* ============ 滚动揭示 ============ */
+        .zyf_reveal_row {
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+        }
+        .zyf_reveal {
+            width: 200px; height: 140px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 700; color: #fff;
+            transform: rotateX(15deg);
+            transition: transform 0.5s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .zyf_reveal:hover { transform: rotateX(0deg) scale(1.05); }
+
+        /* ============ 公共卡片 ============ */
+        .zyf_card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 22px; margin-bottom: 18px;
+        }
+        .zyf_card h3 { font-size: 14px; color: #fbbf24; margin-bottom: 4px; font-family: "Consolas", monospace; }
+        .zyf_card h3 small { color: #64748b; font-weight: 400; margin-left: 6px; }
+        .zyf_card p { font-size: 12.5px; color: #94a3b8; margin-bottom: 14px; line-height: 1.8; }
+        .zyf_code {
+            background: #020617; border: 1px solid #1e293b; border-radius: 8px;
+            padding: 12px 16px; font-family: "Consolas", monospace; font-size: 12px;
+            line-height: 1.8; color: #cbd5e1; overflow-x: auto; margin-bottom: 12px; white-space: pre;
+        }
+        .zyf_code .kw { color: #c084fc; font-weight: 600; }
+        .zyf_code .prop { color: #f472b6; }
+        .zyf_code .cmt { color: #64748b; font-style: italic; }
+
+        .zyf_divider { text-align:center; color:#475569; font-size:12px; letter-spacing:4px; margin:30px 0 10px; }
+    </style>
+</head>
+<body>
+    <div class="zyf_header">
+        <h1>CSS3 3D 动画</h1>
+        <p>立方体 · 翻转卡片 · 旋转木马 —— transform-style: preserve-3d 的魔力</p>
+    </div>
+
+    <!-- ============ 3D 立方体 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">① 旋转立方体</div>
+        <div class="zyf_card">
+            <h3>transform-style: preserve-3d <small>让子元素真正处在 3D 空间</small></h3>
+            <p>6 个面各 translateZ(110px) 向外偏移，父容器 rotateX + rotateY 同时旋转。</p>
+            <div class="zyf_code"><span class="kw">.cube</span> { <span class="prop">transform-style</span>: preserve-3d; }
+<span class="kw">.cube</span> { animation: spin <span class="num">12s</span> infinite linear; }
+<span class="cmt">/* 每个面 */</span>
+<span class="kw">.front</span> { transform: translateZ(<span class="num">110px</span>); }
+<span class="kw">.back</span>  { transform: rotateY(<span class="num">180deg</span>) translateZ(<span class="num">110px</span>); }</div>
+
+            <div class="zyf_cube_scene">
+                <div class="zyf_cube" id="zyf_cube">
+                    <div class="zyf_face zyf_front">FRONT</div>
+                    <div class="zyf_face zyf_back">BACK</div>
+                    <div class="zyf_face zyf_right">RIGHT</div>
+                    <div class="zyf_face zyf_left">LEFT</div>
+                    <div class="zyf_face zyf_top">TOP</div>
+                    <div class="zyf_face zyf_bottom">BOTTOM</div>
+                </div>
+            </div>
+            <div class="zyf_controls">
+                <button class="zyf_btn" onclick="zyf_cube.style.animationPlayState = 'paused'">⏸ 暂停</button>
+                <button class="zyf_btn" onclick="zyf_cube.style.animationPlayState = 'running'">▶ 播放</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 翻转卡片 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">② 3D 翻转卡片</div>
+        <div class="zyf_card">
+            <h3>backface-visibility: hidden <small>背面不可见 + hover rotateY(180deg)</small></h3>
+            <p>鼠标悬停卡片会翻转到背面。点击也可切换（支持触屏）。</p>
+            <div class="zyf_code"><span class="kw">.card</span> { transform-style: preserve-3d; transition: transform <span class="num">0.8s</span>; }
+<span class="kw">.card:hover</span> { transform: rotateY(<span class="num">180deg</span>); }
+<span class="kw">.side</span>  { backface-visibility: hidden; position: absolute; }
+<span class="kw">.back</span>   { transform: rotateY(<span class="num">180deg</span>); }</div>
+
+            <div class="zyf_flip_card_wrap">
+                <div class="zyf_flip_card" onclick="this.classList.toggle('zyf_flipped')">
+                    <div class="zyf_side zyf_front"><div class="zyf_emoji">🎨</div><h4>设计师</h4><p>hover/click 翻转</p></div>
+                    <div class="zyf_side zyf_back"><div class="zyf_emoji">✨</div><h4>DESIGN</h4><p>Figma · Sketch · UI/UX</p></div>
+                </div>
+                <div class="zyf_flip_card" onclick="this.classList.toggle('zyf_flipped')">
+                    <div class="zyf_side zyf_front"><div class="zyf_emoji">💻</div><h4>前端工程师</h4><p>hover/click 翻转</p></div>
+                    <div class="zyf_side zyf_back"><div class="zyf_emoji">⚡</div><h4>CODE</h4><p>HTML · CSS · JS · Vue</p></div>
+                </div>
+                <div class="zyf_flip_card" onclick="this.classList.toggle('zyf_flipped')">
+                    <div class="zyf_side zyf_front"><div class="zyf_emoji">🎮</div><h4>游戏开发者</h4><p>hover/click 翻转</p></div>
+                    <div class="zyf_side zyf_back"><div class="zyf_emoji">🕹️</div><h4>PLAY</h4><p>Unity · C# · 3D</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 旋转木马 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">③ 旋转木马 Carousel</div>
+        <div class="zyf_card">
+            <h3>rotateY + translateZ 围成一圈</h3>
+            <p>每张卡片 rotateY 递增 45° 再 translateZ 到同一个圆周上（这里 8 张，每张 45°）。hover 暂停。</p>
+            <div class="zyf_code"><span class="kw">.item</span> { transform: rotateY(<span class="num">0</span>deg) translateZ(<span class="num">200px</span>); }
+<span class="kw">.item:nth-child(2)</span> { transform: rotateY(<span class="num">45</span>deg) translateZ(<span class="num">200px</span>); }
+<span class="cmt">/* 依次 +45° */</span></div>
+
+            <div class="zyf_carousel_scene">
+                <div class="zyf_carousel" id="zyf_carousel">
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#ef4444,#f97316); transform:rotateY(0deg) translateZ(200px);">1</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#f97316,#eab308); transform:rotateY(45deg) translateZ(200px);">2</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#eab308,#22c55e); transform:rotateY(90deg) translateZ(200px);">3</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#22c55e,#14b8a6); transform:rotateY(135deg) translateZ(200px);">4</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#14b8a6,#3b82f6); transform:rotateY(180deg) translateZ(200px);">5</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6); transform:rotateY(225deg) translateZ(200px);">6</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#8b5cf6,#ec4899); transform:rotateY(270deg) translateZ(200px);">7</div>
+                    <div class="zyf_c_item" style="background:linear-gradient(135deg,#ec4899,#f43f5e); transform:rotateY(315deg) translateZ(200px);">8</div>
+                </div>
+            </div>
+            <div style="text-align:center;font-size:12px;color:#64748b;">💡 hover 木马可暂停旋转</div>
+        </div>
+    </div>
+
+    <!-- ============ 倾斜揭示 ============ -->
+    <div class="zyf_section">
+        <div class="zyf_section_title">④ 倾斜揭示 Tilt Reveal</div>
+        <div class="zyf_card">
+            <h3>rotateX 模拟 3D 悬浮效果</h3>
+            <div class="zyf_reveal_row">
+                <div class="zyf_reveal" style="background:linear-gradient(135deg,#6366f1,#a855f7);">Hover ↑</div>
+                <div class="zyf_reveal" style="background:linear-gradient(135deg,#ec4899,#f43f5e);">2024</div>
+                <div class="zyf_reveal" style="background:linear-gradient(135deg,#22c55e,#14b8a6);">JavaScript</div>
+                <div class="zyf_reveal" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">CSS 3D</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="zyf_divider">· · · 张耀夫 · CSS3 3D 动画 · · ·</div>
+</body>
+</html>
