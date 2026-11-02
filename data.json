@@ -1,0 +1,8 @@
+[
+  { "name": "机械键盘 K87", "category": "外设产品", "price": 329, "stock": 128 },
+  { "name": "无线鼠标 M330", "category": "外设产品", "price": 129, "stock": 256 },
+  { "name": "27 英寸显示器", "category": "电脑配件", "price": 1099, "stock": 64 },
+  { "name": "NVMe 固态硬盘 1TB", "category": "电脑配件", "price": 599, "stock": 92 },
+  { "name": "WiFi 6 路由器", "category": "网络产品", "price": 459, "stock": 47 },
+  { "name": "USB-C 扩展坞", "category": "外设产品", "price": 269, "stock": 150 }
+]
