@@ -1,0 +1,483 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：接口测试工具，支持 GET/POST/PUT/PATCH/DELETE，展示返回数据与错误提示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-4 接口测试工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 28px 16px 60px;
+            min-height: 100vh;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            max-width: 1180px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .zyf_header h1 {
+            font-size: 22px;
+            color: #f8fafc;
+            letter-spacing: 1px;
+        }
+        .zyf_header p {
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+
+        /* ============ 快捷示例 ============ */
+        .zyf_presets {
+            max-width: 1180px;
+            margin: 0 auto 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .zyf_presets span { font-size: 12px; color: #64748b; }
+        .zyf_preset {
+            font-size: 12px;
+            font-family: Consolas, monospace;
+            color: #cbd5e1;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 3px 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .zyf_preset:hover { border-color: #818cf8; color: #fff; }
+
+        /* ============ 主面板 ============ */
+        .zyf_panel {
+            max-width: 1180px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 880px) {
+            .zyf_panel { grid-template-columns: 1fr; }
+        }
+
+        .zyf_col {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            min-height: 480px;
+        }
+        .zyf_col_title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 请求行 */
+        .zyf_row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .zyf_method {
+            width: 108px;
+            font-family: Consolas, monospace;
+            font-weight: 700;
+            font-size: 13px;
+            color: #fff;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 9px 10px;
+            cursor: pointer;
+            outline: none;
+        }
+        .zyf_url {
+            flex: 1;
+            min-width: 0;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            color: #e2e8f0;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 9px 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .zyf_url:focus { border-color: #6366f1; }
+
+        .zyf_btn {
+            border: none;
+            border-radius: 8px;
+            padding: 9px 22px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.2s;
+        }
+        .zyf_btn:hover { filter: brightness(1.12); }
+        .zyf_btn:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
+
+        .zyf_label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+        .zyf_body_wrap { display: none; flex-direction: column; }
+        .zyf_body_wrap.zyf_show { display: flex; }
+
+        .zyf_body {
+            width: 100%;
+            min-height: 150px;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: #a5b4fc;
+            background: #0b1220;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .zyf_body:focus { border-color: #6366f1; }
+
+        .zyf_hint {
+            margin-top: auto;
+            font-size: 11.5px;
+            color: #64748b;
+            border-top: 1px dashed #1f2937;
+            padding-top: 10px;
+        }
+
+        /* ============ 响应区 ============ */
+        .zyf_resp_head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .zyf_pill {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 2px 10px;
+        }
+        .zyf_pill_ok { background: #052e1c; color: #4ade80; border: 1px solid #14532d; }
+        .zyf_pill_bad { background: #3f1218; color: #f87171; border: 1px solid #7f1d1d; }
+        .zyf_pill_info { background: #172554; color: #93c5fd; border: 1px solid #1e3a8a; }
+        .zyf_ms { font-size: 12px; color: #64748b; font-family: Consolas, monospace; }
+
+        .zyf_resp_box {
+            flex: 1;
+            background: #0b1220;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            padding: 12px;
+            overflow: auto;
+            max-height: 520px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12.5px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #94a3b8;
+        }
+        .zyf_placeholder { color: #475569; }
+
+        /* JSON 高亮 */
+        .zyf_key { color: #93c5fd; }
+        .zyf_str { color: #86efac; }
+        .zyf_num { color: #fcd34d; }
+        .zyf_bool { color: #f0abfc; }
+        .zyf_null { color: #94a3b8; }
+
+        /* 错误提示 */
+        .zyf_error {
+            margin-top: 10px;
+            background: #3f1218;
+            border: 1px solid #7f1d1d;
+            color: #fca5a5;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            display: none;
+        }
+        .zyf_error.zyf_show { display: block; }
+        .zyf_error b { color: #fecaca; }
+
+        .zyf_footer {
+            max-width: 1180px;
+            margin: 26px auto 0;
+            text-align: center;
+            font-size: 12px;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>接口测试工具</h1>
+        <p>原生 fetch · 支持 GET / POST / PUT / PATCH / DELETE</p>
+    </div>
+
+    <!-- 快捷示例 -->
+    <div class="zyf_presets">
+        <span>快捷示例：</span>
+        <button class="zyf_preset" onclick="zyf_preset('GET')">GET 列表</button>
+        <button class="zyf_preset" onclick="zyf_preset('GET1')">GET 单条</button>
+        <button class="zyf_preset" onclick="zyf_preset('POST')">POST 新建</button>
+        <button class="zyf_preset" onclick="zyf_preset('PATCH')">PATCH 修改</button>
+        <button class="zyf_preset" onclick="zyf_preset('404')">404 错误</button>
+    </div>
+
+    <div class="zyf_panel">
+
+        <!-- 左：请求 -->
+        <div class="zyf_col">
+            <div class="zyf_col_title">① 请求配置</div>
+
+            <div class="zyf_row">
+                <select class="zyf_method" id="zyf_method" onchange="zyf_onMethodChange()">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                </select>
+                <input class="zyf_url" id="zyf_url" type="text"
+                       value="https://jsonplaceholder.typicode.com/posts"
+                       placeholder="https://example.com/api">
+            </div>
+
+            <div class="zyf_body_wrap zyf_show" id="zyf_body_wrap">
+                <div class="zyf_label">请求体（JSON 格式）</div>
+                <textarea class="zyf_body" id="zyf_body">{
+  "title": "张耀夫的测试文章",
+  "body": "这是通过 fetch POST 提交的数据",
+  "userId": 1
+}</textarea>
+            </div>
+
+            <div class="zyf_row" style="margin-top:12px;">
+                <button class="zyf_btn" id="zyf_send" onclick="zyf_send()">发送请求</button>
+            </div>
+
+            <div class="zyf_hint">
+                提示：GET / DELETE 不发送请求体；POST / PUT / PATCH 会带 <code>Content-Type: application/json</code>。<br>
+                点击「404 错误」可观察非 2xx 状态码的提示效果。
+            </div>
+        </div>
+
+        <!-- 右：响应 -->
+        <div class="zyf_col">
+            <div class="zyf_col_title">② 响应结果</div>
+
+            <div class="zyf_resp_head">
+                <span class="zyf_pill zyf_pill_info" id="zyf_status_pill">等待请求</span>
+                <span class="zyf_ms" id="zyf_ms"></span>
+            </div>
+
+            <div class="zyf_resp_box" id="zyf_resp_box">
+                <span class="zyf_placeholder">// 点击「发送请求」后，这里会显示接口返回的 JSON 数据</span>
+            </div>
+
+            <div class="zyf_error" id="zyf_error"></div>
+        </div>
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-4 接口测试</div>
+
+    <script>
+        var zyf_method = document.getElementById("zyf_method");
+        var zyf_url = document.getElementById("zyf_url");
+        var zyf_body = document.getElementById("zyf_body");
+        var zyf_bodyWrap = document.getElementById("zyf_body_wrap");
+        var zyf_sendBtn = document.getElementById("zyf_send");
+        var zyf_pill = document.getElementById("zyf_status_pill");
+        var zyf_ms = document.getElementById("zyf_ms");
+        var zyf_respBox = document.getElementById("zyf_resp_box");
+        var zyf_error = document.getElementById("zyf_error");
+
+        /* ============ 方法切换 ============ */
+        function zyf_onMethodChange() {
+            var zyf_m = zyf_method.value;
+            var zyf_hasBody = (zyf_m === "POST" || zyf_m === "PUT" || zyf_m === "PATCH");
+            zyf_bodyWrap.className = "zyf_body_wrap" + (zyf_hasBody ? " zyf_show" : "");
+        }
+
+        /* ============ 快捷示例 ============ */
+        function zyf_preset(zyf_type) {
+            if (zyf_type === "GET") {
+                zyf_method.value = "GET";
+                zyf_url.value = "https://jsonplaceholder.typicode.com/posts?_limit=3";
+            } else if (zyf_type === "GET1") {
+                zyf_method.value = "GET";
+                zyf_url.value = "https://jsonplaceholder.typicode.com/posts/1";
+            } else if (zyf_type === "POST") {
+                zyf_method.value = "POST";
+                zyf_url.value = "https://jsonplaceholder.typicode.com/posts";
+                zyf_body.value = '{\n  "title": "张耀夫的测试文章",\n  "body": "这是通过 fetch POST 提交的数据",\n  "userId": 1\n}';
+            } else if (zyf_type === "PATCH") {
+                zyf_method.value = "PATCH";
+                zyf_url.value = "https://jsonplaceholder.typicode.com/posts/1";
+                zyf_body.value = '{\n  "title": "修改后的标题"\n}';
+            } else if (zyf_type === "404") {
+                zyf_method.value = "GET";
+                zyf_url.value = "https://jsonplaceholder.typicode.com/posts/99999";
+            }
+            zyf_onMethodChange();
+            zyf_send();
+        }
+
+        /* ============ 发送请求 ============ */
+        function zyf_send() {
+            var zyf_m = zyf_method.value;
+            var zyf_u = zyf_url.value.trim();
+
+            zyf_error.classList.remove("zyf_show");
+            zyf_error.innerHTML = "";
+
+            if (!zyf_u) {
+                zyf_showError("请求地址不能为空", "请在 URL 输入框中填写接口地址");
+                return;
+            }
+
+            var zyf_hasBody = (zyf_m === "POST" || zyf_m === "PUT" || zyf_m === "PATCH");
+            var zyf_options = {
+                method: zyf_m,
+                headers: { "Accept": "application/json" }
+            };
+
+            if (zyf_hasBody) {
+                var zyf_raw = zyf_body.value.trim();
+                try {
+                    JSON.parse(zyf_raw);
+                } catch (zyf_e) {
+                    zyf_showError("请求体不是合法的 JSON", zyf_e.message + "，请检查逗号、引号是否配对。");
+                    return;
+                }
+                zyf_options.headers["Content-Type"] = "application/json";
+                zyf_options.body = zyf_raw;
+            }
+
+            zyf_sendBtn.disabled = true;
+            zyf_setPill("请求中…", "zyf_pill_info");
+            zyf_ms.textContent = "";
+            zyf_respBox.innerHTML = '<span class="zyf_placeholder">// 正在等待响应…</span>';
+
+            var zyf_start = Date.now();
+
+            fetch(zyf_u, zyf_options)
+                .then(function (zyf_res) {
+                    return zyf_res.text().then(function (zyf_text) {
+                        return { res: zyf_res, text: zyf_text };
+                    });
+                })
+                .then(function (zyf_r) {
+                    zyf_ms.textContent = (Date.now() - zyf_start) + " ms";
+                    var zyf_code = zyf_r.res.status;
+
+                    if (zyf_r.res.ok) {
+                        zyf_setPill(zyf_code + " " + zyf_r.res.statusText, "zyf_pill_ok");
+                    } else {
+                        zyf_setPill(zyf_code + " " + zyf_r.res.statusText, "zyf_pill_bad");
+                        zyf_showError(
+                            "HTTP " + zyf_code + " " + zyf_r.res.statusText,
+                            zyf_code === 404
+                                ? "资源不存在：请检查 URL 中的 id 是否正确，例如 posts/1。"
+                                : "服务器返回了非 2xx 状态码，请检查接口地址与请求参数。"
+                        );
+                    }
+
+                    /* 尝试格式化 JSON，失败则原样输出 */
+                    var zyf_out = zyf_r.text;
+                    try {
+                        zyf_out = JSON.stringify(JSON.parse(zyf_r.text), null, 2);
+                        zyf_respBox.innerHTML = zyf_highlightJson(zyf_out);
+                    } catch (zyf_e2) {
+                        zyf_respBox.innerHTML = zyf_escapeHtml(zyf_out || "（响应体为空）");
+                    }
+                })
+                .catch(function (zyf_err) {
+                    zyf_ms.textContent = (Date.now() - zyf_start) + " ms";
+                    zyf_setPill("请求失败", "zyf_pill_bad");
+                    zyf_respBox.innerHTML = '<span class="zyf_placeholder">// 无响应数据</span>';
+                    zyf_showError("网络请求失败", zyf_err.message +
+                        "。常见原因：域名无法解析、目标接口未开启 CORS、被浏览器拦截。");
+                })
+                .finally(function () {
+                    zyf_sendBtn.disabled = false;
+                });
+        }
+
+        /* ============ 状态胶囊 ============ */
+        function zyf_setPill(zyf_text, zyf_type) {
+            zyf_pill.className = "zyf_pill " + zyf_type;
+            zyf_pill.textContent = zyf_text;
+        }
+
+        /* ============ 错误提示 ============ */
+        function zyf_showError(zyf_title, zyf_detail) {
+            zyf_error.classList.add("zyf_show");
+            zyf_error.innerHTML = "❌ <b>" + zyf_escapeHtml(zyf_title) + "</b><br>" + zyf_escapeHtml(zyf_detail);
+        }
+
+        /* ============ JSON 语法高亮 ============ */
+        function zyf_highlightJson(zyf_json) {
+            var zyf_safe = zyf_escapeHtml(zyf_json);
+            return zyf_safe.replace(
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                function (zyf_match) {
+                    var zyf_cls = "zyf_num";
+                    if (/^"/.test(zyf_match)) {
+                        zyf_cls = /:$/.test(zyf_match) ? "zyf_key" : "zyf_str";
+                    } else if (/true|false/.test(zyf_match)) {
+                        zyf_cls = "zyf_bool";
+                    } else if (/null/.test(zyf_match)) {
+                        zyf_cls = "zyf_null";
+                    }
+                    return '<span class="' + zyf_cls + '">' + zyf_match + "</span>";
+                }
+            );
+        }
+
+        /* ============ HTML 转义 ============ */
+        function zyf_escapeHtml(zyf_text) {
+            return String(zyf_text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        /* ============ 初始化 ============ */
+        zyf_onMethodChange();
+    </script>
+</body>
+</html>

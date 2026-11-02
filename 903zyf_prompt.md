@@ -236,3 +236,13 @@
 > 详情：`https://dummyjson.com/products/1`，根据 ID 获取单个商品。
 
 ---
+
+## 2026-11-02 16:20:00
+
+- **使用模型**: DeepSeek-V4.1-Flash
+- **提示词内容**:
+
+> 完成18-4.html，对远程数据接口进行测试，支持get、post等，显示返回的数据和错误提示信息，
+> 示例post接口：`https://jsonplaceholder.typicode.com/posts`
+
+---
