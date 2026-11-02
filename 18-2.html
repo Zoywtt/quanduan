@@ -1,0 +1,331 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：使用 fetch 获取 jsonplaceholder 的 posts 接口数据并展示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-2 fetch 获取远程数据</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 32px 16px 60px;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            max-width: 1080px;
+            margin: 0 auto 22px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 26px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .zyf_header p { font-size: 13px; color: #64748b; }
+        .zyf_header .zyf_api {
+            display: inline-block;
+            margin-top: 10px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #475569;
+            background: #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 14px;
+        }
+
+        /* ============ 工具栏 ============ */
+        .zyf_toolbar {
+            max-width: 1080px;
+            margin: 0 auto 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+        .zyf_input {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .zyf_input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        .zyf_btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .zyf_btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .zyf_btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .zyf_count {
+            font-size: 12.5px;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .zyf_count b { color: #4f46e5; }
+
+        /* ============ 状态提示 ============ */
+        .zyf_status {
+            max-width: 1080px;
+            margin: 0 auto 16px;
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: none;
+        }
+        .zyf_status.zyf_show { display: block; }
+        .zyf_status.zyf_ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .zyf_status.zyf_bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .zyf_status.zyf_loading { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+        /* ============ 卡片网格 ============ */
+        .zyf_grid {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 14px;
+        }
+        .zyf_post {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+            cursor: pointer;
+        }
+        .zyf_post:hover {
+            transform: translateY(-2px);
+            border-color: #c7d2fe;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
+        }
+        .zyf_post.zyf_open { border-color: #818cf8; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.16); }
+
+        .zyf_post_head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .zyf_tag {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 1px 8px;
+            font-family: Consolas, monospace;
+        }
+        .zyf_tag_id { background: #eef2ff; color: #4338ca; }
+        .zyf_tag_user { background: #ecfeff; color: #0e7490; }
+
+        .zyf_post_title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        .zyf_post_body {
+            font-size: 12.5px;
+            color: #64748b;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .zyf_post.zyf_open .zyf_post_body {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
+        .zyf_post_more {
+            margin-top: 8px;
+            font-size: 11.5px;
+            color: #a5b4fc;
+        }
+
+        .zyf_empty {
+            max-width: 1080px;
+            margin: 0 auto;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 30px 0;
+        }
+
+        .zyf_footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>fetch 获取远程 JSON 数据</h1>
+        <p>调用 jsonplaceholder 的 posts 接口，把返回的 100 条文章渲染到页面上</p>
+        <span class="zyf_api">GET https://jsonplaceholder.typicode.com/posts</span>
+    </div>
+
+    <!-- ============ 工具栏 ============ -->
+    <div class="zyf_toolbar">
+        <input class="zyf_input" id="zyf_search" type="text" placeholder="输入关键字搜索标题或内容…">
+        <button class="zyf_btn" id="zyf_reload" onclick="zyf_fetchPosts()">重新加载</button>
+        <span class="zyf_count" id="zyf_count">共 <b>0</b> 条</span>
+    </div>
+
+    <div class="zyf_status" id="zyf_status"></div>
+
+    <!-- ============ 数据容器 ============ -->
+    <div class="zyf_grid" id="zyf_grid"></div>
+    <div class="zyf_empty" id="zyf_empty" style="display:none;">没有匹配的文章</div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-2 fetch</div>
+
+    <script>
+        var zyf_API = "https://jsonplaceholder.typicode.com/posts";
+
+        var zyf_posts = [];          // 原始数据
+        var zyf_grid = document.getElementById("zyf_grid");
+        var zyf_status = document.getElementById("zyf_status");
+        var zyf_count = document.getElementById("zyf_count");
+        var zyf_empty = document.getElementById("zyf_empty");
+        var zyf_search = document.getElementById("zyf_search");
+        var zyf_reload = document.getElementById("zyf_reload");
+
+        /* ============ 状态提示 ============ */
+        function zyf_setStatus(zyf_text, zyf_type) {
+            if (!zyf_text) {
+                zyf_status.className = "zyf_status";
+                zyf_status.textContent = "";
+                return;
+            }
+            zyf_status.className = "zyf_status zyf_show " + zyf_type;
+            zyf_status.textContent = zyf_text;
+        }
+
+        /* ============ fetch 请求 ============ */
+        function zyf_fetchPosts() {
+            zyf_reload.disabled = true;
+            zyf_setStatus("正在请求接口数据……", "zyf_loading");
+            zyf_grid.innerHTML = "";
+            zyf_empty.style.display = "none";
+
+            fetch(zyf_API)
+                .then(function (zyf_res) {
+                    if (!zyf_res.ok) {
+                        throw new Error("请求失败，HTTP 状态码 " + zyf_res.status);
+                    }
+                    return zyf_res.json();
+                })
+                .then(function (zyf_data) {
+                    zyf_posts = zyf_data;
+                    zyf_setStatus("✅ 请求成功，接口返回 " + zyf_data.length + " 条数据", "zyf_ok");
+                    zyf_render(zyf_posts);
+                })
+                .catch(function (zyf_err) {
+                    zyf_setStatus("❌ " + zyf_err.message +
+                        "（请检查网络或接口地址）", "zyf_bad");
+                    zyf_count.innerHTML = "共 <b>0</b> 条";
+                })
+                .finally(function () {
+                    zyf_reload.disabled = false;
+                });
+        }
+
+        /* ============ 渲染列表 ============ */
+        function zyf_render(zyf_list) {
+            zyf_count.innerHTML = "共 <b>" + zyf_list.length + "</b> 条";
+            zyf_empty.style.display = zyf_list.length === 0 ? "block" : "none";
+
+            var zyf_html = "";
+            for (var zyf_i = 0; zyf_i < zyf_list.length; zyf_i++) {
+                var zyf_post = zyf_list[zyf_i];
+                zyf_html +=
+                    '<div class="zyf_post" onclick="zyf_toggle(this)">' +
+                        '<div class="zyf_post_head">' +
+                            '<span class="zyf_tag zyf_tag_id">#' + zyf_post.id + '</span>' +
+                            '<span class="zyf_tag zyf_tag_user">userId ' + zyf_post.userId + '</span>' +
+                        '</div>' +
+                        '<div class="zyf_post_title">' + zyf_escapeHtml(zyf_post.title) + '</div>' +
+                        '<div class="zyf_post_body">' + zyf_escapeHtml(zyf_post.body) + '</div>' +
+                        '<div class="zyf_post_more">点击展开全文</div>' +
+                    '</div>';
+            }
+            zyf_grid.innerHTML = zyf_html;
+        }
+
+        /* 展开/收起 */
+        function zyf_toggle(zyf_el) {
+            var zyf_isOpen = zyf_el.classList.contains("zyf_open");
+            zyf_el.classList.toggle("zyf_open");
+            var zyf_more = zyf_el.querySelector(".zyf_post_more");
+            zyf_more.textContent = zyf_isOpen ? "点击展开全文" : "点击收起";
+        }
+
+        /* ============ 搜索过滤 ============ */
+        function zyf_filter() {
+            var zyf_keyword = zyf_search.value.trim().toLowerCase();
+            if (zyf_keyword === "") {
+                zyf_render(zyf_posts);
+                return;
+            }
+            var zyf_result = [];
+            for (var zyf_i = 0; zyf_i < zyf_posts.length; zyf_i++) {
+                var zyf_item = zyf_posts[zyf_i];
+                var zyf_title = String(zyf_item.title).toLowerCase();
+                var zyf_body = String(zyf_item.body).toLowerCase();
+                if (zyf_title.indexOf(zyf_keyword) !== -1 || zyf_body.indexOf(zyf_keyword) !== -1) {
+                    zyf_result.push(zyf_item);
+                }
+            }
+            zyf_render(zyf_result);
+        }
+        zyf_search.addEventListener("input", zyf_filter);
+
+        /* ============ HTML 转义 ============ */
+        function zyf_escapeHtml(zyf_text) {
+            return String(zyf_text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        /* ============ 页面加载后自动请求 ============ */
+        zyf_fetchPosts();
+    </script>
+</body>
+</html>
