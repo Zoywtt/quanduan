@@ -1,0 +1,567 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：用 Promise 与 async/await 分别演示包饺子的异步流程 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-6 异步流程：包饺子</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f6f7fb;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 30px 16px 60px;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            max-width: 1120px;
+            margin: 0 auto 18px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 26px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .zyf_header p { font-size: 13px; color: #64748b; }
+        .zyf_header .zyf_rule {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #92400e;
+            background: #fef3c7;
+            border-radius: 999px;
+            padding: 3px 16px;
+        }
+
+        /* ============ 速度控制 ============ */
+        .zyf_toolbar {
+            max-width: 1120px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 12.5px;
+            color: #64748b;
+        }
+        .zyf_select {
+            border: 1px solid #d7dee9;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 12.5px;
+            font-family: inherit;
+            color: #1e293b;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ============ 双列布局 ============ */
+        .zyf_layout {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        @media (max-width: 900px) {
+            .zyf_layout { grid-template-columns: 1fr; }
+        }
+
+        .zyf_card {
+            background: #fff;
+            border: 1px solid #e5e9f2;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .zyf_card_head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .zyf_badge {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 2px 9px;
+        }
+        .zyf_badge_promise { background: #fee2e2; color: #b91c1c; }
+        .zyf_badge_async { background: #dbeafe; color: #1d4ed8; }
+        .zyf_card h2 { font-size: 17px; color: #0f172a; }
+        .zyf_card_sub {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        /* ============ 步骤 ============ */
+        .zyf_steps { margin-bottom: 14px; }
+        .zyf_step {
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background: #fafbfe;
+            transition: border-color 0.25s, background 0.25s;
+        }
+        .zyf_step.zyf_active {
+            border-color: #fbbf24;
+            background: #fffbeb;
+        }
+        .zyf_step.zyf_done {
+            border-color: #bbf7d0;
+            background: #f0fdf4;
+        }
+        .zyf_step_top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .zyf_step_name { font-weight: 700; color: #334155; }
+        .zyf_step_meta {
+            margin-left: auto;
+            font-size: 11.5px;
+            color: #94a3b8;
+            font-family: Consolas, monospace;
+        }
+        .zyf_pill {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 1px 8px;
+            color: #64748b;
+            background: #e2e8f0;
+        }
+        .zyf_pill_run { color: #b45309; background: #fef3c7; }
+        .zyf_pill_done { color: #047857; background: #d1fae5; }
+
+        .zyf_bar {
+            height: 4px;
+            background: #e8edf5;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .zyf_bar_inner {
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            transition: width 0.12s linear;
+        }
+        .zyf_step.zyf_done .zyf_bar_inner { background: #10b981; }
+
+        .zyf_parallel {
+            font-size: 10px;
+            font-weight: 700;
+            color: #6d28d9;
+            background: #ede9fe;
+            border-radius: 4px;
+            padding: 1px 6px;
+        }
+
+        /* ============ 操作按钮 ============ */
+        .zyf_actions { display: flex; gap: 8px; margin-bottom: 12px; }
+        .zyf_btn {
+            border: none;
+            border-radius: 9px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: inherit;
+            color: #fff;
+            background: #ef4444;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.15s;
+        }
+        .zyf_btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .zyf_btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .zyf_btn_async { background: #2563eb; }
+        .zyf_btn_gray { background: #64748b; }
+
+        /* ============ 状态与日志 ============ */
+        .zyf_state_line {
+            font-size: 12.5px;
+            color: #334155;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: baseline;
+        }
+        .zyf_state_line b { color: #b91c1c; font-family: Consolas, monospace; }
+        .zyf_state_async b { color: #1d4ed8; }
+
+        .zyf_log {
+            flex: 1;
+            min-height: 130px;
+            max-height: 170px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #94a3b8;
+        }
+        .zyf_log_line { display: block; }
+        .zyf_log_time { color: #64748b; margin-right: 6px; }
+        .zyf_log_ok { color: #86efac; }
+        .zyf_log_info { color: #93c5fd; }
+        .zyf_log_warn { color: #fcd34d; }
+        .zyf_log_final { color: #fbcfe8; }
+
+        /* ============ 代码片段 ============ */
+        .zyf_code {
+            margin-top: 10px;
+            background: #f8fafc;
+            border: 1px dashed #dbe3ef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 11.5px;
+            line-height: 1.75;
+            color: #475569;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .zyf_footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 26px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>异步流程演示：包饺子</h1>
+        <p>买原料 → 取原料 → 同时和面、和馅 → 两者都完成才包饺子 → 吃饺子</p>
+        <span class="zyf_rule">和面与和馅并行执行，用 Promise.all 等待全部完成</span>
+    </div>
+
+    <div class="zyf_toolbar">
+        <label for="zyf_speed">演示速度：</label>
+        <select class="zyf_select" id="zyf_speed">
+            <option value="1">1×（真实时长：买原料 6s、取原料 8s）</option>
+            <option value="2">2×</option>
+            <option value="5" selected>5×（推荐）</option>
+            <option value="20">20×（快速演示）</option>
+        </select>
+        <span id="zyf_hint">每一步都用 setTimeout 模拟耗时，进度条实时显示</span>
+    </div>
+
+    <div class="zyf_layout">
+
+        <!-- ============ Promise 版 ============ -->
+        <div class="zyf_card">
+            <div class="zyf_card_head">
+                <span class="zyf_badge zyf_badge_promise">Promise</span>
+                <h2>Promise 链式写法</h2>
+            </div>
+            <div class="zyf_card_sub">用 .then() 串联每一步，并行步骤交给 Promise.all</div>
+
+            <div class="zyf_steps" id="zyf_a_steps"></div>
+
+            <div class="zyf_actions">
+                <button class="zyf_btn" id="zyf_a_start">开始制作</button>
+                <button class="zyf_btn zyf_btn_gray" id="zyf_a_reset">重置</button>
+            </div>
+
+            <div class="zyf_state_line" id="zyf_a_state">当前阶段：<b>等待开始</b></div>
+
+            <div class="zyf_log" id="zyf_a_log">
+                <span class="zyf_log_line zyf_log_info"><span class="zyf_log_time">--:--:--</span>等待开始…</span>
+            </div>
+
+            <pre class="zyf_code">买原料()
+  .then(取原料)
+  .then(() =&gt; Promise.all([和面(), 和馅()]))
+  .then(包饺子)
+  .then(吃饺子)</pre>
+        </div>
+
+        <!-- ============ async / await 版 ============ -->
+        <div class="zyf_card">
+            <div class="zyf_card_head">
+                <span class="zyf_badge zyf_badge_async">async / await</span>
+                <h2>async/await 写法</h2>
+            </div>
+            <div class="zyf_card_sub">用 await 等待每一步，代码像同步一样从上往下读</div>
+
+            <div class="zyf_steps" id="zyf_b_steps"></div>
+
+            <div class="zyf_actions">
+                <button class="zyf_btn zyf_btn_async" id="zyf_b_start">开始制作</button>
+                <button class="zyf_btn zyf_btn_gray" id="zyf_b_reset">重置</button>
+            </div>
+
+            <div class="zyf_state_line zyf_state_async" id="zyf_b_state">当前阶段：<b>等待开始</b></div>
+
+            <div class="zyf_log" id="zyf_b_log">
+                <span class="zyf_log_line zyf_log_info"><span class="zyf_log_time">--:--:--</span>等待开始…</span>
+            </div>
+
+            <pre class="zyf_code">async function 做饺子() {
+  await 买原料();
+  await 取原料();
+  await Promise.all([和面(), 和馅()]);
+  await 包饺子();
+  await 吃饺子();
+}</pre>
+        </div>
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-6 Promise 与 async</div>
+
+    <script>
+        /* ============ 流程定义：名称与模拟耗时（秒） ============ */
+        var zyf_steps = [
+            { key: "buy",     name: "① 买原料", dur: 6,  parallel: false },
+            { key: "take",    name: "② 取原料", dur: 8,  parallel: false },
+            { key: "dough",   name: "③ 和面",   dur: 5,  parallel: true },
+            { key: "filling", name: "④ 和馅",   dur: 5,  parallel: true },
+            { key: "wrap",    name: "⑤ 包饺子", dur: 3,  parallel: false },
+            { key: "eat",     name: "⑥ 吃饺子", dur: 2,  parallel: false }
+        ];
+
+        /* ============ 工具函数 ============ */
+        function zyf_now() {
+            var zyf_d = new Date();
+            function zyf_pad(zyf_n) { return zyf_n < 10 ? "0" + zyf_n : "" + zyf_n; }
+            return zyf_pad(zyf_d.getHours()) + ":" + zyf_pad(zyf_d.getMinutes()) + ":" + zyf_pad(zyf_d.getSeconds());
+        }
+
+        /* ============ 创建一块演示面板 ============ */
+        function zyf_createPanel(zyf_prefix) {
+            var zyf_box = document.getElementById(zyf_prefix + "_steps");
+            var zyf_ctrl = {
+                prefix: zyf_prefix,
+                runId: 0,
+                timers: [],
+                rows: {},
+                speed: 5,
+                logBox: document.getElementById(zyf_prefix + "_log"),
+                stateEl: document.getElementById(zyf_prefix + "_state")
+            };
+
+            var zyf_html = "";
+            for (var zyf_i = 0; zyf_i < zyf_steps.length; zyf_i++) {
+                var zyf_s = zyf_steps[zyf_i];
+                zyf_html +=
+                    '<div class="zyf_step" id="' + zyf_prefix + '_row_' + zyf_s.key + '">' +
+                        '<div class="zyf_step_top">' +
+                            '<span class="zyf_step_name">' + zyf_s.name + '</span>' +
+                            (zyf_s.parallel ? '<span class="zyf_parallel">并行</span>' : '') +
+                            '<span class="zyf_pill" id="' + zyf_prefix + '_pill_' + zyf_s.key + '">等待</span>' +
+                            '<span class="zyf_step_meta">' + zyf_s.dur + ' s</span>' +
+                        '</div>' +
+                        '<div class="zyf_bar"><div class="zyf_bar_inner" id="' + zyf_prefix + '_bar_' + zyf_s.key + '"></div></div>' +
+                    '</div>';
+            }
+            zyf_box.innerHTML = zyf_html;
+
+            /* 缓存行元素 */
+            for (var zyf_j = 0; zyf_j < zyf_steps.length; zyf_j++) {
+                var zyf_k = zyf_steps[zyf_j].key;
+                zyf_ctrl.rows[zyf_k] = {
+                    row: document.getElementById(zyf_prefix + "_row_" + zyf_k),
+                    pill: document.getElementById(zyf_prefix + "_pill_" + zyf_k),
+                    bar: document.getElementById(zyf_prefix + "_bar_" + zyf_k)
+                };
+            }
+            return zyf_ctrl;
+        }
+
+        /* ============ 日志 ============ */
+        function zyf_log(zyf_ctrl, zyf_text, zyf_type) {
+            var zyf_line = document.createElement("span");
+            zyf_line.className = "zyf_log_line " + (zyf_type || "zyf_log_info");
+            zyf_line.innerHTML = '<span class="zyf_log_time">' + zyf_now() + "</span>" + zyf_text;
+            zyf_ctrl.logBox.appendChild(zyf_line);
+            zyf_ctrl.logBox.scrollTop = zyf_ctrl.logBox.scrollHeight;
+            while (zyf_ctrl.logBox.children.length > 16) {
+                zyf_ctrl.logBox.removeChild(zyf_ctrl.logBox.firstChild);
+            }
+        }
+
+        /* ============ 设置当前阶段 ============ */
+        function zyf_setState(zyf_ctrl, zyf_text) {
+            zyf_ctrl.stateEl.innerHTML = "当前阶段：<b>" + zyf_text + "</b>";
+        }
+
+        /* ============ 用 setTimeout 模拟一个步骤 ============ */
+        function zyf_sleep(zyf_ctrl, zyf_key, zyf_runId) {
+            var zyf_step;
+            for (var zyf_i = 0; zyf_i < zyf_steps.length; zyf_i++) {
+                if (zyf_steps[zyf_i].key === zyf_key) { zyf_step = zyf_steps[zyf_i]; }
+            }
+            var zyf_row = zyf_ctrl.rows[zyf_key];
+            var zyf_ms = zyf_step.dur * 1000 / zyf_ctrl.speed;
+
+            zyf_row.row.className = "zyf_step zyf_active";
+            zyf_row.pill.className = "zyf_pill zyf_pill_run";
+            zyf_row.pill.textContent = "进行中";
+            zyf_setState(zyf_ctrl, zyf_step.name + " 进行中");
+            zyf_log(zyf_ctrl, "开始：" + zyf_step.name + "（模拟耗时 " + zyf_step.dur + " s）", "zyf_log_info");
+
+            return new Promise(function (zyf_resolve) {
+                var zyf_begin = Date.now();
+                var zyf_iv = setInterval(function () {
+                    if (zyf_ctrl.runId !== zyf_runId) { clearInterval(zyf_iv); return; }
+                    var zyf_p = Math.min((Date.now() - zyf_begin) / zyf_ms, 1);
+                    zyf_row.bar.style.width = (zyf_p * 100) + "%";
+                }, 100);
+                zyf_ctrl.timers.push(zyf_iv);
+
+                var zyf_to = setTimeout(function () {
+                    clearInterval(zyf_iv);
+                    if (zyf_ctrl.runId !== zyf_runId) { return; }
+                    zyf_row.bar.style.width = "100%";
+                    zyf_row.row.className = "zyf_step zyf_done";
+                    zyf_row.pill.className = "zyf_pill zyf_pill_done";
+                    zyf_row.pill.textContent = "完成";
+                    zyf_log(zyf_ctrl, "完成：" + zyf_step.name, "zyf_log_ok");
+                    zyf_resolve();
+                }, zyf_ms);
+                zyf_ctrl.timers.push(zyf_to);
+            });
+        }
+
+        /* ============ Promise 版流程 ============ */
+        function zyf_runPromise(zyf_ctrl) {
+            var zyf_runId = zyf_ctrl.runId;
+            zyf_log(zyf_ctrl, "Promise 链开始执行", "zyf_log_warn");
+
+            zyf_sleep(zyf_ctrl, "buy", zyf_runId)
+                .then(function () {
+                    return zyf_sleep(zyf_ctrl, "take", zyf_runId);
+                })
+                .then(function () {
+                    zyf_log(zyf_ctrl, "原料已备好，和面与和馅同时开始", "zyf_log_warn");
+                    return Promise.all([
+                        zyf_sleep(zyf_ctrl, "dough", zyf_runId),
+                        zyf_sleep(zyf_ctrl, "filling", zyf_runId)
+                    ]);
+                })
+                .then(function () {
+                    zyf_log(zyf_ctrl, "面与馅都准备好了，开始包饺子", "zyf_log_warn");
+                    return zyf_sleep(zyf_ctrl, "wrap", zyf_runId);
+                })
+                .then(function () {
+                    return zyf_sleep(zyf_ctrl, "eat", zyf_runId);
+                })
+                .then(function () {
+                    zyf_setState(zyf_ctrl, "全部完成 🎉");
+                    zyf_log(zyf_ctrl, "🎉 饺子吃完了，Promise 版流程结束", "zyf_log_final");
+                });
+        }
+
+        /* ============ async / await 版流程 ============ */
+        async function zyf_runAsync(zyf_ctrl) {
+            var zyf_runId = zyf_ctrl.runId;
+            zyf_log(zyf_ctrl, "async 函数开始执行", "zyf_log_warn");
+
+            await zyf_sleep(zyf_ctrl, "buy", zyf_runId);
+            if (zyf_ctrl.runId !== zyf_runId) { return; }
+
+            await zyf_sleep(zyf_ctrl, "take", zyf_runId);
+            if (zyf_ctrl.runId !== zyf_runId) { return; }
+
+            zyf_log(zyf_ctrl, "原料已备好，和面与和馅同时开始", "zyf_log_warn");
+            await Promise.all([
+                zyf_sleep(zyf_ctrl, "dough", zyf_runId),
+                zyf_sleep(zyf_ctrl, "filling", zyf_runId)
+            ]);
+            if (zyf_ctrl.runId !== zyf_runId) { return; }
+
+            zyf_log(zyf_ctrl, "面与馅都准备好了，开始包饺子", "zyf_log_warn");
+            await zyf_sleep(zyf_ctrl, "wrap", zyf_runId);
+            if (zyf_ctrl.runId !== zyf_runId) { return; }
+
+            await zyf_sleep(zyf_ctrl, "eat", zyf_runId);
+            if (zyf_ctrl.runId !== zyf_runId) { return; }
+
+            zyf_setState(zyf_ctrl, "全部完成 🎉");
+            zyf_log(zyf_ctrl, "🎉 饺子吃完了，async 版流程结束", "zyf_log_final");
+        }
+
+        /* ============ 重置一块面板 ============ */
+        function zyf_resetPanel(zyf_ctrl) {
+            zyf_ctrl.runId++;                 /* 让旧流程失效 */
+            for (var zyf_i = 0; zyf_i < zyf_ctrl.timers.length; zyf_i++) {
+                clearInterval(zyf_ctrl.timers[zyf_i]);
+                clearTimeout(zyf_ctrl.timers[zyf_i]);
+            }
+            zyf_ctrl.timers = [];
+
+            var zyf_keys = Object.keys(zyf_ctrl.rows);
+            for (var zyf_j = 0; zyf_j < zyf_keys.length; zyf_j++) {
+                var zyf_r = zyf_ctrl.rows[zyf_keys[zyf_j]];
+                zyf_r.row.className = "zyf_step";
+                zyf_r.pill.className = "zyf_pill";
+                zyf_r.pill.textContent = "等待";
+                zyf_r.bar.style.width = "0%";
+            }
+            zyf_setState(zyf_ctrl, "等待开始");
+            zyf_ctrl.logBox.innerHTML = '<span class="zyf_log_line zyf_log_info"><span class="zyf_log_time">' +
+                zyf_now() + "</span>已重置，等待开始…</span>";
+        }
+
+        /* ============ 初始化两块面板 ============ */
+        var zyf_ctrlA = zyf_createPanel("zyf_a");
+        var zyf_ctrlB = zyf_createPanel("zyf_b");
+
+        var zyf_speedSelect = document.getElementById("zyf_speed");
+
+        function zyf_readSpeed() {
+            var zyf_v = parseFloat(zyf_speedSelect.value);
+            return isNaN(zyf_v) || zyf_v <= 0 ? 1 : zyf_v;
+        }
+
+        /* 开始（Promise 版） */
+        document.getElementById("zyf_a_start").addEventListener("click", function () {
+            zyf_ctrlA.speed = zyf_readSpeed();
+            zyf_resetPanel(zyf_ctrlA);
+            zyf_runPromise(zyf_ctrlA);
+        });
+
+        /* 开始（async 版） */
+        document.getElementById("zyf_b_start").addEventListener("click", function () {
+            zyf_ctrlB.speed = zyf_readSpeed();
+            zyf_resetPanel(zyf_ctrlB);
+            zyf_runAsync(zyf_ctrlB);
+        });
+
+        /* 重置按钮 */
+        document.getElementById("zyf_a_reset").addEventListener("click", function () {
+            zyf_resetPanel(zyf_ctrlA);
+        });
+        document.getElementById("zyf_b_reset").addEventListener("click", function () {
+            zyf_resetPanel(zyf_ctrlB);
+        });
+    </script>
+</body>
+</html>
