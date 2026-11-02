@@ -1,0 +1,534 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：演示 JavaScript 两种定时器 setTimeout 与 setInterval 的用法与差异 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-5 JavaScript 两种定时器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 32px 16px 60px;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            max-width: 1080px;
+            margin: 0 auto 24px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 26px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .zyf_header p { font-size: 13px; color: #64748b; }
+        .zyf_header .zyf_note {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+            background: #e8edf7;
+            border-radius: 999px;
+            padding: 3px 14px;
+        }
+
+        /* ============ 布局 ============ */
+        .zyf_layout {
+            max-width: 1080px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        @media (max-width: 860px) {
+            .zyf_layout { grid-template-columns: 1fr; }
+        }
+
+        .zyf_card {
+            background: #fff;
+            border: 1px solid #e5e9f2;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .zyf_card_head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .zyf_icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        .zyf_icon_once { background: #e0f2fe; }
+        .zyf_icon_loop { background: #ede9fe; }
+        .zyf_card h2 { font-size: 18px; color: #0f172a; }
+        .zyf_card_sub { font-size: 12.5px; color: #94a3b8; margin-bottom: 14px; }
+        .zyf_card_sub code {
+            font-family: Consolas, monospace;
+            color: #4338ca;
+            background: #eef2ff;
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        /* 控制区 */
+        .zyf_field { margin-bottom: 12px; }
+        .zyf_field label {
+            display: block;
+            font-size: 12.5px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        .zyf_input {
+            width: 100%;
+            border: 1px solid #d7dee9;
+            border-radius: 9px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            color: #1e293b;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .zyf_input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.13);
+        }
+
+        .zyf_row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .zyf_btn {
+            border: none;
+            border-radius: 9px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            background: #0ea5e9;
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.2s, transform 0.15s;
+        }
+        .zyf_btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .zyf_btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .zyf_btn_purple { background: #8b5cf6; }
+        .zyf_btn_gray { background: #64748b; }
+        .zyf_btn_red { background: #ef4444; }
+
+        /* 展示区 */
+        .zyf_display {
+            background: #f8fafc;
+            border: 1px solid #e8edf5;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .zyf_big {
+            font-family: Consolas, monospace;
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #0f172a;
+        }
+        .zyf_big_blue { color: #0284c7; }
+        .zyf_big_purple { color: #7c3aed; }
+        .zyf_small { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+        /* 倒计时进度条 */
+        .zyf_progress {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .zyf_progress_bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+            border-radius: 99px;
+            transition: width 0.1s linear;
+        }
+
+        /* 日志 */
+        .zyf_log {
+            flex: 1;
+            min-height: 120px;
+            max-height: 180px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            color: #94a3b8;
+        }
+        .zyf_log_line { display: block; }
+        .zyf_log_time { color: #64748b; margin-right: 6px; }
+        .zyf_log_ok { color: #86efac; }
+        .zyf_log_warn { color: #fcd34d; }
+        .zyf_log_bad { color: #fca5a5; }
+        .zyf_log_info { color: #93c5fd; }
+
+        /* ============ 对比表 ============ */
+        .zyf_section {
+            max-width: 1080px;
+            margin: 22px auto 0;
+            background: #fff;
+            border: 1px solid #e5e9f2;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+        .zyf_section h2 {
+            font-size: 17px;
+            color: #0f172a;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .zyf_section h2::before {
+            content: "";
+            width: 4px;
+            height: 16px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, #0ea5e9, #8b5cf6);
+        }
+
+        .zyf_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .zyf_table th, .zyf_table td {
+            border: 1px solid #eef2f7;
+            padding: 10px 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .zyf_table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .zyf_table td { color: #64748b; }
+        .zyf_table td strong { color: #1e293b; }
+
+        .zyf_tips {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        .zyf_tip {
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-left: 3px solid #8b5cf6;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 12.5px;
+            color: #475569;
+        }
+        .zyf_tip b { color: #1e293b; display: block; margin-bottom: 2px; }
+
+        .zyf_footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>JavaScript 的两种定时器</h1>
+        <p>setTimeout 只执行一次，setInterval 每隔一段时间重复执行</p>
+        <span class="zyf_note">两种定时器都返回一个数字 ID，可用 clearTimeout / clearInterval 取消</span>
+    </div>
+
+    <div class="zyf_layout">
+
+        <!-- ============ setTimeout ============ -->
+        <div class="zyf_card">
+            <div class="zyf_card_head">
+                <div class="zyf_icon zyf_icon_once">⏰</div>
+                <h2>setTimeout</h2>
+            </div>
+            <div class="zyf_card_sub">延迟指定毫秒后执行 <code>一次</code>，执行完自动结束</div>
+
+            <div class="zyf_field">
+                <label>延迟时间（毫秒，0 ~ 10000）</label>
+                <input class="zyf_input" id="zyf_to_delay" type="number" value="3000" min="0" max="10000" step="100">
+            </div>
+            <div class="zyf_field">
+                <label>要执行的提示文字</label>
+                <input class="zyf_input" id="zyf_to_msg" type="text" value="时间到！setTimeout 执行了一次">
+            </div>
+
+            <div class="zyf_row">
+                <button class="zyf_btn" id="zyf_to_start">开始计时</button>
+                <button class="zyf_btn zyf_btn_red" id="zyf_to_clear">取消（clearTimeout）</button>
+            </div>
+
+            <div class="zyf_display">
+                <div class="zyf_big zyf_big_blue" id="zyf_to_left">3.0 s</div>
+                <div class="zyf_small" id="zyf_to_state">尚未开始</div>
+                <div class="zyf_progress">
+                    <div class="zyf_progress_bar" id="zyf_to_bar"></div>
+                </div>
+            </div>
+
+            <div class="zyf_log" id="zyf_to_log">
+                <span class="zyf_log_line zyf_log_info"><span class="zyf_log_time">--:--:--</span>等待操作…</span>
+            </div>
+        </div>
+
+        <!-- ============ setInterval ============ -->
+        <div class="zyf_card">
+            <div class="zyf_card_head">
+                <div class="zyf_icon zyf_icon_loop">🔄</div>
+                <h2>setInterval</h2>
+            </div>
+            <div class="zyf_card_sub">每隔指定毫秒执行 <code>一次</code>，直到被清除</div>
+
+            <div class="zyf_field">
+                <label>执行间隔（毫秒，100 ~ 5000）</label>
+                <input class="zyf_input" id="zyf_iv_gap" type="number" value="1000" min="100" max="5000" step="100">
+            </div>
+
+            <div class="zyf_row">
+                <button class="zyf_btn zyf_btn_purple" id="zyf_iv_start">开始</button>
+                <button class="zyf_btn zyf_btn_gray" id="zyf_iv_stop">暂停（clearInterval）</button>
+                <button class="zyf_btn zyf_btn_red" id="zyf_iv_reset">重置</button>
+            </div>
+
+            <div class="zyf_display">
+                <div class="zyf_big zyf_big_purple" id="zyf_iv_count">0</div>
+                <div class="zyf_small" id="zyf_iv_state">已执行次数 · 未运行</div>
+            </div>
+
+            <div class="zyf_log" id="zyf_iv_log">
+                <span class="zyf_log_line zyf_log_info"><span class="zyf_log_time">--:--:--</span>等待操作…</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ 对比与要点 ============ -->
+    <div class="zyf_section">
+        <h2>两种定时器对比</h2>
+        <table class="zyf_table">
+            <thead>
+                <tr>
+                    <th>对比项</th>
+                    <th>setTimeout</th>
+                    <th>setInterval</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>执行次数</strong></td>
+                    <td>只执行一次</td>
+                    <td>按间隔重复执行，直到被清除</td>
+                </tr>
+                <tr>
+                    <td><strong>清除方法</strong></td>
+                    <td>clearTimeout(id)</td>
+                    <td>clearInterval(id)</td>
+                </tr>
+                <tr>
+                    <td><strong>典型场景</strong></td>
+                    <td>延迟提示、倒计时结束回调、请求防抖</td>
+                    <td>轮播图自动切换、时钟走秒、数据轮询</td>
+                </tr>
+                <tr>
+                    <td><strong>执行时机</strong></td>
+                    <td>延迟后进入任务队列，主线程空闲才执行</td>
+                    <td>每次执行完，间隔计时重新开始，长期运行会累积误差</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="zyf_tips">
+            <div class="zyf_tip"><b>定时器不是"精确闹钟"</b>设定 100ms 不代表就在 100ms 触发，要等主线程空闲。</div>
+            <div class="zyf_tip"><b>用完记得清除</b>setInterval 不清除会一直运行，页面关闭前应 clearInterval，避免内存与性能浪费。</div>
+            <div class="zyf_tip"><b>最小延迟约 4ms</b>嵌套层级较深的定时器会被浏览器限制，实际不会低于 4ms。</div>
+            <div class="zyf_tip"><b>需要精确周期用递归</b>用 setTimeout 递归调用可以避免 setInterval 的误差累积。</div>
+        </div>
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-5 定时器</div>
+
+    <script>
+        /* ================= setTimeout 部分 ================= */
+        var zyf_toId = null;         // setTimeout 返回的 ID
+        var zyf_toStartAt = 0;       // 开始时刻
+        var zyf_toDelayMs = 0;       // 本次延迟
+        var zyf_toTicker = null;     // 用于刷新倒计时的内部计时器
+
+        var zyf_toDelay = document.getElementById("zyf_to_delay");
+        var zyf_toMsg = document.getElementById("zyf_to_msg");
+        var zyf_toLeft = document.getElementById("zyf_to_left");
+        var zyf_toState = document.getElementById("zyf_to_state");
+        var zyf_toBar = document.getElementById("zyf_to_bar");
+        var zyf_toLog = document.getElementById("zyf_to_log");
+
+        /* 时间戳 HH:mm:ss */
+        function zyf_now() {
+            var zyf_d = new Date();
+            function zyf_pad(zyf_n) { return zyf_n < 10 ? "0" + zyf_n : "" + zyf_n; }
+            return zyf_pad(zyf_d.getHours()) + ":" + zyf_pad(zyf_d.getMinutes()) + ":" + zyf_pad(zyf_d.getSeconds());
+        }
+
+        /* 追加日志 */
+        function zyf_log(zyf_box, zyf_text, zyf_type) {
+            var zyf_line = document.createElement("span");
+            zyf_line.className = "zyf_log_line " + zyf_type;
+            zyf_line.innerHTML = '<span class="zyf_log_time">' + zyf_now() + "</span>" + zyf_text;
+            zyf_box.appendChild(zyf_line);
+            zyf_box.scrollTop = zyf_box.scrollHeight;
+
+            /* 只保留最近 12 条 */
+            while (zyf_box.children.length > 12) {
+                zyf_box.removeChild(zyf_box.firstChild);
+            }
+        }
+
+        /* 点击「开始计时」 */
+        document.getElementById("zyf_to_start").addEventListener("click", function () {
+            var zyf_delay = parseInt(zyf_toDelay.value, 10);
+            if (isNaN(zyf_delay) || zyf_delay < 0 || zyf_delay > 10000) {
+                zyf_log(zyf_toLog, "延迟时间必须在 0 ~ 10000 毫秒之间", "zyf_log_bad");
+                return;
+            }
+
+            /* 重复点击时先清掉上一次 */
+            if (zyf_toId !== null) {
+                clearTimeout(zyf_toId);
+                clearInterval(zyf_toTicker);
+                zyf_log(zyf_toLog, "上一次定时器已被替换", "zyf_log_warn");
+            }
+
+            zyf_toDelayMs = zyf_delay;
+            zyf_toStartAt = Date.now();
+            zyf_toState.textContent = "计时中…";
+            zyf_log(zyf_toLog, "setTimeout 已安排，将在 " + zyf_delay + " ms 后执行", "zyf_log_info");
+
+            /* 每 100ms 刷新倒计时显示 */
+            zyf_toTicker = setInterval(function () {
+                var zyf_passed = Date.now() - zyf_toStartAt;
+                var zyf_remain = Math.max(zyf_toDelayMs - zyf_passed, 0);
+                zyf_toLeft.textContent = (zyf_remain / 1000).toFixed(1) + " s";
+                zyf_toBar.style.width = Math.min(zyf_passed / zyf_toDelayMs * 100, 100) + "%";
+            }, 100);
+
+            zyf_toId = setTimeout(function () {
+                clearInterval(zyf_toTicker);
+                zyf_toId = null;
+                zyf_toLeft.textContent = "0.0 s";
+                zyf_toBar.style.width = "100%";
+                zyf_toState.textContent = "已执行（不会再执行）";
+                zyf_log(zyf_toLog, "✔ " + zyf_toMsg.value, "zyf_log_ok");
+            }, zyf_delay);
+        });
+
+        /* 点击「取消」 */
+        document.getElementById("zyf_to_clear").addEventListener("click", function () {
+            if (zyf_toId === null) {
+                zyf_log(zyf_toLog, "当前没有正在等待的 setTimeout，无需取消", "zyf_log_warn");
+                return;
+            }
+            clearTimeout(zyf_toId);
+            clearInterval(zyf_toTicker);
+            zyf_toId = null;
+            zyf_toState.textContent = "已取消";
+            zyf_toBar.style.width = "0%";
+            zyf_toLeft.textContent = (zyf_toDelayMs / 1000).toFixed(1) + " s";
+            zyf_log(zyf_toLog, "clearTimeout 已取消本次执行，回调不会触发", "zyf_log_bad");
+        });
+
+        /* ================= setInterval 部分 ================= */
+        var zyf_ivId = null;         // setInterval 返回的 ID
+        var zyf_ivCount = 0;         // 已执行次数
+        var zyf_ivStartAt = 0;       // 开始时刻
+
+        var zyf_ivGap = document.getElementById("zyf_iv_gap");
+        var zyf_ivCountEl = document.getElementById("zyf_iv_count");
+        var zyf_ivState = document.getElementById("zyf_iv_state");
+        var zyf_ivLog = document.getElementById("zyf_iv_log");
+
+        /* 开始 */
+        document.getElementById("zyf_iv_start").addEventListener("click", function () {
+            if (zyf_ivId !== null) {
+                zyf_log(zyf_ivLog, "已在运行中，无需重复开始", "zyf_log_warn");
+                return;
+            }
+            var zyf_gap = parseInt(zyf_ivGap.value, 10);
+            if (isNaN(zyf_gap) || zyf_gap < 100 || zyf_gap > 5000) {
+                zyf_log(zyf_ivLog, "间隔必须在 100 ~ 5000 毫秒之间", "zyf_log_bad");
+                return;
+            }
+
+            zyf_ivStartAt = Date.now();
+            zyf_ivState.textContent = "已执行次数 · 运行中（每 " + zyf_gap + " ms）";
+            zyf_log(zyf_ivLog, "setInterval 已启动，每 " + zyf_gap + " ms 执行一次", "zyf_log_info");
+
+            zyf_ivId = setInterval(function () {
+                zyf_ivCount++;
+                var zyf_elapsed = ((Date.now() - zyf_ivStartAt) / 1000).toFixed(1);
+                zyf_ivCountEl.textContent = zyf_ivCount;
+                zyf_log(zyf_ivLog, "第 " + zyf_ivCount + " 次执行（已运行 " + zyf_elapsed + " s）", "zyf_log_ok");
+            }, zyf_gap);
+        });
+
+        /* 暂停 */
+        document.getElementById("zyf_iv_stop").addEventListener("click", function () {
+            if (zyf_ivId === null) {
+                zyf_log(zyf_ivLog, "当前没有运行中的 setInterval", "zyf_log_warn");
+                return;
+            }
+            clearInterval(zyf_ivId);
+            zyf_ivId = null;
+            zyf_ivState.textContent = "已执行次数 · 已暂停";
+            zyf_log(zyf_ivLog, "clearInterval 已执行，停止于第 " + zyf_ivCount + " 次", "zyf_log_warn");
+        });
+
+        /* 重置 */
+        document.getElementById("zyf_iv_reset").addEventListener("click", function () {
+            if (zyf_ivId !== null) {
+                clearInterval(zyf_ivId);
+                zyf_ivId = null;
+            }
+            zyf_ivCount = 0;
+            zyf_ivCountEl.textContent = "0";
+            zyf_ivState.textContent = "已执行次数 · 未运行";
+            zyf_ivLog.innerHTML = "";
+            zyf_log(zyf_ivLog, "计数已归零", "zyf_log_info");
+        });
+    </script>
+</body>
+</html>
