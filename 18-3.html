@@ -1,0 +1,297 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：商品列表页，fetch 获取 dummyjson 商品数据并渲染卡片，点击进入详情 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-3 商品列表</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 32px 16px 60px;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            max-width: 1120px;
+            margin: 0 auto 22px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 26px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .zyf_header p { font-size: 13px; color: #64748b; }
+        .zyf_header .zyf_api {
+            display: inline-block;
+            margin-top: 10px;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: #475569;
+            background: #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 14px;
+        }
+
+        /* ============ 工具栏 ============ */
+        .zyf_toolbar {
+            max-width: 1120px;
+            margin: 0 auto 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+        .zyf_btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .zyf_btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(236, 72, 153, 0.28); }
+        .zyf_btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .zyf_count {
+            font-size: 12.5px;
+            color: #64748b;
+            margin-left: auto;
+        }
+        .zyf_count b { color: #ec4899; }
+
+        /* ============ 状态条 ============ */
+        .zyf_status {
+            max-width: 1120px;
+            margin: 0 auto 16px;
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: none;
+        }
+        .zyf_status.zyf_show { display: block; }
+        .zyf_status.zyf_ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .zyf_status.zyf_bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .zyf_status.zyf_loading { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+        /* ============ 商品网格 ============ */
+        .zyf_grid {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .zyf_card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+        }
+        .zyf_card:hover {
+            transform: translateY(-3px);
+            border-color: #fed7aa;
+            box-shadow: 0 10px 24px rgba(249, 115, 22, 0.14);
+        }
+        .zyf_thumb {
+            height: 170px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+        .zyf_thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        .zyf_card:hover .zyf_thumb img { transform: scale(1.06); }
+
+        .zyf_card_body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+        .zyf_category {
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 700;
+            color: #c2410c;
+            background: #fff7ed;
+            border-radius: 6px;
+            padding: 1px 8px;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+        .zyf_title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 44px;
+        }
+        .zyf_meta {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .zyf_price { font-size: 18px; font-weight: 700; color: #e11d48; }
+        .zyf_old { font-size: 12px; color: #94a3b8; text-decoration: line-through; }
+        .zyf_rating { font-size: 12px; color: #f59e0b; margin-left: auto; }
+
+        .zyf_link {
+            margin-top: auto;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #f97316, #ec4899);
+            border-radius: 8px;
+            padding: 8px 0;
+            transition: filter 0.2s;
+        }
+        .zyf_link:hover { filter: brightness(1.08); }
+
+        .zyf_footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>商品列表</h1>
+        <p>fetch 请求接口获取前 8 件商品，点击卡片进入商品详情页</p>
+        <span class="zyf_api">GET https://dummyjson.com/products?limit=8</span>
+    </div>
+
+    <div class="zyf_toolbar">
+        <button class="zyf_btn" id="zyf_reload" onclick="zyf_fetchProducts()">重新加载</button>
+        <span class="zyf_count" id="zyf_count">共 <b>0</b> 件商品</span>
+    </div>
+
+    <div class="zyf_status" id="zyf_status"></div>
+
+    <div class="zyf_grid" id="zyf_grid"></div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-3 列表</div>
+
+    <script>
+        var zyf_API = "https://dummyjson.com/products?limit=8";
+
+        var zyf_grid = document.getElementById("zyf_grid");
+        var zyf_status = document.getElementById("zyf_status");
+        var zyf_count = document.getElementById("zyf_count");
+        var zyf_reload = document.getElementById("zyf_reload");
+
+        /* ============ 状态提示 ============ */
+        function zyf_setStatus(zyf_text, zyf_type) {
+            if (!zyf_text) {
+                zyf_status.className = "zyf_status";
+                zyf_status.textContent = "";
+                return;
+            }
+            zyf_status.className = "zyf_status zyf_show " + zyf_type;
+            zyf_status.textContent = zyf_text;
+        }
+
+        /* ============ 请求列表 ============ */
+        function zyf_fetchProducts() {
+            zyf_reload.disabled = true;
+            zyf_setStatus("正在请求商品数据……", "zyf_loading");
+            zyf_grid.innerHTML = "";
+
+            fetch(zyf_API)
+                .then(function (zyf_res) {
+                    if (!zyf_res.ok) {
+                        throw new Error("请求失败，HTTP 状态码 " + zyf_res.status);
+                    }
+                    return zyf_res.json();
+                })
+                .then(function (zyf_data) {
+                    zyf_setStatus("✅ 请求成功，共获取 " + zyf_data.products.length + " 件商品", "zyf_ok");
+                    zyf_render(zyf_data.products);
+                })
+                .catch(function (zyf_err) {
+                    zyf_setStatus("❌ " + zyf_err.message + "（请检查网络或接口地址）", "zyf_bad");
+                    zyf_count.innerHTML = "共 <b>0</b> 件商品";
+                })
+                .finally(function () {
+                    zyf_reload.disabled = false;
+                });
+        }
+
+        /* ============ 渲染卡片 ============ */
+        function zyf_render(zyf_products) {
+            zyf_count.innerHTML = "共 <b>" + zyf_products.length + "</b> 件商品";
+            var zyf_html = "";
+
+            for (var zyf_i = 0; zyf_i < zyf_products.length; zyf_i++) {
+                var zyf_p = zyf_products[zyf_i];
+                var zyf_oldPrice = zyf_p.price / (1 - zyf_p.discountPercentage / 100);
+
+                zyf_html +=
+                    '<div class="zyf_card">' +
+                        '<div class="zyf_thumb">' +
+                            '<img src="' + zyf_p.thumbnail + '" alt="' + zyf_escapeHtml(zyf_p.title) + '">' +
+                        '</div>' +
+                        '<div class="zyf_card_body">' +
+                            '<span class="zyf_category">' + zyf_escapeHtml(zyf_p.category) + '</span>' +
+                            '<div class="zyf_title">' + zyf_escapeHtml(zyf_p.title) + '</div>' +
+                            '<div class="zyf_meta">' +
+                                '<span class="zyf_price">$' + zyf_p.price + '</span>' +
+                                '<span class="zyf_old">$' + zyf_oldPrice.toFixed(2) + '</span>' +
+                                '<span class="zyf_rating">★ ' + zyf_p.rating + '</span>' +
+                            '</div>' +
+                            '<a class="zyf_link" href="18-3-detail.html?id=' + zyf_p.id + '">查看详情 →</a>' +
+                        '</div>' +
+                    '</div>';
+            }
+            zyf_grid.innerHTML = zyf_html;
+        }
+
+        /* ============ 转义 ============ */
+        function zyf_escapeHtml(zyf_text) {
+            return String(zyf_text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        /* ============ 初始化 ============ */
+        zyf_fetchProducts();
+    </script>
+</body>
+</html>

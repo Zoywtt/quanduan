@@ -225,3 +225,14 @@
 > 完成18-2.html，获取`https://jsonplaceholder.typicode.com/posts`的数据并展示。接口可以跨域访问。使用fetch和原生代码实现
 
 ---
+
+## 2026-11-02 16:12:00
+
+- **使用模型**: DeepSeek-V4.1-Flash
+- **提示词内容**:
+
+> 完成18-3.html和18-3-detail.html，显示列表和列表详情，数据来源于接口，使用fetch
+> 列表：`https://dummyjson.com/products?limit=8`，默认商品列表。
+> 详情：`https://dummyjson.com/products/1`，根据 ID 获取单个商品。
+
+---

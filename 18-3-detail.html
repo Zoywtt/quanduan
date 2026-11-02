@@ -1,0 +1,410 @@
+<!-- 姓名：张耀夫 日期：2026-11-02 功能名称：商品详情页，根据 URL 中的 id 用 fetch 请求单个商品并展示详情 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18-3-detail 商品详情</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 28px 16px 60px;
+        }
+
+        /* ============ 顶部导航 ============ */
+        .zyf_nav {
+            max-width: 1000px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .zyf_back {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 14px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .zyf_back:hover { border-color: #fdba74; color: #ea580c; }
+        .zyf_nav .zyf_id {
+            font-size: 12.5px;
+            color: #94a3b8;
+            font-family: Consolas, monospace;
+            margin-left: auto;
+        }
+
+        /* ============ 状态条 ============ */
+        .zyf_status {
+            max-width: 1000px;
+            margin: 0 auto 16px;
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: none;
+        }
+        .zyf_status.zyf_show { display: block; }
+        .zyf_status.zyf_bad { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .zyf_status.zyf_loading { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+        /* ============ 详情主体 ============ */
+        .zyf_detail {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+            padding: 24px;
+            display: none;
+            grid-template-columns: 400px 1fr;
+            gap: 28px;
+        }
+        .zyf_detail.zyf_show { display: grid; }
+
+        /* 图片区 */
+        .zyf_gallery { display: flex; flex-direction: column; gap: 12px; }
+        .zyf_main_img {
+            height: 340px;
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .zyf_main_img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .zyf_thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .zyf_thumbs img {
+            width: 62px;
+            height: 62px;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f8fafc;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .zyf_thumbs img:hover { transform: translateY(-2px); }
+        .zyf_thumbs img.zyf_active { border-color: #f97316; }
+
+        /* 信息区 */
+        .zyf_info { display: flex; flex-direction: column; }
+        .zyf_badge_row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .zyf_badge {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 2px 9px;
+            text-transform: capitalize;
+        }
+        .zyf_badge_cate { background: #fff7ed; color: #c2410c; }
+        .zyf_badge_brand { background: #eff6ff; color: #1d4ed8; }
+        .zyf_badge_stock { background: #ecfdf5; color: #047857; }
+        .zyf_badge_stock.zyf_low { background: #fef2f2; color: #b91c1c; }
+
+        .zyf_title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+
+        .zyf_price_row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .zyf_price { font-size: 28px; font-weight: 700; color: #e11d48; }
+        .zyf_old_price { font-size: 14px; color: #94a3b8; text-decoration: line-through; }
+        .zyf_discount {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            background: #e11d48;
+            border-radius: 6px;
+            padding: 1px 8px;
+        }
+        .zyf_rating { font-size: 13px; color: #f59e0b; margin-bottom: 14px; }
+
+        .zyf_desc {
+            font-size: 13.5px;
+            color: #475569;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 14px;
+            margin-bottom: 14px;
+        }
+
+        .zyf_spec {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .zyf_spec_item {
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .zyf_spec_item .zyf_spec_label { font-size: 11.5px; color: #94a3b8; }
+        .zyf_spec_item .zyf_spec_value { font-size: 14px; font-weight: 700; color: #334155; }
+
+        .zyf_tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+        .zyf_tag {
+            font-size: 12px;
+            color: #475569;
+            background: #eef2f7;
+            border-radius: 999px;
+            padding: 2px 12px;
+        }
+
+        .zyf_switch { display: flex; gap: 10px; margin-top: auto; }
+        .zyf_btn {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #475569;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .zyf_btn:hover { border-color: #fdba74; color: #ea580c; }
+        .zyf_btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .zyf_footer {
+            max-width: 1000px;
+            margin: 26px auto 0;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 820px) {
+            .zyf_detail { grid-template-columns: 1fr; gap: 18px; }
+            .zyf_main_img { height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_nav">
+        <a class="zyf_back" href="18-3.html">← 返回商品列表</a>
+        <button class="zyf_btn" id="zyf_prev" onclick="zyf_go(-1)">上一件</button>
+        <button class="zyf_btn" id="zyf_next" onclick="zyf_go(1)">下一件</button>
+        <span class="zyf_id" id="zyf_api_label">GET https://dummyjson.com/products/1</span>
+    </div>
+
+    <div class="zyf_status" id="zyf_status"></div>
+
+    <div class="zyf_detail" id="zyf_detail">
+        <!-- 图片区 -->
+        <div class="zyf_gallery">
+            <div class="zyf_main_img">
+                <img id="zyf_main_img" src="" alt="商品图片">
+            </div>
+            <div class="zyf_thumbs" id="zyf_thumbs"></div>
+        </div>
+
+        <!-- 信息区 -->
+        <div class="zyf_info">
+            <div class="zyf_badge_row" id="zyf_badges"></div>
+            <div class="zyf_title" id="zyf_title">—</div>
+
+            <div class="zyf_price_row">
+                <span class="zyf_price" id="zyf_price">$0</span>
+                <span class="zyf_old_price" id="zyf_old_price"></span>
+                <span class="zyf_discount" id="zyf_discount"></span>
+            </div>
+            <div class="zyf_rating" id="zyf_rating"></div>
+
+            <div class="zyf_desc" id="zyf_desc"></div>
+
+            <div class="zyf_spec" id="zyf_spec"></div>
+            <div class="zyf_tags" id="zyf_tags"></div>
+
+            <div class="zyf_switch">
+                <a class="zyf_btn" id="zyf_back_bottom" href="18-3.html">返回列表</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 18-3 详情</div>
+
+    <script>
+        /* 从 URL 读取 id，缺省为 1 */
+        var zyf_params = new URLSearchParams(window.location.search);
+        var zyf_productId = parseInt(zyf_params.get("id"), 10);
+        if (isNaN(zyf_productId) || zyf_productId < 1) {
+            zyf_productId = 1;
+        }
+
+        var zyf_detail = document.getElementById("zyf_detail");
+        var zyf_status = document.getElementById("zyf_status");
+        var zyf_mainImg = document.getElementById("zyf_main_img");
+        var zyf_thumbs = document.getElementById("zyf_thumbs");
+
+        /* ============ 状态提示 ============ */
+        function zyf_setStatus(zyf_text, zyf_type) {
+            if (!zyf_text) {
+                zyf_status.className = "zyf_status";
+                return;
+            }
+            zyf_status.className = "zyf_status zyf_show " + zyf_type;
+            zyf_status.textContent = zyf_text;
+        }
+
+        /* ============ 请求详情 ============ */
+        function zyf_fetchDetail(zyf_id) {
+            var zyf_api = "https://dummyjson.com/products/" + zyf_id;
+            document.getElementById("zyf_api_label").textContent = "GET " + zyf_api;
+            zyf_setStatus("正在加载商品详情……", "zyf_loading");
+            zyf_detail.classList.remove("zyf_show");
+
+            fetch(zyf_api)
+                .then(function (zyf_res) {
+                    if (!zyf_res.ok) {
+                        throw new Error("请求失败，HTTP 状态码 " + zyf_res.status);
+                    }
+                    return zyf_res.json();
+                })
+                .then(function (zyf_p) {
+                    zyf_setStatus("");
+                    zyf_detail.classList.add("zyf_show");
+                    zyf_render(zyf_p);
+                })
+                .catch(function (zyf_err) {
+                    zyf_setStatus("❌ " + zyf_err.message + "（请检查商品 ID 或网络）", "zyf_bad");
+                });
+        }
+
+        /* ============ 渲染详情 ============ */
+        function zyf_render(zyf_p) {
+            /* 标题、价格、评分 */
+            document.getElementById("zyf_title").textContent = zyf_p.title;
+            document.getElementById("zyf_price").textContent = "$" + zyf_p.price;
+
+            var zyf_oldPrice = zyf_p.price / (1 - zyf_p.discountPercentage / 100);
+            document.getElementById("zyf_old_price").textContent = "$" + zyf_oldPrice.toFixed(2);
+            document.getElementById("zyf_discount").textContent =
+                "-" + Math.round(zyf_p.discountPercentage) + "%";
+            document.getElementById("zyf_rating").textContent =
+                "★ " + zyf_p.rating + " / 5　（库存 " + zyf_p.stock + " 件）";
+            document.getElementById("zyf_desc").textContent = zyf_p.description;
+
+            /* 徽章 */
+            var zyf_badges = "";
+            zyf_badges += '<span class="zyf_badge zyf_badge_cate">' + zyf_escapeHtml(zyf_p.category) + '</span>';
+            if (zyf_p.brand) {
+                zyf_badges += '<span class="zyf_badge zyf_badge_brand">' + zyf_escapeHtml(zyf_p.brand) + '</span>';
+            }
+            zyf_badges += '<span class="zyf_badge zyf_badge_stock' + (zyf_p.stock < 10 ? " zyf_low" : "") + '">' +
+                (zyf_p.stock > 0 ? "有货 " + zyf_p.stock : "缺货") + '</span>';
+            document.getElementById("zyf_badges").innerHTML = zyf_badges;
+
+            /* 规格 */
+            var zyf_spec = [
+                { label: "价格", value: "$" + zyf_p.price },
+                { label: "折扣", value: Math.round(zyf_p.discountPercentage) + "%" },
+                { label: "评分", value: zyf_p.rating + " 星" },
+                { label: "库存", value: zyf_p.stock + " 件" },
+                { label: "重量", value: zyf_p.weight + " g" },
+                { label: "保修", value: zyf_p.warrantyInformation },
+                { label: "发货", value: zyf_p.shippingInformation },
+                { label: "退换", value: zyf_p.returnPolicy }
+            ];
+            var zyf_specHtml = "";
+            for (var zyf_i = 0; zyf_i < zyf_spec.length; zyf_i++) {
+                zyf_specHtml +=
+                    '<div class="zyf_spec_item">' +
+                        '<div class="zyf_spec_label">' + zyf_spec[zyf_i].label + '</div>' +
+                        '<div class="zyf_spec_value">' + zyf_escapeHtml(zyf_spec[zyf_i].value) + '</div>' +
+                    '</div>';
+            }
+            document.getElementById("zyf_spec").innerHTML = zyf_specHtml;
+
+            /* 标签 */
+            var zyf_tagsHtml = "";
+            var zyf_tags = zyf_p.tags || [];
+            for (var zyf_j = 0; zyf_j < zyf_tags.length; zyf_j++) {
+                zyf_tagsHtml += '<span class="zyf_tag">#' + zyf_escapeHtml(zyf_tags[zyf_j]) + '</span>';
+            }
+            document.getElementById("zyf_tags").innerHTML = zyf_tagsHtml;
+
+            /* 图片画廊 */
+            var zyf_images = zyf_p.images && zyf_p.images.length ? zyf_p.images : [zyf_p.thumbnail];
+            zyf_mainImg.src = zyf_images[0];
+            zyf_mainImg.alt = zyf_p.title;
+
+            var zyf_thumbsHtml = "";
+            for (var zyf_k = 0; zyf_k < zyf_images.length; zyf_k++) {
+                zyf_thumbsHtml += '<img src="' + zyf_images[zyf_k] + '" alt="缩略图 ' + (zyf_k + 1) +
+                    '" class="' + (zyf_k === 0 ? "zyf_active" : "") +
+                    '" onclick="zyf_switchImage(this, \'' + zyf_images[zyf_k] + '\')">';
+            }
+            zyf_thumbs.innerHTML = zyf_thumbsHtml;
+
+            /* 翻页按钮状态 */
+            document.getElementById("zyf_prev").disabled = zyf_p.id <= 1;
+            document.getElementById("zyf_next").disabled = false;
+
+            /* 同步导航链接 */
+            document.getElementById("zyf_back_bottom").href = "18-3.html";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        /* 切换主图 */
+        function zyf_switchImage(zyf_el, zyf_src) {
+            zyf_mainImg.src = zyf_src;
+            var zyf_all = zyf_thumbs.querySelectorAll("img");
+            for (var zyf_i = 0; zyf_i < zyf_all.length; zyf_i++) {
+                zyf_all[zyf_i].classList.remove("zyf_active");
+            }
+            zyf_el.classList.add("zyf_active");
+        }
+
+        /* 上一件 / 下一件 */
+        function zyf_go(zyf_step) {
+            var zyf_next = zyf_productId + zyf_step;
+            if (zyf_next < 1) return;
+            zyf_productId = zyf_next;
+            history.replaceState(null, "", "18-3-detail.html?id=" + zyf_productId);
+            zyf_fetchDetail(zyf_productId);
+        }
+
+        /* ============ 转义 ============ */
+        function zyf_escapeHtml(zyf_text) {
+            return String(zyf_text === undefined ? "" : zyf_text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        /* ============ 初始化 ============ */
+        zyf_fetchDetail(zyf_productId);
+    </script>
+</body>
+</html>
