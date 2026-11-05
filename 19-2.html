@@ -1,0 +1,549 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：基于 Canvas 绘制的电商全站系统架构图，支持悬浮高亮与点击查看模块职责 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-2 Canvas 电商系统架构图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 28px 16px 56px;
+        }
+
+        .zyf_header {
+            max-width: 1000px;
+            margin: 0 auto 16px;
+            text-align: center;
+        }
+        .zyf_header h1 {
+            font-size: 24px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            font-size: 12.5px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* ============ 画布 ============ */
+        .zyf_stage {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            aspect-ratio: 1000 / 760;
+            background: #ffffff;
+            border: 1px solid #e5e9f2;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+            overflow: hidden;
+        }
+        .zyf_stage canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+
+        /* ============ 说明面板 ============ */
+        .zyf_panel {
+            max-width: 1000px;
+            margin: 14px auto 0;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 780px) {
+            .zyf_panel { grid-template-columns: 1fr; }
+        }
+
+        .zyf_summary {
+            background: #fff;
+            border: 1px solid #e5e9f2;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 12.5px;
+            color: #64748b;
+            line-height: 2;
+        }
+        .zyf_summary b { color: #0f172a; font-family: Consolas, monospace; }
+
+        .zyf_detail {
+            background: #fff;
+            border: 1px solid #e5e9f2;
+            border-left: 4px solid #6366f1;
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+        .zyf_detail_title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+        .zyf_detail_desc {
+            font-size: 12.5px;
+            color: #475569;
+        }
+
+        .zyf_footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>电商全站系统架构图</h1>
+        <p>纯 Canvas 绘制的分层架构：用户层 → 接入层 → 业务服务层 → 中间件层 → 数据层，虚线代表外部或异步依赖</p>
+    </div>
+
+    <div class="zyf_stage" id="zyf_stage">
+        <canvas id="zyf_canvas"></canvas>
+    </div>
+
+    <div class="zyf_panel">
+        <div class="zyf_summary">
+            模块总数：<b id="zyf_total">0</b><br>
+            连线总数：<b id="zyf_edges">0</b><br>
+            悬浮模块会高亮边框，点击后右侧显示该模块职责说明。
+        </div>
+        <div class="zyf_detail">
+            <div class="zyf_detail_title" id="zyf_detail_title">点击任意模块查看职责</div>
+            <div class="zyf_detail_desc" id="zyf_detail_desc">
+                画布上每个方块都代表一个子系统或基础组件，点击后可查看它在电商系统中的具体作用。
+            </div>
+        </div>
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-2 Canvas 架构图</div>
+
+    <script>
+        /* ============ 逻辑画布尺寸（与 CSS 等比例缩放） ============ */
+        var zyf_W = 1000;
+        var zyf_H = 760;
+
+        var zyf_cvs = document.getElementById("zyf_canvas");
+        var zyf_ctx = zyf_cvs.getContext("2d");
+        var zyf_stage = document.getElementById("zyf_stage");
+        var zyf_scale = 1;
+        var zyf_hoverId = null;
+
+        /* ============ 配色 ============ */
+        var zyf_theme = {
+            user:    { fill: "#eff6ff", stroke: "#93c5fd", text: "#1e3a8a" },
+            access:  { fill: "#ecfdf5", stroke: "#6ee7b7", text: "#065f46" },
+            service: { fill: "#fff7ed", stroke: "#fdba74", text: "#9a3412" },
+            middle:  { fill: "#faf5ff", stroke: "#d8b4fe", text: "#6b21a8" },
+            data:    { fill: "#fef2f2", stroke: "#fca5a5", text: "#991b1b" },
+            external:{ fill: "#f8fafc", stroke: "#94a3b8", text: "#475569" }
+        };
+
+        /* ============ 模块数据 ============ */
+        var zyf_nodes = [
+            /* 用户层 */
+            { id: "u_pc",  label: "PC 商城",    sub: "浏览器访问", type: "user",
+              x: 202, y: 86, w: 196, h: 60,
+              desc: "面向电脑浏览器的购物入口，承载首页、商品详情、购物车、下单等完整链路。" },
+            { id: "u_app", label: "移动 App",   sub: "iOS / Android", type: "user",
+              x: 402, y: 86, w: 196, h: 60,
+              desc: "移动端原生应用入口，通过 App 内的页面容器与 H5 页面混合渲染商品与订单。" },
+            { id: "u_mp",  label: "微信小程序", sub: "社交分享", type: "user",
+              x: 602, y: 86, w: 196, h: 60,
+              desc: "轻量入口，便于通过微信分享传播活动，承担拉新与快速下单场景。" },
+
+            /* 接入层 */
+            { id: "a_cdn", label: "CDN 静态加速", sub: "图片 / 静态资源", type: "access",
+              x: 202, y: 186, w: 196, h: 60,
+              desc: "把商品图片、脚本、样式分发到边缘节点，降低首屏加载时间与源站带宽压力。" },
+            { id: "a_gw",  label: "API 网关",     sub: "鉴权 / 限流 / 路由", type: "access",
+              x: 402, y: 186, w: 196, h: 60,
+              desc: "所有请求的统一入口：做身份校验、限流熔断、灰度路由，并把请求转发给后端服务。" },
+            { id: "a_lb",  label: "负载均衡",     sub: "流量分发", type: "access",
+              x: 602, y: 186, w: 196, h: 60,
+              desc: "将入口流量按权重分发到多台应用服务器，配合健康检查自动摘除故障节点。" },
+
+            /* 业务服务层 */
+            { id: "s_user",  label: "用户服务", sub: "注册 / 登录", type: "service",
+              x: 111, y: 286, w: 132, h: 92,
+              desc: "负责账号、登录态、收货地址与会员等级，为其他服务提供用户身份与画像数据。" },
+            { id: "s_goods", label: "商品服务", sub: "SKU / 类目", type: "service",
+              x: 259, y: 286, w: 132, h: 92,
+              desc: "维护商品主数据、SKU 与类目属性，提供搜索、详情、价格与库存的聚合查询。" },
+            { id: "s_order", label: "订单服务", sub: "下单 / 状态机", type: "service",
+              x: 407, y: 286, w: 132, h: 92,
+              desc: "电商核心：创建订单、管理订单状态机（待支付/已支付/发货/完成），并协调库存与支付。" },
+            { id: "s_pay",   label: "支付服务", sub: "支付 / 退款", type: "service",
+              x: 555, y: 286, w: 132, h: 92,
+              desc: "对接第三方支付渠道，处理支付下单、回调验签、对账与退款，保证资金流水一致。" },
+            { id: "s_stock", label: "库存服务", sub: "扣减 / 回滚", type: "service",
+              x: 703, y: 286, w: 132, h: 92,
+              desc: "维护库存与预占，下单先预扣、支付成功实扣、超时未支付自动回滚，防止超卖。" },
+            { id: "s_mkt",   label: "营销服务", sub: "优惠券 / 活动", type: "service",
+              x: 851, y: 286, w: 132, h: 92,
+              desc: "优惠券、满减、秒杀活动的规则计算与发放，下单时计算最优优惠并校验使用条件。" },
+
+            /* 中间件层 */
+            { id: "m_mq",   label: "消息队列 Kafka", sub: "异步解耦", type: "middle",
+              x: 111, y: 412, w: 200, h: 64,
+              desc: "订单创建后异步发送事件，驱动库存、物流、通知等下游任务，削峰并解耦服务依赖。" },
+            { id: "m_cache", label: "缓存 Redis",   sub: "热点数据", type: "middle",
+              x: 335, y: 412, w: 200, h: 64,
+              desc: "缓存商品详情、会话与库存热点数据，把高频读请求挡在数据库之前。" },
+            { id: "m_es",   label: "搜索引擎 ES",  sub: "商品检索", type: "middle",
+              x: 559, y: 412, w: 200, h: 64,
+              desc: "承载商品搜索、筛选与排序，支持关键词、类目、价格区间等组合条件的高性能检索。" },
+            { id: "m_job",  label: "定时任务调度", sub: "对账 / 清理", type: "middle",
+              x: 783, y: 412, w: 200, h: 64,
+              desc: "执行超时订单关闭、支付对账、数据报表生成等定时批处理任务。" },
+
+            /* 数据层 */
+            { id: "d_mysql", label: "MySQL 集群",  sub: "主从读写分离", type: "data",
+              x: 111, y: 512, w: 200, h: 64,
+              desc: "业务主库，存储用户、商品、订单、支付等核心交易数据，主从复制支撑读写分离。" },
+            { id: "d_oss",   label: "对象存储 OSS", sub: "图片 / 附件", type: "data",
+              x: 335, y: 512, w: 200, h: 64,
+              desc: "存放商品图片、详情长图与售后凭证等非结构化文件，配合 CDN 下发。" },
+            { id: "d_log",   label: "日志与监控",  sub: "链路追踪", type: "data",
+              x: 559, y: 512, w: 200, h: 64,
+              desc: "集中采集应用日志、接口耗时与异常指标，支撑故障定位与容量评估。" },
+            { id: "d_backup", label: "数据备份",   sub: "容灾恢复", type: "data",
+              x: 783, y: 512, w: 200, h: 64,
+              desc: "定期全量与增量备份核心数据，提供误删恢复与机房级容灾能力。" },
+
+            /* 外部系统 */
+            { id: "e_pay", label: "第三方支付", sub: "支付宝 / 微信支付", type: "external",
+              x: 700, y: 620, w: 196, h: 56,
+              desc: "外部支付渠道，接收支付请求并异步回调支付结果，是资金流的关键外部依赖。" },
+            { id: "e_logi", label: "物流系统",  sub: "快递 / 仓储", type: "external",
+              x: 402, y: 620, w: 196, h: 56,
+              desc: "外部物流与仓储系统，接收发货指令并回传运单号与签收状态。" }
+        ];
+
+        /* ============ 连线（solid 同步，dashed 外部/异步） ============ */
+        var zyf_edges = [
+            { from: "u_pc",  to: "a_gw", solid: true,  dot: true },
+            { from: "u_app", to: "a_gw", solid: true,  dot: true },
+            { from: "u_mp",  to: "a_gw", solid: true,  dot: false },
+            { from: "a_gw",  to: "s_user",  solid: true, dot: false },
+            { from: "a_gw",  to: "s_goods", solid: true, dot: false },
+            { from: "a_gw",  to: "s_order", solid: true, dot: true },
+            { from: "s_order", to: "s_stock", solid: true, dot: true },
+            { from: "s_order", to: "s_pay",   solid: true, dot: true },
+            { from: "s_order", to: "s_mkt",   solid: true, dot: false },
+            { from: "s_goods", to: "m_cache", solid: true, dot: true },
+            { from: "s_goods", to: "m_es",    solid: true, dot: false },
+            { from: "s_order", to: "m_mq",    solid: true, dot: true },
+            { from: "m_mq",    to: "d_mysql", solid: true, dot: true },
+            { from: "m_cache", to: "d_mysql", solid: true, dot: false },
+            { from: "m_job",   to: "d_backup", solid: true, dot: false },
+            { from: "s_pay",   to: "e_pay",   solid: false, dot: true },
+            { from: "s_order", to: "e_logi",  solid: false, dot: true }
+        ];
+
+        var zyf_layerLabels = [
+            { name: "用户层",   y: 86,  h: 60 },
+            { name: "接入层",   y: 186, h: 60 },
+            { name: "业务服务层", y: 286, h: 92 },
+            { name: "中间件层", y: 412, h: 64 },
+            { name: "数据层",   y: 512, h: 64 },
+            { name: "外部系统", y: 620, h: 56 }
+        ];
+
+        /* ============ 查找节点 ============ */
+        function zyf_findNode(zyf_id) {
+            for (var zyf_i = 0; zyf_i < zyf_nodes.length; zyf_i++) {
+                if (zyf_nodes[zyf_i].id === zyf_id) { return zyf_nodes[zyf_i]; }
+            }
+            return null;
+        }
+
+        /* ============ 圆角矩形路径 ============ */
+        function zyf_roundRect(zyf_c, zyf_x, zyf_y, zyf_w, zyf_h, zyf_r) {
+            zyf_c.beginPath();
+            zyf_c.moveTo(zyf_x + zyf_r, zyf_y);
+            zyf_c.lineTo(zyf_x + zyf_w - zyf_r, zyf_y);
+            zyf_c.quadraticCurveTo(zyf_x + zyf_w, zyf_y, zyf_x + zyf_w, zyf_y + zyf_r);
+            zyf_c.lineTo(zyf_x + zyf_w, zyf_y + zyf_h - zyf_r);
+            zyf_c.quadraticCurveTo(zyf_x + zyf_w, zyf_y + zyf_h, zyf_x + zyf_w - zyf_r, zyf_y + zyf_h);
+            zyf_c.lineTo(zyf_x + zyf_r, zyf_y + zyf_h);
+            zyf_c.quadraticCurveTo(zyf_x, zyf_y + zyf_h, zyf_x, zyf_y + zyf_h - zyf_r);
+            zyf_c.lineTo(zyf_x, zyf_y + zyf_r);
+            zyf_c.quadraticCurveTo(zyf_x, zyf_y, zyf_x + zyf_r, zyf_y);
+            zyf_c.closePath();
+        }
+
+        /* ============ 计算连线起止点 ============ */
+        function zyf_edgePoints(zyf_e) {
+            var zyf_a = zyf_findNode(zyf_e.from);
+            var zyf_b = zyf_findNode(zyf_e.to);
+            var zyf_acx = zyf_a.x + zyf_a.w / 2;
+            var zyf_acy = zyf_a.y + zyf_a.h / 2;
+            var zyf_bcx = zyf_b.x + zyf_b.w / 2;
+            var zyf_bcy = zyf_b.y + zyf_b.h / 2;
+
+            var zyf_x1, zyf_y1, zyf_x2, zyf_y2;
+            if (Math.abs(zyf_bcy - zyf_acy) > Math.abs(zyf_bcx - zyf_acx)) {
+                /* 纵向为主 */
+                zyf_x1 = zyf_acx;
+                zyf_y1 = zyf_bcy > zyf_acy ? zyf_a.y + zyf_a.h : zyf_a.y;
+                zyf_x2 = zyf_bcx;
+                zyf_y2 = zyf_bcy > zyf_acy ? zyf_b.y : zyf_b.y + zyf_b.h;
+            } else {
+                /* 横向为主 */
+                zyf_x1 = zyf_bcx > zyf_acx ? zyf_a.x + zyf_a.w : zyf_a.x;
+                zyf_y1 = zyf_acy;
+                zyf_x2 = zyf_bcx > zyf_acx ? zyf_b.x : zyf_b.x + zyf_b.w;
+                zyf_y2 = zyf_bcy;
+            }
+            return { x1: zyf_x1, y1: zyf_y1, x2: zyf_x2, y2: zyf_y2 };
+        }
+
+        /* ============ 箭头 ============ */
+        function zyf_drawArrowHead(zyf_c, zyf_x1, zyf_y1, zyf_x2, zyf_y2) {
+            var zyf_ang = Math.atan2(zyf_y2 - zyf_y1, zyf_x2 - zyf_x1);
+            var zyf_size = 7;
+            zyf_c.beginPath();
+            zyf_c.moveTo(zyf_x2, zyf_y2);
+            zyf_c.lineTo(
+                zyf_x2 - zyf_size * Math.cos(zyf_ang - Math.PI / 7),
+                zyf_y2 - zyf_size * Math.sin(zyf_ang - Math.PI / 7)
+            );
+            zyf_c.lineTo(
+                zyf_x2 - zyf_size * Math.cos(zyf_ang + Math.PI / 7),
+                zyf_y2 - zyf_size * Math.sin(zyf_ang + Math.PI / 7)
+            );
+            zyf_c.closePath();
+            zyf_c.fill();
+        }
+
+        /* ============ 绘制一帧 ============ */
+        function zyf_draw(zyf_ts) {
+            var zyf_c = zyf_ctx;
+
+            zyf_c.setTransform(1, 0, 0, 1, 0, 0);
+            zyf_c.clearRect(0, 0, zyf_cvs.width, zyf_cvs.height);
+
+            var zyf_dpr = window.devicePixelRatio || 1;
+            var zyf_k = zyf_scale * zyf_dpr;
+            zyf_c.setTransform(zyf_k, 0, 0, zyf_k, 0, 0);
+
+            /* 背景网格点 */
+            zyf_c.fillStyle = "#ffffff";
+            zyf_c.fillRect(0, 0, zyf_W, zyf_H);
+            zyf_c.fillStyle = "rgba(15, 23, 42, 0.055)";
+            for (var zyf_gx = 40; zyf_gx < zyf_W; zyf_gx += 40) {
+                for (var zyf_gy = 40; zyf_gy < zyf_H; zyf_gy += 40) {
+                    zyf_c.beginPath();
+                    zyf_c.arc(zyf_gx, zyf_gy, 1, 0, Math.PI * 2);
+                    zyf_c.fill();
+                }
+            }
+
+            /* 标题 */
+            zyf_c.textAlign = "center";
+            zyf_c.fillStyle = "#0f172a";
+            zyf_c.font = "700 22px 'Microsoft YaHei', sans-serif";
+            zyf_c.fillText("电商全站系统架构", zyf_W / 2, 42);
+            zyf_c.fillStyle = "#94a3b8";
+            zyf_c.font = "12px 'Microsoft YaHei', sans-serif";
+            zyf_c.fillText("Canvas 绘制 · 点击任意模块查看职责说明", zyf_W / 2, 64);
+
+            /* 层级标签 */
+            zyf_c.textAlign = "center";
+            for (var zyf_l = 0; zyf_l < zyf_layerLabels.length; zyf_l++) {
+                var zyf_lab = zyf_layerLabels[zyf_l];
+                zyf_c.fillStyle = "#f1f5f9";
+                zyf_roundRect(zyf_c, 16, zyf_lab.y, 72, zyf_lab.h, 8);
+                zyf_c.fill();
+                zyf_c.fillStyle = "#64748b";
+                zyf_c.font = "700 11px 'Microsoft YaHei', sans-serif";
+                var zyf_chars = zyf_lab.name.split("");
+                var zyf_lineH = 14;
+                var zyf_startY = zyf_lab.y + zyf_lab.h / 2 - (zyf_chars.length - 1) * zyf_lineH / 2;
+                for (var zyf_lc = 0; zyf_lc < zyf_chars.length; zyf_lc++) {
+                    zyf_c.fillText(zyf_chars[zyf_lc], 52, zyf_startY + zyf_lc * zyf_lineH);
+                }
+            }
+
+            /* 连线 */
+            for (var zyf_ei = 0; zyf_ei < zyf_edges.length; zyf_ei++) {
+                var zyf_e = zyf_edges[zyf_ei];
+                var zyf_p = zyf_edgePoints(zyf_e);
+
+                zyf_c.beginPath();
+                zyf_c.strokeStyle = zyf_e.solid ? "#94a3b8" : "#cbd5e1";
+                zyf_c.lineWidth = 1.4;
+                zyf_c.setLineDash(zyf_e.solid ? [] : [5, 4]);
+                zyf_c.moveTo(zyf_p.x1, zyf_p.y1);
+                zyf_c.lineTo(zyf_p.x2, zyf_p.y2);
+                zyf_c.stroke();
+                zyf_c.setLineDash([]);
+
+                zyf_c.fillStyle = zyf_e.solid ? "#94a3b8" : "#cbd5e1";
+                zyf_drawArrowHead(zyf_c, zyf_p.x1, zyf_p.y1, zyf_p.x2, zyf_p.y2);
+
+                /* 流动的数据点 */
+                if (zyf_e.dot) {
+                    var zyf_phase = ((zyf_ts / 1000) * 0.55 + zyf_ei * 0.2) % 1;
+                    var zyf_dx = zyf_p.x1 + (zyf_p.x2 - zyf_p.x1) * zyf_phase;
+                    var zyf_dy = zyf_p.y1 + (zyf_p.y2 - zyf_p.y1) * zyf_phase;
+                    zyf_c.beginPath();
+                    zyf_c.fillStyle = zyf_e.solid ? "rgba(99, 102, 241, 0.85)" : "rgba(148, 163, 184, 0.8)";
+                    zyf_c.arc(zyf_dx, zyf_dy, 3, 0, Math.PI * 2);
+                    zyf_c.fill();
+                }
+            }
+
+            /* 模块 */
+            for (var zyf_ni = 0; zyf_ni < zyf_nodes.length; zyf_ni++) {
+                var zyf_n = zyf_nodes[zyf_ni];
+                var zyf_style = zyf_theme[zyf_n.type];
+                var zyf_hover = (zyf_n.id === zyf_hoverId);
+
+                if (zyf_hover) {
+                    zyf_c.shadowColor = "rgba(99, 102, 241, 0.35)";
+                    zyf_c.shadowBlur = 14;
+                }
+
+                zyf_roundRect(zyf_c, zyf_n.x, zyf_n.y, zyf_n.w, zyf_n.h, 12);
+                zyf_c.fillStyle = zyf_hover ? "#ffffff" : zyf_style.fill;
+                zyf_c.fill();
+                zyf_c.shadowBlur = 0;
+
+                zyf_c.lineWidth = zyf_hover ? 2.4 : 1.4;
+                zyf_c.strokeStyle = zyf_hover ? "#6366f1" : zyf_style.stroke;
+                if (zyf_n.type === "external") { zyf_c.setLineDash([5, 4]); }
+                zyf_c.stroke();
+                zyf_c.setLineDash([]);
+
+                /* 文字 */
+                zyf_c.textAlign = "center";
+                zyf_c.fillStyle = zyf_style.text;
+                var zyf_twoLines = zyf_n.h >= 80;
+                if (zyf_twoLines) {
+                    zyf_c.font = "700 13px 'Microsoft YaHei', sans-serif";
+                    zyf_c.fillText(zyf_n.label, zyf_n.x + zyf_n.w / 2, zyf_n.y + zyf_n.h / 2 - 8);
+                    zyf_c.fillStyle = "#94a3b8";
+                    zyf_c.font = "11px 'Microsoft YaHei', sans-serif";
+                    zyf_c.fillText(zyf_n.sub, zyf_n.x + zyf_n.w / 2, zyf_n.y + zyf_n.h / 2 + 14);
+                } else {
+                    zyf_c.font = "700 13px 'Microsoft YaHei', sans-serif";
+                    zyf_c.fillText(zyf_n.label, zyf_n.x + zyf_n.w / 2, zyf_n.y + zyf_n.h / 2 - 6);
+                    zyf_c.fillStyle = "#94a3b8";
+                    zyf_c.font = "11px 'Microsoft YaHei', sans-serif";
+                    zyf_c.fillText(zyf_n.sub, zyf_n.x + zyf_n.w / 2, zyf_n.y + zyf_n.h / 2 + 14);
+                }
+            }
+
+            /* 图例 */
+            zyf_c.textAlign = "left";
+            zyf_c.font = "11.5px 'Microsoft YaHei', sans-serif";
+            zyf_c.strokeStyle = "#94a3b8";
+            zyf_c.lineWidth = 1.4;
+            zyf_c.beginPath();
+            zyf_c.moveTo(111, 716);
+            zyf_c.lineTo(151, 716);
+            zyf_c.stroke();
+            zyf_c.fillStyle = "#64748b";
+            zyf_c.fillText("同步调用 / 数据通道", 160, 720);
+
+            zyf_c.strokeStyle = "#cbd5e1";
+            zyf_c.setLineDash([5, 4]);
+            zyf_c.beginPath();
+            zyf_c.moveTo(320, 716);
+            zyf_c.lineTo(360, 716);
+            zyf_c.stroke();
+            zyf_c.setLineDash([]);
+            zyf_c.fillStyle = "#64748b";
+            zyf_c.fillText("外部系统 / 异步依赖", 369, 720);
+
+            zyf_c.beginPath();
+            zyf_c.fillStyle = "rgba(99, 102, 241, 0.85)";
+            zyf_c.arc(540, 716, 3, 0, Math.PI * 2);
+            zyf_c.fill();
+            zyf_c.fillStyle = "#64748b";
+            zyf_c.fillText("数据流动画", 551, 720);
+
+            requestAnimationFrame(zyf_draw);
+        }
+
+        /* ============ 自适应尺寸 ============ */
+        function zyf_resize() {
+            var zyf_cssW = zyf_stage.clientWidth;
+            var zyf_cssH = zyf_cssW * (zyf_H / zyf_W);
+            var zyf_dpr = window.devicePixelRatio || 1;
+
+            zyf_cvs.width = Math.floor(zyf_cssW * zyf_dpr);
+            zyf_cvs.height = Math.floor(zyf_cssH * zyf_dpr);
+            zyf_scale = zyf_cssW / zyf_W;
+        }
+
+        /* ============ 鼠标交互 ============ */
+        function zyf_toLogic(zyf_e) {
+            var zyf_rect = zyf_cvs.getBoundingClientRect();
+            return {
+                x: (zyf_e.clientX - zyf_rect.left) / (zyf_rect.width / zyf_W),
+                y: (zyf_e.clientY - zyf_rect.top) / (zyf_rect.width / zyf_W)
+            };
+        }
+
+        function zyf_hitTest(zyf_x, zyf_y) {
+            for (var zyf_i = zyf_nodes.length - 1; zyf_i >= 0; zyf_i--) {
+                var zyf_n = zyf_nodes[zyf_i];
+                if (zyf_x >= zyf_n.x && zyf_x <= zyf_n.x + zyf_n.w &&
+                    zyf_y >= zyf_n.y && zyf_y <= zyf_n.y + zyf_n.h) {
+                    return zyf_n;
+                }
+            }
+            return null;
+        }
+
+        zyf_cvs.addEventListener("mousemove", function (zyf_e) {
+            var zyf_pt = zyf_toLogic(zyf_e);
+            var zyf_n = zyf_hitTest(zyf_pt.x, zyf_pt.y);
+            zyf_hoverId = zyf_n ? zyf_n.id : null;
+            zyf_cvs.style.cursor = zyf_n ? "pointer" : "default";
+        });
+
+        zyf_cvs.addEventListener("mouseleave", function () {
+            zyf_hoverId = null;
+            zyf_cvs.style.cursor = "default";
+        });
+
+        zyf_cvs.addEventListener("click", function (zyf_e) {
+            var zyf_pt = zyf_toLogic(zyf_e);
+            var zyf_n = zyf_hitTest(zyf_pt.x, zyf_pt.y);
+            if (!zyf_n) { return; }
+
+            document.getElementById("zyf_detail_title").textContent = zyf_n.label;
+            document.getElementById("zyf_detail_desc").textContent = zyf_n.desc;
+        });
+
+        window.addEventListener("resize", function () {
+            zyf_resize();
+        });
+
+        /* ============ 统计信息 ============ */
+        document.getElementById("zyf_total").textContent = zyf_nodes.length;
+        document.getElementById("zyf_edges").textContent = zyf_edges.length;
+
+        /* ============ 启动 ============ */
+        zyf_resize();
+        requestAnimationFrame(zyf_draw);
+    </script>
+</body>
+</html>

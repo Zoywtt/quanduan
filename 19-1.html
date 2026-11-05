@@ -1,0 +1,361 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：Canvas 粒子文字动画，粒子聚合为“张耀夫”三个字并支持鼠标交互 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-1 Canvas 粒子文字动画</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background: #060a18;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 26px 16px 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .zyf_header h1 {
+            font-size: 24px;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            font-size: 12.5px;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        /* ============ 画布舞台 ============ */
+        .zyf_stage {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 520px;
+            border-radius: 18px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.20), transparent 62%),
+                radial-gradient(circle at 20% 85%, rgba(168, 85, 247, 0.16), transparent 55%),
+                #060a18;
+            border: 1px solid #1e293b;
+            box-shadow: 0 20px 50px rgba(2, 6, 23, 0.8), inset 0 0 60px rgba(56, 189, 248, 0.06);
+        }
+        .zyf_stage canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* 画布左上角状态 */
+        .zyf_meta {
+            position: absolute;
+            left: 14px;
+            top: 12px;
+            font-family: Consolas, monospace;
+            font-size: 11.5px;
+            color: #475569;
+            line-height: 1.8;
+            pointer-events: none;
+        }
+        .zyf_meta b { color: #38bdf8; font-weight: 700; }
+
+        /* ============ 控制栏 ============ */
+        .zyf_controls {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .zyf_btn {
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 8px 22px;
+            font-size: 13px;
+            font-family: inherit;
+            font-weight: 700;
+            color: #cbd5e1;
+            background: rgba(30, 41, 59, 0.6);
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .zyf_btn:hover {
+            color: #f8fafc;
+            border-color: #38bdf8;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+        }
+        .zyf_btn_primary {
+            color: #0b1120;
+            background: linear-gradient(135deg, #38bdf8, #a78bfa);
+            border-color: transparent;
+        }
+        .zyf_btn_primary:hover { color: #0b1120; }
+
+        .zyf_hint {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #475569;
+            text-align: center;
+            line-height: 1.9;
+        }
+
+        .zyf_footer {
+            margin-top: 26px;
+            font-size: 12px;
+            color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_header">
+        <h1>Canvas 粒子文字动画</h1>
+        <p>粒子自动聚合为「张耀夫」三个字，鼠标靠近会把粒子推开</p>
+    </div>
+
+    <div class="zyf_stage" id="zyf_stage">
+        <canvas id="zyf_canvas"></canvas>
+        <div class="zyf_meta">
+            粒子数：<b id="zyf_count">0</b><br>
+            帧率：<b id="zyf_fps">--</b>
+        </div>
+    </div>
+
+    <div class="zyf_controls">
+        <button class="zyf_btn zyf_btn_primary" id="zyf_regather">重新聚合</button>
+        <button class="zyf_btn" id="zyf_scatter">散开</button>
+        <button class="zyf_btn" id="zyf_pause">暂停动画</button>
+    </div>
+
+    <div class="zyf_hint">
+        交互说明：鼠标在画布内移动可推开附近粒子 · 点击画布会打散所有粒子 · 约 2 秒后粒子重新回到文字位置
+    </div>
+
+    <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-1 Canvas 动画</div>
+
+    <script>
+        var zyf_cvs = document.getElementById("zyf_canvas");
+        var zyf_ctx = zyf_cvs.getContext("2d");
+        var zyf_stage = document.getElementById("zyf_stage");
+        var zyf_countEl = document.getElementById("zyf_count");
+        var zyf_fpsEl = document.getElementById("zyf_fps");
+
+        var zyf_dpr = window.devicePixelRatio || 1;
+        var zyf_W = 0;                /* 画布 CSS 宽度 */
+        var zyf_H = 0;                /* 画布 CSS 高度 */
+        var zyf_particles = [];       /* 粒子数组 */
+        var zyf_mouse = { x: -9999, y: -9999, active: false };
+        var zyf_paused = false;
+        var zyf_lastFrame = 0;
+        var zyf_fpsAcc = 0;
+        var zyf_fpsFrames = 0;
+
+        /* ============ 单个粒子的物理迭代 ============ */
+        function zyf_stepParticle(zyf_p) {
+            /* 弹簧模型，向目标点靠近 */
+            zyf_p.vx += (zyf_p.tx - zyf_p.x) * 0.012;
+            zyf_p.vy += (zyf_p.ty - zyf_p.y) * 0.012;
+
+            /* 鼠标斥力 */
+            if (zyf_mouse.active) {
+                var zyf_dx = zyf_p.x - zyf_mouse.x;
+                var zyf_dy = zyf_p.y - zyf_mouse.y;
+                var zyf_dist = Math.sqrt(zyf_dx * zyf_dx + zyf_dy * zyf_dy);
+                if (zyf_dist < 90 && zyf_dist > 0.1) {
+                    var zyf_force = (90 - zyf_dist) / 90;
+                    zyf_p.vx += (zyf_dx / zyf_dist) * zyf_force * 3.2;
+                    zyf_p.vy += (zyf_dy / zyf_dist) * zyf_force * 3.2;
+                }
+            }
+
+            /* 阻尼 + 位移 */
+            zyf_p.vx *= 0.9;
+            zyf_p.vy *= 0.9;
+            zyf_p.x += zyf_p.vx;
+            zyf_p.y += zyf_p.vy;
+        }
+
+        /* ============ 采样文字，生成目标点 ============ */
+        function zyf_buildTargets() {
+            var zyf_off = document.createElement("canvas");
+            var zyf_octx = zyf_off.getContext("2d");
+
+            /* 按画布尺寸计算字号，保证三个字能放下 */
+            var zyf_fontSize = Math.min(zyf_H * 0.42, zyf_W / 3.6);
+            zyf_off.width = Math.floor(zyf_W);
+            zyf_off.height = Math.floor(zyf_H);
+
+            zyf_octx.fillStyle = "#fff";
+            zyf_octx.font = "700 " + zyf_fontSize + "px 'Microsoft YaHei', 'PingFang SC', sans-serif";
+            zyf_octx.textAlign = "center";
+            zyf_octx.textBaseline = "middle";
+            zyf_octx.fillText("张耀夫", zyf_W / 2, zyf_H * 0.46);
+
+            var zyf_img = zyf_octx.getImageData(0, 0, zyf_off.width, zyf_off.height);
+            var zyf_step = 4;                       /* 采样步长，越小粒子越密 */
+            var zyf_targets = [];
+
+            for (var zyf_y = 0; zyf_y < zyf_off.height; zyf_y += zyf_step) {
+                for (var zyf_x = 0; zyf_x < zyf_off.width; zyf_x += zyf_step) {
+                    var zyf_idx = (zyf_y * zyf_off.width + zyf_x) * 4;
+                    if (zyf_img.data[zyf_idx + 3] > 128) {
+                        zyf_targets.push({ x: zyf_x, y: zyf_y });
+                    }
+                }
+            }
+
+            /* 生成粒子：先随机分布，再预热收敛到目标点 */
+            zyf_particles = [];
+            for (var zyf_i = 0; zyf_i < zyf_targets.length; zyf_i++) {
+                var zyf_t = zyf_targets[zyf_i];
+                zyf_particles.push({
+                    x: Math.random() * zyf_W,
+                    y: Math.random() * zyf_H,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    tx: zyf_t.x,
+                    ty: zyf_t.y,
+                    r: 1 + Math.random() * 1.2,
+                    hue: 190 + Math.random() * 90
+                });
+            }
+
+            /* 预热：首帧就呈现文字，之后靠 rAF 继续微小抖动 */
+            for (var zyf_w = 0; zyf_w < 240; zyf_w++) {
+                for (var zyf_pi = 0; zyf_pi < zyf_particles.length; zyf_pi++) {
+                    zyf_stepParticle(zyf_particles[zyf_pi]);
+                }
+            }
+            zyf_countEl.textContent = zyf_particles.length;
+        }
+
+        /* ============ 重置画布尺寸 ============ */
+        function zyf_resize() {
+            zyf_W = zyf_stage.clientWidth;
+            zyf_H = zyf_stage.clientHeight;
+            zyf_dpr = window.devicePixelRatio || 1;
+
+            zyf_cvs.width = Math.floor(zyf_W * zyf_dpr);
+            zyf_cvs.height = Math.floor(zyf_H * zyf_dpr);
+            zyf_ctx.setTransform(zyf_dpr, 0, 0, zyf_dpr, 0, 0);
+
+            zyf_buildTargets();
+            zyf_ctx.fillStyle = "#060a18";
+            zyf_ctx.fillRect(0, 0, zyf_W, zyf_H);
+        }
+
+        /* ============ 每帧绘制 ============ */
+        function zyf_render(zyf_ts) {
+            requestAnimationFrame(zyf_render);
+
+            if (!zyf_paused) {
+                /* 半透明覆盖形成拖尾效果 */
+                zyf_ctx.fillStyle = "rgba(6, 10, 24, 0.22)";
+                zyf_ctx.fillRect(0, 0, zyf_W, zyf_H);
+
+                for (var zyf_i = 0; zyf_i < zyf_particles.length; zyf_i++) {
+                    var zyf_p = zyf_particles[zyf_i];
+
+                    /* 物理迭代（与预热共用同一套逻辑） */
+                    zyf_stepParticle(zyf_p);
+
+                    var zyf_speed = Math.sqrt(zyf_p.vx * zyf_p.vx + zyf_p.vy * zyf_p.vy);
+                    var zyf_alpha = Math.min(0.35 + zyf_speed * 0.12, 1);
+
+                    zyf_ctx.beginPath();
+                    zyf_ctx.fillStyle = "hsla(" + zyf_p.hue + ", 90%, 66%, " + zyf_alpha + ")";
+                    zyf_ctx.arc(zyf_p.x, zyf_p.y, zyf_p.r, 0, Math.PI * 2);
+                    zyf_ctx.fill();
+                }
+
+                /* 底部说明文字（普通文字，不参与粒子） */
+                zyf_ctx.fillStyle = "rgba(148, 163, 184, 0.5)";
+                zyf_ctx.font = "12px 'Microsoft YaHei', sans-serif";
+                zyf_ctx.textAlign = "center";
+                zyf_ctx.fillText("CANVAS PARTICLE TEXT", zyf_W / 2, zyf_H * 0.84);
+            }
+
+            /* 帧率统计 */
+            if (zyf_lastFrame) {
+                zyf_fpsAcc += zyf_ts - zyf_lastFrame;
+                zyf_fpsFrames++;
+                if (zyf_fpsAcc >= 500) {
+                    zyf_fpsEl.textContent = Math.round(1000 / (zyf_fpsAcc / zyf_fpsFrames));
+                    zyf_fpsAcc = 0;
+                    zyf_fpsFrames = 0;
+                }
+            }
+            zyf_lastFrame = zyf_ts;
+        }
+
+        /* ============ 交互：鼠标 ============ */
+        zyf_cvs.addEventListener("mousemove", function (zyf_e) {
+            var zyf_rect = zyf_cvs.getBoundingClientRect();
+            zyf_mouse.x = zyf_e.clientX - zyf_rect.left;
+            zyf_mouse.y = zyf_e.clientY - zyf_rect.top;
+            zyf_mouse.active = true;
+        });
+
+        zyf_cvs.addEventListener("mouseleave", function () {
+            zyf_mouse.active = false;
+        });
+
+        /* 点击画布：全部打散 */
+        zyf_cvs.addEventListener("click", function () {
+            zyf_scatterAll();
+        });
+
+        function zyf_scatterAll() {
+            for (var zyf_i = 0; zyf_i < zyf_particles.length; zyf_i++) {
+                var zyf_p = zyf_particles[zyf_i];
+                zyf_p.vx = (Math.random() - 0.5) * 26;
+                zyf_p.vy = (Math.random() - 0.5) * 26;
+            }
+        }
+
+        /* ============ 按钮 ============ */
+        document.getElementById("zyf_regather").addEventListener("click", function () {
+            for (var zyf_i = 0; zyf_i < zyf_particles.length; zyf_i++) {
+                var zyf_p = zyf_particles[zyf_i];
+                zyf_p.x = Math.random() * zyf_W;
+                zyf_p.y = Math.random() * zyf_H;
+                zyf_p.vx = 0;
+                zyf_p.vy = 0;
+            }
+        });
+
+        document.getElementById("zyf_scatter").addEventListener("click", function () {
+            zyf_scatterAll();
+        });
+
+        document.getElementById("zyf_pause").addEventListener("click", function () {
+            zyf_paused = !zyf_paused;
+            this.textContent = zyf_paused ? "继续动画" : "暂停动画";
+        });
+
+        /* ============ 窗口尺寸变化 ============ */
+        var zyf_resizeTimer = null;
+        window.addEventListener("resize", function () {
+            clearTimeout(zyf_resizeTimer);
+            zyf_resizeTimer = setTimeout(zyf_resize, 200);
+        });
+
+        /* ============ 启动 ============ */
+        zyf_resize();
+        requestAnimationFrame(zyf_render);
+    </script>
+</body>
+</html>
