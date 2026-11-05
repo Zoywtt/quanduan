@@ -1,0 +1,606 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：基于知识库的智能客服系统架构图（SVG 矢量绘制，RAG 分层 + 科研评估闭环） -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-3 基于知识库的智能客服系统架构（SVG）</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.10), transparent 45%),
+                radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.10), transparent 42%),
+                #f4f7fb;
+            color: #0f172a;
+            min-height: 100vh;
+            padding: 30px 16px 46px;
+        }
+
+        .zyf_page {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+        .zyf_tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 999px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .zyf_header h1 {
+            font-size: 27px;
+            letter-spacing: 1px;
+            color: #0b1a33;
+        }
+        .zyf_header h1 span {
+            background: linear-gradient(120deg, #1d4ed8, #0d9488);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.9;
+        }
+
+        /* ============ 图卡片 ============ */
+        .zyf_card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px 16px 10px;
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+        }
+        .zyf_card_bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 2px 4px 12px;
+            flex-wrap: wrap;
+        }
+        .zyf_card_bar h2 {
+            font-size: 15px;
+            color: #1e293b;
+            letter-spacing: 0.5px;
+        }
+        .zyf_card_bar h2 em {
+            font-style: normal;
+            font-size: 11.5px;
+            color: #94a3b8;
+            margin-left: 10px;
+            letter-spacing: 0;
+        }
+        .zyf_stats {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .zyf_stats b {
+            color: #1d4ed8;
+            font-size: 14px;
+            margin: 0 2px;
+        }
+
+        .zyf_svg_wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+        #zyf_svg {
+            display: block;
+            width: 100%;
+            min-width: 880px;
+            height: auto;
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", sans-serif;
+        }
+
+        .zyf_node { cursor: pointer; }
+        .zyf_node rect { transition: stroke-width 0.18s ease, fill 0.18s ease; }
+        .zyf_node text { transition: fill 0.18s ease; }
+
+        /* ============ 详情面板 ============ */
+        .zyf_detail {
+            margin-top: 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #1d4ed8;
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+        .zyf_detail_top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .zyf_badge {
+            font-size: 11px;
+            color: #1d4ed8;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 3px 9px;
+            letter-spacing: 0.5px;
+        }
+        .zyf_detail_top h3 {
+            font-size: 16px;
+            color: #0f172a;
+        }
+        .zyf_detail p {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.9;
+        }
+        .zyf_research {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 12.5px;
+            color: #92400e;
+            line-height: 1.85;
+        }
+        .zyf_research b {
+            display: inline-block;
+            color: #b45309;
+            background: #fef3c7;
+            border-radius: 6px;
+            padding: 2px 8px;
+            margin-right: 8px;
+            font-size: 11.5px;
+        }
+
+        .zyf_hint {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.9;
+        }
+        .zyf_footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6c2d4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_page">
+
+        <header class="zyf_header">
+            <div class="zyf_tag">19-3 · SVG 矢量架构图 · 科研方向</div>
+            <h1>基于知识库的智能客服系统<span>架构图</span></h1>
+            <p>
+                以检索增强生成（RAG）为核心的全站分层架构：接入层 → 服务层 → 生成层 → 检索层 → 知识库层，<br>
+                右侧为科研评估与实验闭环，标有「研」的模块为可展开的研究切入点。
+            </p>
+        </header>
+
+        <section class="zyf_card">
+            <div class="zyf_card_bar">
+                <h2>智能客服全站架构 <em>纯 SVG 矢量绘制 · 缩放不失真</em></h2>
+                <div class="zyf_stats">功能模块 <b id="zyf_total">0</b> · 调用关系 <b id="zyf_edge_count">0</b></div>
+            </div>
+            <div class="zyf_svg_wrap">
+                <svg id="zyf_svg" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="基于知识库的智能客服系统架构图">
+                    <defs>
+                        <pattern id="zyf_grid" width="26" height="26" patternUnits="userSpaceOnUse">
+                            <path d="M26 0H0V26" fill="none" stroke="#e9eff8" stroke-width="1"></path>
+                        </pattern>
+                        <marker id="zyf_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#94a3b8"></path>
+                        </marker>
+                        <marker id="zyf_arrow_dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#f59e0b"></path>
+                        </marker>
+                    </defs>
+                    <rect x="0" y="0" width="1200" height="900" fill="url(#zyf_grid)"></rect>
+                </svg>
+            </div>
+        </section>
+
+        <section class="zyf_detail" id="zyf_detail">
+            <div class="zyf_detail_top">
+                <span class="zyf_badge">模块职责</span>
+                <h3 id="zyf_detail_title">点击架构图中的任意模块查看职责说明</h3>
+            </div>
+            <p id="zyf_detail_desc">
+                该图描述一条完整的智能客服链路：用户请求从多渠道接入，经意图识别与路由后进入 RAG 问答，
+                检索层从知识库召回相关片段，生成层完成答案组织与安全校验，最终返回用户或转交人工坐席。
+            </p>
+            <div class="zyf_research">
+                <b>科研切入点</b><span id="zyf_detail_research">橙色「研」标记的模块给出可展开的研究问题，右侧面板为评测与实验闭环。</span>
+            </div>
+        </section>
+
+        <div class="zyf_hint">
+            交互说明：鼠标悬停高亮模块 · 单击查看职责与科研方向 · 图中共 21 个功能模块与 5 项科研评估环节
+        </div>
+
+        <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-3 SVG 架构图</div>
+    </div>
+
+    <script>
+        var zyf_NS = "http://www.w3.org/2000/svg";
+        var zyf_svg = document.getElementById("zyf_svg");
+        var zyf_totalEl = document.getElementById("zyf_total");
+        var zyf_edgeEl = document.getElementById("zyf_edge_count");
+        var zyf_dTitle = document.getElementById("zyf_detail_title");
+        var zyf_dDesc = document.getElementById("zyf_detail_desc");
+        var zyf_dResearch = document.getElementById("zyf_detail_research");
+
+        /* ============ 分层定义 ============ */
+        var zyf_bands = [
+            { row: 0, name: "接入层", color: "#2563eb", pale: "#eff6ff", y: 48 },
+            { row: 1, name: "服务层", color: "#7c3aed", pale: "#f5f3ff", y: 196 },
+            { row: 2, name: "生成层", color: "#e11d48", pale: "#fff1f2", y: 344 },
+            { row: 3, name: "检索层", color: "#0d9488", pale: "#f0fdfa", y: 492 },
+            { row: 4, name: "知识库层", color: "#0369a1", pale: "#f0f9ff", y: 640 }
+        ];
+
+        /* ============ 功能模块 ============ */
+        var zyf_nodesDef = [
+            { id: "a1", band: 0, title: "网页 / H5", sub: "商城与帮助中心", flag: false,
+              desc: "面向商城网页与帮助中心的在线客服悬浮窗，提供 FAQ 直达、机器人问答与工单入口。",
+              research: "多模态输入（图文、语音）对检索与生成效果的影响。" },
+            { id: "a2", band: 0, title: "移动 App", sub: "iOS / Android", flag: false,
+              desc: "App 内嵌客服 SDK，支持图文消息、语音输入、消息推送与富媒体答案展示。",
+              research: "端侧小模型与云端大模型协同的低时延方案。" },
+            { id: "a3", band: 0, title: "微信生态", sub: "公众号 / 小程序", flag: false,
+              desc: "公众号与小程序渠道接入，复用同一套会话服务与会话标识，保证多渠道体验一致。",
+              research: "跨渠道会话一致性与用户意图迁移建模。" },
+            { id: "a4", band: 0, title: "电话 IVR", sub: "语音转写接入", flag: false,
+              desc: "电话语音接入，经 ASR 转写后并入文本会话链路，支持语音播报答案与转人工。",
+              research: "语音识别错误对下游检索鲁棒性的影响与纠错机制。" },
+
+            { id: "s1", band: 1, title: "多轮会话管理", sub: "上下文 / 状态机", flag: false,
+              desc: "维护会话上下文、用户画像与对话状态机，负责指代消解、话题跟踪与超时回收。",
+              research: "长对话的上下文压缩与外部记忆机制。" },
+            { id: "s2", band: 1, title: "意图识别", sub: "分类 / 槽位填充", flag: true,
+              desc: "对用户输入做意图分类与槽位填充，判断走知识问答、业务办理还是人工坐席。",
+              research: "小样本 / 零样本意图识别、意图与槽位联合建模。" },
+            { id: "s3", band: 1, title: "业务路由", sub: "问答 · 办理 · 转人工", flag: false,
+              desc: "按意图把请求分发到 RAG 问答、工具调用或人工坐席，并设置置信度阈值与兜底降级策略。",
+              research: "基于强化学习的路由策略优化与置信度校准。" },
+            { id: "s4", band: 1, title: "人工坐席协同", sub: "摘要 / 话术推荐", flag: false,
+              desc: "转人工时把会话摘要、命中的知识引用与推荐话术推送给坐席，实现人机协同。",
+              research: "人机协同中的信任建模与坐席辅助话术生成。" },
+
+            { id: "g1", band: 2, title: "Prompt 编排", sub: "模板 / 上下文拼装", flag: false,
+              desc: "把系统指令、检索上下文与对话历史拼装为提示词模板，约束输出格式并要求给出引用来源。",
+              research: "提示词自动优化（APE）与结构化输出约束。" },
+            { id: "g2", band: 2, title: "大模型推理", sub: "LLM 生成 / 流式输出", flag: true,
+              desc: "调用大语言模型完成答案生成，支持流式输出、温度控制、多模型路由与降级切换。",
+              research: "领域微调、幻觉检测与推理加速（量化 / 蒸馏）。" },
+            { id: "g3", band: 2, title: "工具调用", sub: "订单 · 物流 · 工单", flag: false,
+              desc: "通过函数调用对接订单、物流、退换货、创建工单等业务 API，完成事务型请求。",
+              research: "工具调用的规划能力、参数校验与失败恢复。" },
+            { id: "g4", band: 2, title: "安全合规过滤", sub: "敏感信息 / 事实校验", flag: true,
+              desc: "对生成答案做敏感信息、越权承诺与事实一致性校验，不通过则降级为模板回复或转人工。",
+              research: "事实一致性校验、安全对齐与拒答策略。" },
+
+            { id: "r1", band: 3, title: "查询改写", sub: "多轮补全 / 扩展", flag: false,
+              desc: "结合多轮上下文补全指代、扩展同义词，把口语化问题改写为利于检索的查询语句。",
+              research: "查询改写与用户意图对齐的联合建模。" },
+            { id: "r2", band: 3, title: "混合检索", sub: "BM25 + 稠密向量", flag: true,
+              desc: "稀疏 BM25 与稠密向量召回并行执行，取并集后按融合分数排序，兼顾关键词与语义匹配。",
+              research: "稀疏-稠密融合权重、多路召回策略与召回率上限。" },
+            { id: "r3", band: 3, title: "重排序", sub: "Cross-Encoder", flag: true,
+              desc: "用 Cross-Encoder 对候选段落做精细打分重排，提升 Top-K 命中质量与排序合理性。",
+              research: "轻量化重排序模型、知识蒸馏与时延压缩。" },
+            { id: "r4", band: 3, title: "上下文压缩", sub: "去冗余 / 引用溯源", flag: false,
+              desc: "裁剪冗余段落、保留关键证据与来源信息，在有限上下文窗口内提升答案忠实度。",
+              research: "上下文压缩比例对忠实度与召回的影响分析。" },
+
+            { id: "k1", band: 4, title: "文档解析", sub: "PDF · HTML · OCR", flag: false,
+              desc: "解析 PDF、HTML、Word 与图片 OCR 内容，抽取正文、表格与层级标题结构。",
+              research: "版面分析与表格结构抽取、扫描件鲁棒解析。" },
+            { id: "k2", band: 4, title: "智能切分", sub: "语义分块 / 元数据", flag: true,
+              desc: "按语义边界进行分块，并写入产品线、版本、权限等元数据，决定检索粒度与过滤条件。",
+              research: "分块粒度与检索效果的量化关系研究。" },
+            { id: "k3", band: 4, title: "向量化", sub: "Embedding 模型", flag: true,
+              desc: "用 Embedding 模型把文本块编码为稠密向量，支持批量离线编码与增量更新。",
+              research: "领域自适应预训练、对比学习与向量对齐。" },
+            { id: "k4", band: 4, title: "向量索引", sub: "ANN / HNSW", flag: false,
+              desc: "构建 ANN 近邻索引（HNSW / IVF）支撑毫秒级召回，并做多租户与权限隔离。",
+              research: "索引压缩与召回率-时延权衡。" },
+            { id: "k5", band: 4, title: "知识图谱", sub: "实体关系 / 三元组", flag: false,
+              desc: "从文档与工单中抽取实体关系，用于实体链接、结构化问答与答案一致性校验。",
+              research: "知识图谱与向量检索的混合推理。" }
+        ];
+
+        /* ============ 调用关系 ============ */
+        var zyf_edges = [
+            { f: "a1", t: "s1" }, { f: "a2", t: "s1" }, { f: "a3", t: "s1" }, { f: "a4", t: "s4" },
+            { f: "s1", t: "s2" }, { f: "s2", t: "s3" }, { f: "s3", t: "s4" },
+            { f: "s3", t: "g1" },
+            { f: "g1", t: "g2" }, { f: "g2", t: "g3" }, { f: "g3", t: "g4" },
+            { f: "g3", t: "s3", dashed: true },
+            { f: "g1", t: "r1", dashed: true },
+            { f: "r1", t: "r2" }, { f: "r2", t: "r3" }, { f: "r3", t: "r4" },
+            { f: "r4", t: "g2", dashed: true },
+            { f: "r2", t: "k4" }, { f: "r1", t: "k5", dashed: true },
+            { f: "k1", t: "k2" }, { f: "k2", t: "k3" }, { f: "k3", t: "k4" }, { f: "k1", t: "k5", dashed: true }
+        ];
+
+        /* ============ 基础绘图工具 ============ */
+        function zyf_mk(tag, zyf_attr) {
+            var zyf_el = document.createElementNS(zyf_NS, tag);
+            for (var zyf_k in zyf_attr) {
+                zyf_el.setAttribute(zyf_k, zyf_attr[zyf_k]);
+            }
+            return zyf_el;
+        }
+
+        function zyf_text(x, y, zyf_str, zyf_size, zyf_color, zyf_weight, zyf_anchor) {
+            var zyf_t = zyf_mk("text", {
+                x: x, y: y,
+                "font-size": zyf_size,
+                fill: zyf_color,
+                "font-weight": zyf_weight || 400,
+                "text-anchor": zyf_anchor || "middle"
+            });
+            zyf_t.textContent = zyf_str;
+            return zyf_t;
+        }
+
+        /* ============ 计算模块坐标 ============ */
+        var zyf_mainX = 128;
+        var zyf_mainW = 724;
+        var zyf_nodeH = 110;
+
+        zyf_bands.forEach(function (zyf_b) {
+            var zyf_list = zyf_nodesDef.filter(function (zyf_n) { return zyf_n.band === zyf_b.row; });
+            var zyf_gap = zyf_list.length === 5 ? 14 : 16;
+            var zyf_w = (zyf_mainW - zyf_gap * (zyf_list.length - 1)) / zyf_list.length;
+
+            zyf_list.forEach(function (zyf_n, zyf_i) {
+                zyf_n.x = zyf_mainX + zyf_i * (zyf_w + zyf_gap);
+                zyf_n.y = zyf_b.y + 14;
+                zyf_n.w = zyf_w;
+                zyf_n.h = zyf_nodeH;
+                zyf_n.cx = zyf_n.x + zyf_w / 2;
+                zyf_n.cy = zyf_n.y + zyf_nodeH / 2;
+                zyf_n.color = zyf_b.color;
+                zyf_n.pale = zyf_b.pale;
+            });
+        });
+
+        var zyf_nodeMap = {};
+        zyf_nodesDef.forEach(function (zyf_n) { zyf_nodeMap[zyf_n.id] = zyf_n; });
+
+        /* ============ 绘制分层底纹与层名 ============ */
+        zyf_bands.forEach(function (zyf_b) {
+            zyf_svg.appendChild(zyf_mk("rect", {
+                x: 8, y: zyf_b.y, width: 852, height: 138, rx: 14,
+                fill: zyf_b.pale, "fill-opacity": "0.7",
+                stroke: zyf_b.color, "stroke-opacity": "0.16"
+            }));
+            zyf_svg.appendChild(zyf_mk("rect", {
+                x: 14, y: zyf_b.y + 47, width: 100, height: 44, rx: 10,
+                fill: "#ffffff", stroke: zyf_b.color, "stroke-opacity": "0.45"
+            }));
+            zyf_svg.appendChild(zyf_text(64, zyf_b.y + 74, zyf_b.name, 13, zyf_b.color, 700));
+        });
+
+        /* ============ 绘制连线 ============ */
+        var zyf_incoming = {};
+        zyf_edges.forEach(function (zyf_e) {
+            zyf_incoming[zyf_e.t] = (zyf_incoming[zyf_e.t] || 0) + 1;
+        });
+
+        var zyf_seen = {};
+        zyf_edges.forEach(function (zyf_e) {
+            var zyf_s = zyf_nodeMap[zyf_e.f];
+            var zyf_t = zyf_nodeMap[zyf_e.t];
+            var zyf_idx = zyf_seen[zyf_e.t] || 0;
+            var zyf_num = zyf_incoming[zyf_e.t];
+            var zyf_off = (zyf_idx - (zyf_num - 1) / 2) * 26;
+            zyf_seen[zyf_e.t] = zyf_idx + 1;
+
+            var zyf_x1, zyf_y1, zyf_x2, zyf_y2;
+
+            if (zyf_s.band === zyf_t.band) {
+                /* 同层内从左向右 */
+                zyf_x1 = zyf_s.x + zyf_s.w;
+                zyf_y1 = zyf_s.cy;
+                zyf_x2 = zyf_t.x - 3;
+                zyf_y2 = zyf_t.cy;
+            } else if (zyf_s.band < zyf_t.band) {
+                /* 向下调用 */
+                zyf_x1 = zyf_s.cx;
+                zyf_y1 = zyf_s.y + zyf_s.h;
+                zyf_x2 = zyf_t.cx + zyf_off;
+                zyf_y2 = zyf_t.y - 3;
+            } else {
+                /* 向上回源 */
+                zyf_x1 = zyf_s.cx;
+                zyf_y1 = zyf_s.y;
+                zyf_x2 = zyf_t.cx + zyf_off;
+                zyf_y2 = zyf_t.y + zyf_t.h + 3;
+            }
+
+            var zyf_line = zyf_mk("line", {
+                x1: zyf_x1, y1: zyf_y1, x2: zyf_x2, y2: zyf_y2,
+                stroke: zyf_e.dashed ? "#f59e0b" : "#94a3b8",
+                "stroke-width": zyf_e.dashed ? 1.4 : 1.6,
+                "stroke-dasharray": zyf_e.dashed ? "6 5" : "none",
+                "marker-end": zyf_e.dashed ? "url(#zyf_arrow_dash)" : "url(#zyf_arrow)"
+            });
+            zyf_svg.appendChild(zyf_line);
+        });
+
+        /* ============ 绘制模块 ============ */
+        var zyf_selected = null;
+
+        function zyf_setState(zyf_g, zyf_on) {
+            var zyf_rect = zyf_g.querySelector("rect");
+            zyf_rect.setAttribute("stroke-width", zyf_on ? "2.4" : "1.2");
+            zyf_rect.setAttribute("fill", zyf_on ? zyf_g.getAttribute("data-pale") : "#ffffff");
+        }
+
+        zyf_nodesDef.forEach(function (zyf_n) {
+            var zyf_g = zyf_mk("g", { "class": "zyf_node", "data-id": zyf_n.id, "data-pale": zyf_n.pale });
+
+            zyf_g.appendChild(zyf_mk("rect", {
+                x: zyf_n.x, y: zyf_n.y, width: zyf_n.w, height: zyf_n.h, rx: 10,
+                fill: "#ffffff", stroke: zyf_n.color, "stroke-width": 1.2,
+                "stroke-opacity": "0.75"
+            }));
+
+            /* 顶部细色条，区分所属层级 */
+            zyf_g.appendChild(zyf_mk("rect", {
+                x: zyf_n.x + 10, y: zyf_n.y + 9, width: zyf_n.w - 20, height: 3, rx: 1.5,
+                fill: zyf_n.color, "fill-opacity": "0.55"
+            }));
+
+            zyf_g.appendChild(zyf_text(zyf_n.cx, zyf_n.y + 49, zyf_n.title, 13, "#0f172a", 700));
+            zyf_g.appendChild(zyf_text(zyf_n.cx, zyf_n.y + 72, zyf_n.sub, 10.5, "#64748b"));
+
+            /* 科研切入点标记 */
+            if (zyf_n.flag) {
+                zyf_g.appendChild(zyf_mk("rect", {
+                    x: zyf_n.x + zyf_n.w - 26, y: zyf_n.y + 6, width: 19, height: 15, rx: 4,
+                    fill: "#fef3c7", stroke: "#f59e0b", "stroke-width": 0.9
+                }));
+                zyf_g.appendChild(zyf_text(zyf_n.x + zyf_n.w - 16.5, zyf_n.y + 17, "研", 9.5, "#b45309", 700));
+            }
+
+            zyf_g.addEventListener("mouseenter", function () {
+                zyf_setState(zyf_g, true);
+            });
+            zyf_g.addEventListener("mouseleave", function () {
+                if (zyf_selected !== zyf_g) { zyf_setState(zyf_g, false); }
+            });
+            zyf_g.addEventListener("click", function () {
+                if (zyf_selected && zyf_selected !== zyf_g) { zyf_setState(zyf_selected, false); }
+                zyf_selected = zyf_g;
+                zyf_setState(zyf_g, true);
+                zyf_showDetail(zyf_n);
+            });
+
+            zyf_svg.appendChild(zyf_g);
+        });
+
+        function zyf_showDetail(zyf_n) {
+            zyf_dTitle.textContent = zyf_n.title + "（" + zyf_bands[zyf_n.band].name + "）";
+            zyf_dDesc.textContent = zyf_n.desc;
+            zyf_dResearch.textContent = zyf_n.research;
+        }
+
+        /* ============ 基础支撑条 ============ */
+        zyf_svg.appendChild(zyf_mk("rect", {
+            x: 8, y: 788, width: 852, height: 54, rx: 14,
+            fill: "#f1f5f9", stroke: "#cbd5e1", "stroke-opacity": "0.8"
+        }));
+        zyf_svg.appendChild(zyf_mk("rect", {
+            x: 14, y: 797, width: 100, height: 36, rx: 10,
+            fill: "#ffffff", stroke: "#94a3b8", "stroke-opacity": "0.6"
+        }));
+        zyf_svg.appendChild(zyf_text(64, 820, "基础支撑", 12, "#475569", 700));
+
+        var zyf_infra = ["GPU 推理集群", "向量库集群", "日志与埋点", "模型版本管理"];
+        var zyf_pw = 168;
+        zyf_infra.forEach(function (zyf_name, zyf_i) {
+            var zyf_px = zyf_mainX + zyf_i * (zyf_pw + 16);
+            zyf_svg.appendChild(zyf_mk("rect", {
+                x: zyf_px, y: 797, width: zyf_pw, height: 36, rx: 18,
+                fill: "#ffffff", stroke: "#cbd5e1"
+            }));
+            zyf_svg.appendChild(zyf_text(zyf_px + zyf_pw / 2, 820, zyf_name, 11.5, "#334155", 600));
+        });
+
+        /* ============ 右侧科研评估面板 ============ */
+        zyf_svg.appendChild(zyf_mk("rect", {
+            x: 872, y: 48, width: 304, height: 794, rx: 16,
+            fill: "#ffffff", stroke: "#f59e0b", "stroke-opacity": "0.35",
+            "stroke-width": 1.2
+        }));
+        zyf_svg.appendChild(zyf_text(1024, 83, "科研评估与实验闭环", 15, "#b45309", 700));
+        zyf_svg.appendChild(zyf_text(1024, 104, "评测 → 归因 → 改进 → 回灌", 10.5, "#a16207"));
+
+        var zyf_researchItems = [
+            { t: "离线检索评测", d: "Recall@K · MRR · nDCG", y: 122 },
+            { t: "生成质量评测", d: "忠实度 · 相关性 · 幻觉率", y: 246 },
+            { t: "在线业务指标", d: "解决率 · 转人工率 · CSAT", y: 370 },
+            { t: "A/B 分流与消融实验", d: "多路召回 / 融合权重对比", y: 494 },
+            { t: "反馈标注与持续学习", d: "SFT · DPO · 知识回灌", y: 618 }
+        ];
+
+        zyf_researchItems.forEach(function (zyf_item) {
+            zyf_svg.appendChild(zyf_mk("rect", {
+                x: 886, y: zyf_item.y, width: 276, height: 108, rx: 10,
+                fill: "#fffbeb", stroke: "#f59e0b", "stroke-opacity": "0.3"
+            }));
+            zyf_svg.appendChild(zyf_mk("rect", {
+                x: 886, y: zyf_item.y, width: 4, height: 108, rx: 2,
+                fill: "#f59e0b", "fill-opacity": "0.75"
+            }));
+            zyf_svg.appendChild(zyf_text(1024, zyf_item.y + 45, zyf_item.t, 12.5, "#92400e", 700));
+            zyf_svg.appendChild(zyf_text(1024, zyf_item.y + 70, zyf_item.d, 10.5, "#a16207"));
+        });
+
+        zyf_svg.appendChild(zyf_mk("rect", {
+            x: 886, y: 746, width: 276, height: 66, rx: 10,
+            fill: "#fff7ed", stroke: "#fdba74", "stroke-opacity": "0.5",
+            "stroke-dasharray": "5 4"
+        }));
+        zyf_svg.appendChild(zyf_text(1024, 774, "研究闭环", 12, "#c2410c", 700));
+        zyf_svg.appendChild(zyf_text(1024, 794, "问题定位 → 消融归因 → 策略改进", 10.5, "#9a3412"));
+
+        /* 面板指向主链路的反馈箭头 */
+        [400, 530, 670].forEach(function (zyf_y) {
+            zyf_svg.appendChild(zyf_mk("line", {
+                x1: 874, y1: zyf_y, x2: 856, y2: zyf_y,
+                stroke: "#f59e0b", "stroke-width": 1.4,
+                "stroke-dasharray": "5 4",
+                "marker-end": "url(#zyf_arrow_dash)"
+            }));
+        });
+
+        /* ============ 图例 ============ */
+        zyf_svg.appendChild(zyf_mk("line", {
+            x1: 118, y1: 868, x2: 152, y2: 868, stroke: "#94a3b8", "stroke-width": 1.6,
+            "marker-end": "url(#zyf_arrow)"
+        }));
+        zyf_svg.appendChild(zyf_text(160, 872, "主流程调用", 11, "#64748b", 400, "start"));
+
+        zyf_svg.appendChild(zyf_mk("line", {
+            x1: 290, y1: 868, x2: 324, y2: 868, stroke: "#f59e0b", "stroke-width": 1.4,
+            "stroke-dasharray": "5 4", "marker-end": "url(#zyf_arrow_dash)"
+        }));
+        zyf_svg.appendChild(zyf_text(332, 872, "异步回源 / 科研反馈", 11, "#64748b", 400, "start"));
+
+        zyf_svg.appendChild(zyf_mk("rect", {
+            x: 520, y: 861, width: 19, height: 15, rx: 4,
+            fill: "#fef3c7", stroke: "#f59e0b", "stroke-width": 0.9
+        }));
+        zyf_svg.appendChild(zyf_text(529.5, 872, "研", 9.5, "#b45309", 700));
+        zyf_svg.appendChild(zyf_text(548, 872, "科研切入点", 11, "#64748b", 400, "start"));
+
+        zyf_svg.appendChild(zyf_text(720, 872, "SVG 矢量图：任意缩放不失真，文字可被检索", 11, "#94a3b8", 400, "start"));
+
+        /* ============ 统计 ============ */
+        zyf_totalEl.textContent = zyf_nodesDef.length;
+        zyf_edgeEl.textContent = zyf_edges.length;
+    </script>
+</body>
+</html>
