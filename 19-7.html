@@ -1,0 +1,475 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：基于 three.js 的 3D 柱状图与 3D 环形饼图，依赖本地 cdn/three.min.js -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-7 three.js 3D 图表</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.18), transparent 42%),
+                radial-gradient(circle at 85% 15%, rgba(34, 211, 238, 0.12), transparent 40%),
+                #070b16;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 30px 16px 46px;
+        }
+
+        .zyf_page {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+        .zyf_tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+            background: rgba(37, 99, 235, 0.12);
+            color: #93c5fd;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .zyf_header h1 {
+            font-size: 28px;
+            letter-spacing: 2px;
+            color: #f1f5f9;
+        }
+        .zyf_header h1 span {
+            background: linear-gradient(120deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.9;
+        }
+
+        /* ============ 图表卡片 ============ */
+        .zyf_grid2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+            gap: 20px;
+        }
+        .zyf_card {
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 18px;
+            padding: 18px 18px 14px;
+            box-shadow: 0 20px 50px rgba(2, 6, 23, 0.55);
+            backdrop-filter: blur(10px);
+        }
+        .zyf_card_head {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+        .zyf_card_head h2 {
+            font-size: 16px;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+        }
+        .zyf_card_head i {
+            font-style: normal;
+            font-size: 10.5px;
+            color: #67e8f9;
+            background: rgba(34, 211, 238, 0.10);
+            border: 1px solid rgba(34, 211, 238, 0.28);
+            border-radius: 6px;
+            padding: 2px 7px;
+        }
+        .zyf_card_head span {
+            font-size: 11.5px;
+            color: #64748b;
+        }
+
+        .zyf_canvas_wrap {
+            position: relative;
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0b1220 0%, #070b16 100%);
+            border: 1px solid rgba(148, 163, 184, 0.10);
+            cursor: grab;
+        }
+        .zyf_canvas_wrap:active { cursor: grabbing; }
+        .zyf_canvas_wrap canvas {
+            display: block;
+            width: 100%;
+            height: 420px;
+        }
+
+        .zyf_caption {
+            margin-top: 10px;
+            font-size: 11.5px;
+            color: #64748b;
+            line-height: 1.8;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ============ 说明 ============ */
+        .zyf_notes {
+            margin-top: 20px;
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-left: 4px solid #22d3ee;
+            border-radius: 14px;
+            padding: 18px 22px;
+            box-shadow: 0 16px 40px rgba(2, 6, 23, 0.5);
+        }
+        .zyf_notes h3 {
+            font-size: 14px;
+            color: #e2e8f0;
+            margin-bottom: 10px;
+        }
+        .zyf_notes ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 4px 26px;
+            font-size: 12.5px;
+            color: #94a3b8;
+            line-height: 2;
+        }
+        .zyf_notes li::before {
+            content: "·";
+            color: #475569;
+            margin-right: 7px;
+        }
+        .zyf_notes li b { color: #67e8f9; font-weight: 700; }
+        .zyf_notes code {
+            font-family: Consolas, monospace;
+            font-size: 11.5px;
+            background: rgba(148, 163, 184, 0.12);
+            color: #cbd5e1;
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        .zyf_footer {
+            margin-top: 26px;
+            text-align: center;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .zyf_fallback {
+            display: none;
+            padding: 22px;
+            font-size: 12.5px;
+            color: #fca5a5;
+            line-height: 1.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_page">
+
+        <header class="zyf_header">
+            <div class="zyf_tag">19-7 · three.js r128 · 本地 cdn 依赖</div>
+            <h1>three.js <span>3D 图表</span></h1>
+            <p>用 WebGL 在浏览器中绘制两个三维图表：3D 柱状图与 3D 环形饼图，可拖拽旋转视角</p>
+        </header>
+
+        <div class="zyf_grid2">
+
+            <!-- 3D 柱状图 -->
+            <section class="zyf_card">
+                <div class="zyf_card_head">
+                    <h2>3D 柱状图</h2>
+                    <i>BoxGeometry</i>
+                    <span>客服咨询量（类目对比）</span>
+                </div>
+                <div class="zyf_canvas_wrap" id="zyf_bar_wrap">
+                    <canvas id="zyf_bar_canvas"></canvas>
+                    <div class="zyf_fallback" id="zyf_bar_fallback">当前浏览器不支持 WebGL，无法渲染 three.js 图表。</div>
+                </div>
+                <div class="zyf_caption">
+                    <span>柱体高度编码数值，颜色按数值渐变</span>
+                    <span>拖动旋转 · 自动缓慢旋转</span>
+                </div>
+            </section>
+
+            <!-- 3D 环形饼图 -->
+            <section class="zyf_card">
+                <div class="zyf_card_head">
+                    <h2>3D 环形饼图</h2>
+                    <i>CylinderGeometry</i>
+                    <span>工单来源占比</span>
+                </div>
+                <div class="zyf_canvas_wrap" id="zyf_pie_wrap">
+                    <canvas id="zyf_pie_canvas"></canvas>
+                    <div class="zyf_fallback" id="zyf_pie_fallback">当前浏览器不支持 WebGL，无法渲染 three.js 图表。</div>
+                </div>
+                <div class="zyf_caption">
+                    <span>扇形角度编码占比，高度编码数值量级</span>
+                    <span>拖动旋转 · 自动缓慢旋转</span>
+                </div>
+            </section>
+        </div>
+
+        <section class="zyf_notes">
+            <h3>three.js 绘图要点</h3>
+            <ul>
+                <li><b>三件套</b>：<code>Scene</code> 场景、<code>PerspectiveCamera</code> 透视相机、<code>WebGLRenderer</code> 渲染器</li>
+                <li><b>几何体</b>：柱状图用 <code>BoxGeometry</code>，饼图扇形用 <code>CylinderGeometry</code> 的 <code>thetaStart / thetaLength</code></li>
+                <li><b>材质与灯光</b>：<code>MeshStandardMaterial</code> 配合环境光与平行光，才有立体明暗</li>
+                <li><b>动画循环</b>：<code>requestAnimationFrame</code> 每帧渲染，旋转 group 实现自转</li>
+                <li><b>交互</b>：监听 pointerdown / pointermove 修改 <code>group.rotation.y</code> 实现拖拽</li>
+                <li><b>自适应</b>：窗口变化时同步更新渲染尺寸与相机 <code>aspect</code></li>
+            </ul>
+        </section>
+
+        <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-7 three.js</div>
+    </div>
+
+    <script src="cdn/three.min.js"></script>
+    <script>
+        /* ==================== 公共：拖拽旋转 ==================== */
+        function zyf_bindDrag(zyf_canvas, zyf_target, zyf_state) {
+            zyf_canvas.addEventListener("pointerdown", function (zyf_e) {
+                zyf_state.drag = true;
+                zyf_state.lastX = zyf_e.clientX;
+                zyf_canvas.setPointerCapture(zyf_e.pointerId);
+            });
+            zyf_canvas.addEventListener("pointermove", function (zyf_e) {
+                if (!zyf_state.drag) { return; }
+                var zyf_dx = zyf_e.clientX - zyf_state.lastX;
+                zyf_state.lastX = zyf_e.clientX;
+                zyf_target.rotation.y += zyf_dx * 0.009;
+            });
+            zyf_canvas.addEventListener("pointerup", function () {
+                zyf_state.drag = false;
+            });
+            zyf_canvas.addEventListener("pointerleave", function () {
+                zyf_state.drag = false;
+            });
+        }
+
+        /* ==================== 图 1：3D 柱状图 ==================== */
+        var zyf_barCanvas = document.getElementById("zyf_bar_canvas");
+        var zyf_barWrap = document.getElementById("zyf_bar_wrap");
+        var zyf_barState = { drag: false, lastX: 0 };
+
+        var zyf_barData = [
+            { name: "售后", value: 42 },
+            { name: "订单", value: 36 },
+            { name: "物流", value: 30 },
+            { name: "退换", value: 26 },
+            { name: "产品", value: 22 },
+            { name: "支付", value: 18 },
+            { name: "会员", value: 14 },
+            { name: "其他", value: 10 }
+        ];
+        var zyf_barColors = ["#1d4ed8", "#2563eb", "#3b82f6", "#0ea5e9", "#06b6d4", "#14b8a6", "#10b981", "#22c55e"];
+
+        try {
+            var zyf_barRenderer = new THREE.WebGLRenderer({ canvas: zyf_barCanvas, antialias: true, alpha: true });
+            zyf_barRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            zyf_barRenderer.setClearColor(0x000000, 0);
+
+            var zyf_barScene = new THREE.Scene();
+            var zyf_barCamera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+            zyf_barCamera.position.set(0, 8.2, 13.5);
+            zyf_barCamera.lookAt(0, 2.2, 0);
+
+            zyf_barScene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+            var zyf_barLight = new THREE.DirectionalLight(0xbfdbfe, 0.9);
+            zyf_barLight.position.set(6, 12, 8);
+            zyf_barScene.add(zyf_barLight);
+
+            var zyf_barLight2 = new THREE.PointLight(0x22d3ee, 0.5, 40);
+            zyf_barLight2.position.set(-8, 6, -6);
+            zyf_barScene.add(zyf_barLight2);
+
+            var zyf_barGroup = new THREE.Group();
+            zyf_barScene.add(zyf_barGroup);
+
+            /* 底座 */
+            var zyf_barBase = new THREE.Mesh(
+                new THREE.BoxGeometry(13.6, 0.3, 4.2),
+                new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.4, roughness: 0.55 })
+            );
+            zyf_barBase.position.y = -0.15;
+            zyf_barGroup.add(zyf_barBase);
+
+            /* 柱体：宽度 1.1、间距 0.5，共 8 根居中排列 */
+            var zyf_barW = 1.1;
+            var zyf_barGap = 0.5;
+            var zyf_barTotal = zyf_barData.length * zyf_barW + (zyf_barData.length - 1) * zyf_barGap;
+            var zyf_barStart = -zyf_barTotal / 2 + zyf_barW / 2;
+
+            zyf_barData.forEach(function (zyf_d, zyf_i) {
+                var zyf_h = zyf_d.value / 10;
+                var zyf_mesh = new THREE.Mesh(
+                    new THREE.BoxGeometry(zyf_barW, zyf_h, zyf_barW),
+                    new THREE.MeshStandardMaterial({
+                        color: new THREE.Color(zyf_barColors[zyf_i]),
+                        metalness: 0.45,
+                        roughness: 0.3,
+                        emissive: new THREE.Color(zyf_barColors[zyf_i]),
+                        emissiveIntensity: 0.12
+                    })
+                );
+                zyf_mesh.position.set(zyf_barStart + zyf_i * (zyf_barW + zyf_barGap), zyf_h / 2, 0);
+                zyf_barGroup.add(zyf_mesh);
+            });
+
+            /* 地面网格 */
+            var zyf_barGrid = new THREE.GridHelper(20, 20, 0x1e293b, 0x131c2e);
+            zyf_barGrid.position.y = -0.32;
+            zyf_barGroup.add(zyf_barGrid);
+
+            zyf_bindDrag(zyf_barCanvas, zyf_barGroup, zyf_barState);
+
+            var zyf_barResize = function () {
+                var zyf_w = zyf_barWrap.clientWidth;
+                var zyf_h = zyf_barCanvas.clientHeight || 420;
+                zyf_barRenderer.setSize(zyf_w, zyf_h, false);
+                zyf_barCamera.aspect = zyf_w / zyf_h;
+                zyf_barCamera.updateProjectionMatrix();
+            };
+            zyf_barResize();
+
+            var zyf_barRender = function () {
+                requestAnimationFrame(zyf_barRender);
+                if (!zyf_barState.drag) { zyf_barGroup.rotation.y += 0.0045; }
+                zyf_barRenderer.render(zyf_barScene, zyf_barCamera);
+            };
+            zyf_barRender();
+
+            window.addEventListener("resize", zyf_barResize);
+        } catch (zyf_barErr) {
+            document.getElementById("zyf_bar_fallback").style.display = "block";
+        }
+
+        /* ==================== 图 2：3D 环形饼图 ==================== */
+        var zyf_pieCanvas = document.getElementById("zyf_pie_canvas");
+        var zyf_pieWrap = document.getElementById("zyf_pie_wrap");
+        var zyf_pieState = { drag: false, lastX: 0 };
+
+        var zyf_pieData = [
+            { name: "在线客服", value: 30, color: "#2563eb" },
+            { name: "App", value: 24, color: "#0ea5e9" },
+            { name: "微信", value: 18, color: "#06b6d4" },
+            { name: "电话", value: 12, color: "#14b8a6" },
+            { name: "邮件", value: 9, color: "#22c55e" },
+            { name: "其他", value: 7, color: "#a3e635" }
+        ];
+
+        try {
+            var zyf_pieRenderer = new THREE.WebGLRenderer({ canvas: zyf_pieCanvas, antialias: true, alpha: true });
+            zyf_pieRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            zyf_pieRenderer.setClearColor(0x000000, 0);
+
+            var zyf_pieScene = new THREE.Scene();
+            var zyf_pieCamera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+            zyf_pieCamera.position.set(0, 8.6, 11.5);
+            zyf_pieCamera.lookAt(0, 1.2, 0);
+
+            zyf_pieScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+            var zyf_pieLight = new THREE.DirectionalLight(0xffffff, 0.95);
+            zyf_pieLight.position.set(6, 12, 8);
+            zyf_pieScene.add(zyf_pieLight);
+
+            var zyf_pieLight2 = new THREE.PointLight(0x60a5fa, 0.55, 35);
+            zyf_pieLight2.position.set(-7, 5, -8);
+            zyf_pieScene.add(zyf_pieLight2);
+
+            var zyf_pieGroup = new THREE.Group();
+            zyf_pieScene.add(zyf_pieGroup);
+
+            /* 环形底座 */
+            var zyf_pieBase = new THREE.Mesh(
+                new THREE.CylinderGeometry(5.4, 5.4, 0.25, 64),
+                new THREE.MeshStandardMaterial({ color: 0x111c30, metalness: 0.4, roughness: 0.6 })
+            );
+            zyf_pieBase.position.y = -0.14;
+            zyf_pieGroup.add(zyf_pieBase);
+
+            var zyf_pieTotal = zyf_pieData.reduce(function (zyf_s, zyf_d) { return zyf_s + zyf_d.value; }, 0);
+            var zyf_pieAngle = 0;
+            var zyf_pieGapAngle = 0.035;
+
+            zyf_pieData.forEach(function (zyf_d) {
+                var zyf_theta = (zyf_d.value / zyf_pieTotal) * Math.PI * 2 - zyf_pieGapAngle;
+                var zyf_h = 0.7 + (zyf_d.value / zyf_pieTotal) * 4.2;
+
+                var zyf_mesh = new THREE.Mesh(
+                    new THREE.CylinderGeometry(4.9, 4.9, zyf_h, 48, 1, false, zyf_pieAngle, zyf_theta),
+                    new THREE.MeshStandardMaterial({
+                        color: new THREE.Color(zyf_d.color),
+                        metalness: 0.4,
+                        roughness: 0.32,
+                        emissive: new THREE.Color(zyf_d.color),
+                        emissiveIntensity: 0.1
+                    })
+                );
+                zyf_mesh.position.y = zyf_h / 2;
+                zyf_pieGroup.add(zyf_mesh);
+
+                zyf_pieAngle += (zyf_d.value / zyf_pieTotal) * Math.PI * 2;
+            });
+
+            /* 中心圆环（装饰） */
+            var zyf_pieRing = new THREE.Mesh(
+                new THREE.TorusGeometry(1.5, 0.16, 16, 64),
+                new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.7, roughness: 0.25, emissive: 0x0ea5e9, emissiveIntensity: 0.35 })
+            );
+            zyf_pieRing.rotation.x = Math.PI / 2;
+            zyf_pieRing.position.y = 0.55;
+            zyf_pieGroup.add(zyf_pieRing);
+
+            var zyf_pieGrid = new THREE.GridHelper(18, 18, 0x1e293b, 0x131c2e);
+            zyf_pieGrid.position.y = -0.3;
+            zyf_pieGroup.add(zyf_pieGrid);
+
+            zyf_bindDrag(zyf_pieCanvas, zyf_pieGroup, zyf_pieState);
+
+            var zyf_pieResize = function () {
+                var zyf_w = zyf_pieWrap.clientWidth;
+                var zyf_h = zyf_pieCanvas.clientHeight || 420;
+                zyf_pieRenderer.setSize(zyf_w, zyf_h, false);
+                zyf_pieCamera.aspect = zyf_w / zyf_h;
+                zyf_pieCamera.updateProjectionMatrix();
+            };
+            zyf_pieResize();
+
+            var zyf_pieRender = function () {
+                requestAnimationFrame(zyf_pieRender);
+                if (!zyf_pieState.drag) { zyf_pieGroup.rotation.y += 0.005; }
+                zyf_pieRing.rotation.z += 0.01;
+                zyf_pieRenderer.render(zyf_pieScene, zyf_pieCamera);
+            };
+            zyf_pieRender();
+
+            window.addEventListener("resize", zyf_pieResize);
+        } catch (zyf_pieErr) {
+            document.getElementById("zyf_pie_fallback").style.display = "block";
+        }
+    </script>
+</body>
+</html>
