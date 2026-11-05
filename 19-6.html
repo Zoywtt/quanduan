@@ -1,0 +1,425 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：Mermaid 智能客服系统流程图与 ER 图，依赖本地 cdn/mermaid.min.js -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-6 Mermaid 流程图与 ER 图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(124, 58, 237, 0.10), transparent 42%),
+                radial-gradient(circle at 90% 10%, rgba(13, 148, 136, 0.10), transparent 40%),
+                #f4f7fb;
+            color: #0f172a;
+            min-height: 100vh;
+            padding: 30px 16px 46px;
+        }
+
+        .zyf_page {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .zyf_tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 999px;
+            border: 1px solid #ddd6fe;
+            background: #f5f3ff;
+            color: #6d28d9;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .zyf_header h1 {
+            font-size: 27px;
+            letter-spacing: 1px;
+            color: #0b1a33;
+        }
+        .zyf_header h1 span {
+            background: linear-gradient(120deg, #6d28d9, #0d9488);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.9;
+        }
+
+        /* ============ 卡片 ============ */
+        .zyf_card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 20px 22px 18px;
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+            margin-bottom: 20px;
+        }
+        .zyf_card_head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .zyf_card_head h2 {
+            font-size: 16px;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+        .zyf_card_head h2 i {
+            font-style: normal;
+            display: inline-block;
+            font-size: 10.5px;
+            color: #6d28d9;
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
+            border-radius: 6px;
+            padding: 2px 7px;
+            margin-left: 8px;
+            vertical-align: 2px;
+        }
+        .zyf_card_head p {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.8;
+            max-width: 540px;
+        }
+
+        .zyf_mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 18px 0 6px;
+        }
+        .zyf_mermaid svg { max-width: 100%; height: auto; }
+        .zyf_err {
+            font-size: 12px;
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        /* 图例芯片 */
+        .zyf_chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-top: 14px;
+            border-top: 1px dashed #eef2f7;
+            margin-top: 10px;
+        }
+        .zyf_chip {
+            font-size: 11.5px;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 4px 12px;
+            line-height: 1.4;
+        }
+        .zyf_chip b {
+            color: #0f172a;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+        .zyf_chip span { color: #94a3b8; }
+
+        /* ============ 说明 ============ */
+        .zyf_notes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 20px;
+        }
+        .zyf_note {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #6d28d9;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+        .zyf_note:nth-child(2) { border-left-color: #0d9488; }
+        .zyf_note h3 {
+            font-size: 14px;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+        .zyf_note h3 span {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+        .zyf_note ul {
+            list-style: none;
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 2;
+        }
+        .zyf_note li::before {
+            content: "·";
+            color: #94a3b8;
+            margin-right: 7px;
+        }
+        .zyf_note li b { color: #6d28d9; font-weight: 700; }
+        .zyf_note:nth-child(2) li b { color: #0f766e; }
+        .zyf_note code {
+            font-family: Consolas, monospace;
+            font-size: 11.5px;
+            background: #f1f5f9;
+            color: #334155;
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        .zyf_footer {
+            margin-top: 26px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6c2d4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_page">
+
+        <header class="zyf_header">
+            <div class="zyf_tag">19-6 · Mermaid 10.9.1 · 本地 cdn 依赖</div>
+            <h1>Mermaid <span>流程图与 ER 图</span></h1>
+            <p>用纯文本语法描述智能客服系统的业务流程与数据结构，由本地 <code>cdn/mermaid.min.js</code> 在浏览器端渲染为 SVG</p>
+        </header>
+
+        <!-- 流程图 -->
+        <section class="zyf_card">
+            <div class="zyf_card_head">
+                <h2>智能客服业务流程<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:8px;">flowchart</span><i>flowchart TD</i></h2>
+                <p>从多渠道接入到意图路由，业务问答走 RAG 检索链路、业务办理走工具调用、低置信度转人工，最后由安全合规校验兜底。</p>
+            </div>
+            <script type="text/plain" id="zyf_flow_src">
+flowchart TD
+    A["用户提问<br/>网页 / App / 微信 / 电话"]:::acc --> B["渠道接入网关"]:::acc
+    B --> C["多轮会话管理<br/>上下文 · 用户画像"]:::und
+    C --> D["意图识别与槽位填充"]:::und
+    D --> E{"意图类型判定"}:::und
+
+    E -->|业务问答| F["RAG 检索链路<br/>查询改写 · 混合检索<br/>重排序 · 上下文压缩"]:::ret
+    E -->|业务办理| N["业务工具调用<br/>订单 · 物流 · 工单"]:::hum
+    E -->|闲聊| R["闲聊与寒暄应答"]:::hum
+    E -->|低置信度| O["转人工坐席<br/>会话摘要 + 话术推荐"]:::hum
+
+    KB[("知识库<br/>文档 · 向量索引 · 知识图谱")]:::ret --> F
+    F --> G["Prompt 编排 + 大模型生成<br/>流式输出"]:::gen
+    G --> H{"安全合规校验"}:::gen
+    H -->|通过| M["返回答案<br/>附带知识引用"]:::gen
+    H -->|不通过| M2["降级：模板回复 / 转人工"]:::gen
+    M --> P["满意度评价"]:::hum
+
+    classDef acc fill:#eff6ff,stroke:#2563eb,stroke-width:1.4px,color:#0f172a
+    classDef und fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.4px,color:#0f172a
+    classDef ret fill:#f0fdfa,stroke:#0d9488,stroke-width:1.4px,color:#0f172a
+    classDef gen fill:#fff1f2,stroke:#e11d48,stroke-width:1.4px,color:#0f172a
+    classDef hum fill:#fffbeb,stroke:#f59e0b,stroke-width:1.4px,color:#0f172a
+            </script>
+            <div class="zyf_mermaid" id="zyf_flow"></div>
+            <div class="zyf_chips">
+                <div class="zyf_chip"><b>接入层</b><span>渠道网关与用户入口</span></div>
+                <div class="zyf_chip"><b>理解层</b><span>会话上下文 · 意图路由</span></div>
+                <div class="zyf_chip"><b>检索层</b><span>RAG 召回与重排</span></div>
+                <div class="zyf_chip"><b>生成层</b><span>LLM 生成与安全校验</span></div>
+                <div class="zyf_chip"><b>业务与人工</b><span>工具调用 · 坐席协同</span></div>
+            </div>
+        </section>
+
+        <!-- ER 图 -->
+        <section class="zyf_card">
+            <div class="zyf_card_head">
+                <h2>智能客服数据模型<span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:8px;">entity relationship</span><i>erDiagram</i></h2>
+                <p>用户、会话、消息、意图、工单、坐席、知识文档与知识分块之间的关系；分块与消息的引用关系支撑答案溯源。</p>
+            </div>
+            <script type="text/plain" id="zyf_er_src">
+erDiagram
+    USER ||--o{ SESSION : "发起"
+    USER ||--o{ FEEDBACK : "提交"
+    SESSION ||--o{ MESSAGE : "包含"
+    SESSION ||--o| TICKET : "转人工"
+    SESSION ||--o{ FEEDBACK : "评价"
+    MESSAGE }o--|| INTENT : "识别为"
+    AGENT ||--o{ TICKET : "处理"
+    TICKET ||--o{ FEEDBACK : "回访"
+    DOCUMENT ||--o{ CHUNK : "切分"
+    CHUNK ||--o{ MESSAGE : "被引用"
+
+    USER {
+        bigint user_id PK "用户ID"
+        varchar nickname "昵称"
+        varchar phone "手机号"
+        varchar channel "来源渠道"
+        datetime created_at "注册时间"
+    }
+    SESSION {
+        bigint session_id PK "会话ID"
+        bigint user_id FK "所属用户"
+        varchar status "会话状态"
+        datetime started_at "开始时间"
+        datetime ended_at "结束时间"
+    }
+    MESSAGE {
+        bigint message_id PK "消息ID"
+        bigint session_id FK "所属会话"
+        bigint intent_id FK "识别意图"
+        varchar role "角色：用户 / 机器人 / 坐席"
+        text content "消息内容"
+        datetime created_at "发送时间"
+    }
+    INTENT {
+        bigint intent_id PK "意图ID"
+        varchar intent_name "意图名称"
+        decimal confidence "置信度"
+        varchar route "路由结果"
+    }
+    TICKET {
+        bigint ticket_id PK "工单ID"
+        bigint session_id FK "来源会话"
+        bigint agent_id FK "处理坐席"
+        varchar category "问题分类"
+        varchar status "工单状态"
+        datetime created_at "创建时间"
+    }
+    AGENT {
+        bigint agent_id PK "坐席ID"
+        varchar agent_name "坐席姓名"
+        varchar skill_group "技能组"
+        boolean online "是否在线"
+    }
+    FEEDBACK {
+        bigint feedback_id PK "评价ID"
+        bigint session_id FK "所属会话"
+        bigint user_id FK "评价用户"
+        tinyint score "满意度评分"
+        varchar comment "评价内容"
+    }
+    DOCUMENT {
+        bigint doc_id PK "文档ID"
+        varchar title "文档标题"
+        varchar product_line "产品线"
+        varchar version "版本号"
+        datetime updated_at "更新时间"
+    }
+    CHUNK {
+        bigint chunk_id PK "分块ID"
+        bigint doc_id FK "所属文档"
+        text content "分块内容"
+        int token_count "Token 数"
+        varchar embedding "向量表示"
+    }
+            </script>
+            <div class="zyf_mermaid" id="zyf_er"></div>
+            <div class="zyf_chips">
+                <div class="zyf_chip"><b>USER</b><span>用户</span></div>
+                <div class="zyf_chip"><b>SESSION</b><span>会话</span></div>
+                <div class="zyf_chip"><b>MESSAGE</b><span>消息</span></div>
+                <div class="zyf_chip"><b>INTENT</b><span>意图</span></div>
+                <div class="zyf_chip"><b>TICKET</b><span>工单</span></div>
+                <div class="zyf_chip"><b>AGENT</b><span>坐席</span></div>
+                <div class="zyf_chip"><b>FEEDBACK</b><span>满意度评价</span></div>
+                <div class="zyf_chip"><b>DOCUMENT</b><span>知识文档</span></div>
+                <div class="zyf_chip"><b>CHUNK</b><span>知识分块</span></div>
+            </div>
+        </section>
+
+        <!-- 说明 -->
+        <div class="zyf_notes">
+            <div class="zyf_note">
+                <h3>流程图写法 <span>flowchart TD</span></h3>
+                <ul>
+                    <li><b>TD 表示自上而下</b>，箭头 <code>--&gt;</code> 连接节点，竖线 <code>|文案|</code> 标注分支条件</li>
+                    <li>节点形状：<code>["矩形"]</code> 表示步骤、<code>{"菱形"}</code> 表示判定、<code>[("圆柱")]</code> 表示数据存储</li>
+                    <li><b>subgraph</b> 把同层节点分组，<b>classDef</b> 定义配色，再用 <code>:::名称</code> 应用样式</li>
+                    <li>本图四条路由：业务问答、业务办理、闲聊、低置信度转人工</li>
+                </ul>
+            </div>
+            <div class="zyf_note">
+                <h3>ER 图写法 <span>erDiagram</span></h3>
+                <ul>
+                    <li><b>||--o{</b> 表示一对多，<b>||--o|</b> 表示一对零或一，<b>}o--||</b> 表示多对一</li>
+                    <li>实体块内按 <code>类型 字段名 约束 "注释"</code> 书写，<b>PK</b> 主键、<b>FK</b> 外键</li>
+                    <li>关系标签用引号包裹中文，如 <code>"发起"</code>、<code>"被引用"</code></li>
+                    <li>分块 CHUNK 与消息 MESSAGE 的引用关系，对应答案的引用溯源能力</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-6 Mermaid</div>
+    </div>
+
+    <script src="cdn/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: "base",
+            securityLevel: "loose",
+            fontFamily: "'PingFang SC', 'Microsoft YaHei', '微软雅黑', sans-serif",
+            themeVariables: {
+                background: "#ffffff",
+                primaryColor: "#eff6ff",
+                primaryBorderColor: "#2563eb",
+                primaryTextColor: "#0f172a",
+                lineColor: "#94a3b8",
+                fontSize: "15px",
+                mainBkg: "#ffffff",
+                nodeBorder: "#2563eb",
+                clusterBkg: "#fbfdff",
+                clusterBorder: "#dbeafe",
+                edgeLabelBackground: "#ffffff",
+                tertiaryColor: "#f8fafc"
+            },
+            flowchart: {
+                curve: "basis",
+                nodeSpacing: 44,
+                rankSpacing: 46,
+                padding: 12,
+                htmlLabels: true,
+                useMaxWidth: true
+            },
+            er: {
+                fontSize: 13,
+                useMaxWidth: true
+            }
+        });
+
+        /* 从 text/plain 源码块读取图定义，渲染为 SVG 后写入容器 */
+        function zyf_render(zyf_srcId, zyf_targetId, zyf_svgId) {
+            var zyf_src = document.getElementById(zyf_srcId).textContent;
+            var zyf_target = document.getElementById(zyf_targetId);
+            return mermaid.render(zyf_svgId, zyf_src).then(function (zyf_res) {
+                zyf_target.innerHTML = zyf_res.svg;
+            }).catch(function (zyf_err) {
+                zyf_target.innerHTML = '<div class="zyf_err">图表解析失败：' + zyf_err.message + '</div>';
+            });
+        }
+
+        zyf_render("zyf_flow_src", "zyf_flow", "zyf_flow_svg");
+        zyf_render("zyf_er_src", "zyf_er", "zyf_er_svg");
+    </script>
+</body>
+</html>
