@@ -1,0 +1,433 @@
+<!-- 姓名：张耀夫 日期：2026-11-05 功能名称：ECharts 数据可视化（南丁格尔玫瑰图 + 安斯库姆四重奏），依赖本地 cdn/echarts.min.js -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>19-4 ECharts 数据可视化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            background:
+                radial-gradient(circle at 12% 0%, rgba(29, 78, 216, 0.10), transparent 42%),
+                radial-gradient(circle at 88% 12%, rgba(13, 148, 136, 0.10), transparent 40%),
+                #f4f7fb;
+            color: #0f172a;
+            min-height: 100vh;
+            padding: 30px 16px 46px;
+        }
+
+        .zyf_page {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* ============ 页头 ============ */
+        .zyf_header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .zyf_tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 999px;
+            border: 1px solid #bfdbfe;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .zyf_header h1 {
+            font-size: 27px;
+            letter-spacing: 1px;
+            color: #0b1a33;
+        }
+        .zyf_header h1 span {
+            background: linear-gradient(120deg, #1d4ed8, #0d9488);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .zyf_header p {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.9;
+        }
+
+        /* ============ 卡片 ============ */
+        .zyf_card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 20px 22px 14px;
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.08);
+            margin-bottom: 20px;
+        }
+        .zyf_card_head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .zyf_card_head h2 {
+            font-size: 16px;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+        .zyf_card_head h2 i {
+            font-style: normal;
+            display: inline-block;
+            font-size: 10.5px;
+            color: #1d4ed8;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 2px 7px;
+            margin-left: 8px;
+            vertical-align: 2px;
+        }
+        .zyf_card_head p {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.8;
+            max-width: 520px;
+        }
+
+        .zyf_chart {
+            width: 100%;
+            height: 440px;
+        }
+        .zyf_chart_tall {
+            height: 560px;
+        }
+
+        /* ============ 说明 ============ */
+        .zyf_notes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .zyf_note {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #1d4ed8;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+        }
+        .zyf_note:nth-child(2) { border-left-color: #0d9488; }
+        .zyf_note h3 {
+            font-size: 14px;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+        .zyf_note h3 span {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+        .zyf_note ul {
+            list-style: none;
+            font-size: 12.5px;
+            color: #475569;
+            line-height: 2;
+        }
+        .zyf_note li::before {
+            content: "·";
+            color: #94a3b8;
+            margin-right: 7px;
+        }
+        .zyf_note li b { color: #1d4ed8; font-weight: 700; }
+        .zyf_note:nth-child(2) li b { color: #0f766e; }
+        .zyf_note code {
+            font-family: Consolas, monospace;
+            font-size: 11.5px;
+            background: #f1f5f9;
+            color: #334155;
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        .zyf_footer {
+            margin-top: 26px;
+            text-align: center;
+            font-size: 12px;
+            color: #b6c2d4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="zyf_page">
+
+        <header class="zyf_header">
+            <div class="zyf_tag">19-4 · ECharts 5.5.1 · 本地 cdn 依赖</div>
+            <h1>ECharts <span>数据可视化</span></h1>
+            <p>两个来自 ECharts 官方示例的图表：基础南丁格尔玫瑰图与安斯库姆四重奏<br>全部使用本地 <code>cdn/echarts.min.js</code>，不引用任何在线 CDN</p>
+        </header>
+
+        <!-- 图 1：南丁格尔玫瑰图 -->
+        <section class="zyf_card">
+            <div class="zyf_card_head">
+                <h2>基础南丁格尔玫瑰图<i>pie-custom</i></h2>
+                <p>以半径长短表示数值大小、角度均分，适合对比多个类目的量级差异。</p>
+            </div>
+            <div class="zyf_chart" id="zyf_rose"></div>
+        </section>
+
+        <!-- 图 2：安斯库姆四重奏 -->
+        <section class="zyf_card">
+            <div class="zyf_card_head">
+                <h2>安斯库姆四重奏<i>scatter-anscombe-quartet</i></h2>
+                <p>四组数据的均值、方差、相关系数与回归直线几乎完全相同，但散点分布形态差异极大。</p>
+            </div>
+            <div class="zyf_chart zyf_chart_tall" id="zyf_anscombe"></div>
+        </section>
+
+        <!-- 说明 -->
+        <div class="zyf_notes">
+            <div class="zyf_note">
+                <h3>南丁格尔玫瑰图 <span>Nightingale Rose Chart</span></h3>
+                <ul>
+                    <li>本质是饼图：<b>角度相同、半径编码数值</b>，靠扇形长短表达大小</li>
+                    <li>关键配置 <code>roseType: 'radius'</code>，改为 <code>'area'</code> 则用半径面积编码</li>
+                    <li>用 <code>radius: ['18%', '72%']</code> 留出中心空白，形成环形玫瑰效果</li>
+                    <li>适合类目较多、量级差异明显的数据，比普通饼图更易比较长短</li>
+                </ul>
+            </div>
+            <div class="zyf_note">
+                <h3>安斯库姆四重奏 <span>Anscombe's Quartet</span></h3>
+                <ul>
+                    <li>四组数据的 <b>平均值、方差、相关系数、回归线</b>几乎一致（相关系数均约 0.816）</li>
+                    <li>但形态完全不同：线性、曲线、含离群点、竖直分布</li>
+                    <li>结论：<b>只依赖统计量而不看图</b>，会掩盖数据真实的分布结构</li>
+                    <li>实现上使用 4 个 <code>grid</code> + 4 组 <code>xAxis / yAxis</code> + 8 个 <code>series</code> 组合</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="zyf_footer">© 2026 903 张耀夫 · 《高级网页设计》课堂实践 · 19-4 ECharts</div>
+    </div>
+
+    <script src="cdn/echarts.min.js"></script>
+    <script>
+        /* ============ 图 1：基础南丁格尔玫瑰图 ============ */
+        var zyf_roseEl = document.getElementById("zyf_rose");
+        var zyf_roseChart = echarts.init(zyf_roseEl);
+
+        var zyf_roseOption = {
+            color: ["#1d4ed8", "#2563eb", "#3b82f6", "#0ea5e9", "#06b6d4", "#14b8a6", "#10b981", "#84cc16"],
+            tooltip: {
+                trigger: "item",
+                backgroundColor: "rgba(15, 23, 42, 0.88)",
+                borderWidth: 0,
+                textStyle: { color: "#f8fafc", fontSize: 12 },
+                formatter: "{b}<br/>咨询量：{c} 条（{d}%）"
+            },
+            legend: {
+                bottom: 4,
+                itemWidth: 10,
+                itemHeight: 10,
+                itemGap: 14,
+                textStyle: { color: "#64748b", fontSize: 11 }
+            },
+            series: [{
+                name: "咨询类型",
+                type: "pie",
+                roseType: "radius",
+                radius: ["18%", "72%"],
+                center: ["50%", "46%"],
+                itemStyle: {
+                    borderRadius: 6,
+                    borderColor: "#ffffff",
+                    borderWidth: 2,
+                    shadowBlur: 14,
+                    shadowColor: "rgba(29, 78, 216, 0.16)"
+                },
+                label: {
+                    color: "#334155",
+                    fontSize: 11,
+                    lineHeight: 16,
+                    formatter: "{b}\n{d}%"
+                },
+                labelLine: {
+                    length: 10,
+                    length2: 12,
+                    lineStyle: { color: "#cbd5e1" }
+                },
+                emphasis: {
+                    itemStyle: { shadowBlur: 26, shadowColor: "rgba(29, 78, 216, 0.35)" }
+                },
+                data: [
+                    { value: 42, name: "售后咨询" },
+                    { value: 36, name: "订单查询" },
+                    { value: 30, name: "物流跟踪" },
+                    { value: 26, name: "退换货" },
+                    { value: 22, name: "产品咨询" },
+                    { value: 18, name: "支付问题" },
+                    { value: 14, name: "会员权益" },
+                    { value: 10, name: "其他问题" }
+                ]
+            }]
+        };
+        zyf_roseChart.setOption(zyf_roseOption);
+
+        /* ============ 图 2：安斯库姆四重奏 ============ */
+        var zyf_anscombeEl = document.getElementById("zyf_anscombe");
+        var zyf_anscombeChart = echarts.init(zyf_anscombeEl);
+
+        /* 官方四组数据（x, y） */
+        var zyf_anscombeData = {
+            I: [
+                [10.0, 8.04], [8.0, 6.95], [13.0, 7.58], [9.0, 8.81], [11.0, 8.33],
+                [14.0, 9.96], [6.0, 7.24], [4.0, 4.26], [12.0, 10.84], [7.0, 4.82], [5.0, 5.68]
+            ],
+            II: [
+                [10.0, 9.14], [8.0, 8.14], [13.0, 8.74], [9.0, 8.77], [11.0, 9.26],
+                [14.0, 8.10], [6.0, 6.13], [4.0, 3.10], [12.0, 9.13], [7.0, 7.26], [5.0, 4.74]
+            ],
+            III: [
+                [10.0, 7.46], [8.0, 6.77], [13.0, 12.74], [9.0, 7.11], [11.0, 7.81],
+                [14.0, 8.84], [6.0, 6.08], [4.0, 5.39], [12.0, 8.15], [7.0, 6.42], [5.0, 5.73]
+            ],
+            IV: [
+                [8.0, 6.58], [8.0, 5.76], [8.0, 7.71], [8.0, 8.84], [8.0, 8.47],
+                [8.0, 7.04], [8.0, 5.25], [19.0, 12.50], [8.0, 5.56], [8.0, 7.91], [8.0, 6.89]
+            ]
+        };
+
+        var zyf_ansColor = ["#1d4ed8", "#0d9488", "#e11d48", "#f59e0b"];
+        var zyf_ansTitle = ["I", "II", "III", "IV"];
+        var zyf_ansKeys = ["I", "II", "III", "IV"];
+
+        /* 2×2 四个坐标系的位置 */
+        var zyf_ansBox = [
+            { left: "9%", top: "18%", width: "34%", height: "29%", tLeft: "11%", tTop: "10%" },
+            { left: "57%", top: "18%", width: "34%", height: "29%", tLeft: "59%", tTop: "10%" },
+            { left: "9%", top: "65%", width: "34%", height: "29%", tLeft: "11%", tTop: "57%" },
+            { left: "57%", top: "65%", width: "34%", height: "29%", tLeft: "59%", tTop: "57%" }
+        ];
+
+        var zyf_ansTitleArr = [];
+        var zyf_ansGridArr = [];
+        var zyf_ansXAxisArr = [];
+        var zyf_ansYAxisArr = [];
+        var zyf_ansSeriesArr = [];
+
+        zyf_ansKeys.forEach(function (zyf_key, zyf_i) {
+            var zyf_box = zyf_ansBox[zyf_i];
+
+            zyf_ansTitleArr.push({
+                text: "Quartet " + zyf_key,
+                left: zyf_box.tLeft,
+                top: zyf_box.tTop,
+                textStyle: { fontSize: 13, fontWeight: 700, color: zyf_ansColor[zyf_i] }
+            });
+
+            zyf_ansGridArr.push({
+                left: zyf_box.left,
+                top: zyf_box.top,
+                width: zyf_box.width,
+                height: zyf_box.height,
+                containLabel: false,
+                borderColor: "#eef2f7",
+                backgroundColor: "#fbfcfe"
+            });
+
+            zyf_ansXAxisArr.push({
+                gridIndex: zyf_i,
+                min: 0,
+                max: 20,
+                interval: 5,
+                name: "x",
+                nameTextStyle: { fontSize: 10, color: "#94a3b8" },
+                axisLine: { lineStyle: { color: "#e2e8f0" } },
+                axisTick: { show: false },
+                splitLine: { lineStyle: { color: "#eff4fa" } },
+                axisLabel: { fontSize: 10, color: "#94a3b8" }
+            });
+
+            zyf_ansYAxisArr.push({
+                gridIndex: zyf_i,
+                min: 0,
+                max: 14,
+                interval: 4,
+                name: "y",
+                nameTextStyle: { fontSize: 10, color: "#94a3b8" },
+                axisLine: { show: true, lineStyle: { color: "#e2e8f0" } },
+                axisTick: { show: false },
+                splitLine: { lineStyle: { color: "#eff4fa" } },
+                axisLabel: { fontSize: 10, color: "#94a3b8" }
+            });
+
+            /* 散点 */
+            zyf_ansSeriesArr.push({
+                name: "Quartet " + zyf_key,
+                type: "scatter",
+                xAxisIndex: zyf_i,
+                yAxisIndex: zyf_i,
+                symbolSize: 9,
+                itemStyle: {
+                    color: zyf_ansColor[zyf_i],
+                    opacity: 0.9,
+                    borderColor: "#ffffff",
+                    borderWidth: 1
+                },
+                emphasis: { scale: 1.5 },
+                data: zyf_anscombeData[zyf_key]
+            });
+
+            /* 四组共用的回归直线 y = 3 + 0.5x */
+            zyf_ansSeriesArr.push({
+                name: "Regression",
+                type: "line",
+                xAxisIndex: zyf_i,
+                yAxisIndex: zyf_i,
+                showSymbol: false,
+                silent: true,
+                lineStyle: { color: "#94a3b8", width: 1.4, type: "dashed" },
+                data: [[0, 3.0], [20, 13.0]]
+            });
+        });
+
+        var zyf_ansOption = {
+            color: zyf_ansColor,
+            title: zyf_ansTitleArr,
+            grid: zyf_ansGridArr,
+            xAxis: zyf_ansXAxisArr,
+            yAxis: zyf_ansYAxisArr,
+            tooltip: {
+                trigger: "item",
+                backgroundColor: "rgba(15, 23, 42, 0.88)",
+                borderWidth: 0,
+                textStyle: { color: "#f8fafc", fontSize: 12 },
+                formatter: function (zyf_param) {
+                    if (zyf_param.seriesType !== "scatter") { return ""; }
+                    return zyf_param.seriesName + "<br/>x：" + zyf_param.value[0] + " ，y：" + zyf_param.value[1];
+                }
+            },
+            series: zyf_ansSeriesArr
+        };
+        zyf_anscombeChart.setOption(zyf_ansOption);
+
+        /* ============ 自适应尺寸 ============ */
+        var zyf_resizeTimer = null;
+        window.addEventListener("resize", function () {
+            clearTimeout(zyf_resizeTimer);
+            zyf_resizeTimer = setTimeout(function () {
+                zyf_roseChart.resize();
+                zyf_anscombeChart.resize();
+            }, 150);
+        });
+    </script>
+</body>
+</html>
